@@ -1,2 +1,3 @@
-# retdec-r2plugin
-Radare2 plugin for RetDec
+# RetDec Radare2 plugin
+
+RetDec plugin for Radare2.
