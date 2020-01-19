@@ -1,7 +1,0 @@
-#!/usr/bin/env python3
-
-from r2plugin import r2plugin
-
-
-if __name__ == "__main__":
-    r2plugin.main()
