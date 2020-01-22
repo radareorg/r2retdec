@@ -92,7 +92,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		run(deccmd);
 		return outgen.generateOutput(decpath.string());
 	}
-	catch (const DecompilationError err) {
+	catch (const DecompilationError &err) {
 		return nullptr;
 	}
 }
