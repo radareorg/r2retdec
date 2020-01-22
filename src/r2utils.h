@@ -16,7 +16,7 @@ public:
 
 private:
 	static std::map<const std::string, const std::string> _primitives;
-	static std::vector<const std::string> _type_keywords;
+	static std::vector<std::string> _type_keywords;
 };
 
 }
