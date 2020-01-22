@@ -24,7 +24,7 @@ std::map<const std::string, const std::string> CTypeConverter::_primitives {
 	{"double", "double"}
 };
 
-std::vector<const std::string> CTypeConverter::_type_keywords = {
+std::vector<std::string> CTypeConverter::_type_keywords = {
 	"const",
 	"struct",
 	"unsigned",

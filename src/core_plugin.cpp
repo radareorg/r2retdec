@@ -1,5 +1,7 @@
+#include <cstring>
 #include <filesystem>
 #include <iostream>
+#include <iterator>
 #include <mutex>
 
 #include <r_core.h>
