@@ -116,6 +116,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		return outgen.generateOutput(decpath.string());
 	}
 	catch (const DecompilationError &err) {
+		std::cerr << "retdec-r2plugin: " << err.what() << std::endl;
 		return nullptr;
 	}
 }
