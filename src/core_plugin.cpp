@@ -57,12 +57,35 @@ std::string fetchRetdecPath()
 	return rdpath;
 }
 
+fs::path getTmpDirPath()
+{
+	std::error_code err;
+	auto tmpDir = fs::temp_directory_path(err);
+
+	if (tmpDir.string() == "") {
+		// This is a fallback solution for situation when user does
+		// not have TMPDIR environment variable set. In this case the
+		// standard function `temp_directory_path` seems to not
+		// be able to find the /tmp directory and thus return
+		// empty string with error code. This was reported
+		// to happen only on linux systems with standard /tmp
+		// directory and only when this method is called from r2 console.
+		tmpDir = fs::path("/tmp");
+		if (!is_directory(tmpDir, err)) {
+			throw DecompilationError("cannot find a temporary directory. Please specify a temporary directory by setting $TMPDIR properly.");
+		}
+	}
+
+	return tmpDir;
+}
+
 RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 {
 	try {
 		R2CGenerator outgen;
+		auto tmpDir = getTmpDirPath();
 		auto config = retdec::config::Config::empty(
-				(fs::temp_directory_path()/"rd_config.json").string());
+				(tmpDir/"rd_config.json").string());
 
 		auto rdpath = fetchRetdecPath();
 
@@ -72,8 +95,8 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 
 		auto fnc = binInfo.fetchCurrentFunction();
 		
-		auto decpath = fs::temp_directory_path()/"rd_dec.json";
-		auto outpath = fs::temp_directory_path()/"rd_out.log";
+		auto decpath = tmpDir/"rd_dec.json";
+		auto outpath = tmpDir/"rd_out.log";
 
 		std::ostringstream decrange;
 		decrange << fnc.getStartLine() << "-" << fnc.getEndLine();
