@@ -49,13 +49,20 @@ if (R2PLUGIN_DOC)
 endif()
 
 set(RADARE2_INSTALL_PLUGDIR "share/radare2/plugins" CACHE PATH "Directory to install radare2 plugin into")
+set(CUTTER_INSTALL_PLUGDIR "share/RadareOrg/Cutter/plugins/native" CACHE PATH "Directory to install Cutter plugin into")
 
+set(CUTTER_SOURCE_DIR CUTTER_SOURCE_DIR-NOTFOUND CACHE STRING "Root directory of Cutter source")
+
+option(BUILD_CUTTER_PLUGIN "Build r2ghidra plugin for Cutter" OFF)
 option(BUILD_BUNDLED_RETDEC "Build retdec with the r2retdec plugin" ON)
 set(RETDEC_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE STRING "RetDec installation prefix (if bundled RetDec build is OFF r2plugin will search this directory implicitly in order to find a RetDec installation)")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(Radare2 REQUIRED)
+if(BUILD_CUTTER_PLUGIN)
+	add_subdirectory(cutter-plugin)
+endif()
 
 add_subdirectory(deps)
 add_subdirectory(src)

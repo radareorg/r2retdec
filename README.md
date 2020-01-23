@@ -65,6 +65,8 @@ You can pass the following additional parameters to `cmake`:
 * `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. The build of the bundled RetDec is by default turned on.
 * `-DRETDEC_INSTALL_PREFIX=<path>` to specify the path where the bundled RetDec version will be installed or to specify the path of an existing RetDec installation (default is the value of `CMAKE_INSTALL_PREFIX`).
 * `-DR2PLUGIN_DOC=OFF` optional parameter to build Doxygen documentation.
+* `-DBUILD_CUTTER_PLUGIN=OFF` setting to ON will try to build Cutter plugin. This option may, however, require setting `CUTTER_SOURCE_DIR`. The Cutter must be built with support for plugin loading, see [Cutter documentation](https://cutter.re/docs/plugins.html).
+* `-DCUTTER_SOURCE_DIR` path to the `${CUTTER_REPO_ROOT}/src` used to compile Cutter plugin.
 
 ## License
 
