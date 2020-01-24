@@ -14,4 +14,6 @@ set_target_properties(core_retdec PROPERTIES
 		OUTPUT_NAME core_retdec
 		PREFIX "")
 
+target_compile_definitions(core_retdec PRIVATE "-DRETDEC_CUSTOM_INSTALL=\"${RETDEC_CUSTOM_INSTALL}\"")
+
 install(TARGETS core_retdec DESTINATION "${RADARE2_INSTALL_PLUGDIR}")
