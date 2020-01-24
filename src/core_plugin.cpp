@@ -44,17 +44,31 @@ void run(const std::vector<std::string> cmd)
 	system(finalcmd.str().c_str());
 }
 
-std::string fetchRetdecPath()
+fs::path fetchRetdecPath()
 {
-	auto rdpRaw = getenv("RETDEC_PATH");
-	std::string rdpath(rdpRaw != nullptr ? rdpRaw : "");
+	// If user specified environment variable then use it primarily.
+	auto userCustomRaw = getenv("RETDEC_PATH");
+	std::string userCustom(userCustomRaw != nullptr ? userCustomRaw : "");
 	
-	if (rdpath == "") {
-		// TODO: default path to look at
-		throw DecompilationError("missing path to RetDec decompilation script");
+	if (userCustom != "") {
+		fs::path userCustomPath(userCustom);
+		if (!fs::exists(userCustomPath))
+			throw DecompilationError("invalid $RETDEC_PATH set: "+userCustom);
+
+		return userCustomPath;
 	}
 
-	return rdpath;
+#if defined(RETDEC_INSTALL_PREFIX)
+	// If user wanted to install bundled RetDec with retdec-r2plugin.
+	auto rddef = fs::path(RETDEC_INSTALL_PREFIX)/"bin"/"retdec-decompiler.py";
+#elif defined(RETDEC_CUSTOM_INSTALL)
+	// If user specified path to his own installation of RetDec during compilation.
+	auto rddef = fs::path(RETDEC_CUSTOM_INSTALL)/"retdec-decompiler.py";
+	if (fs::exists(rddef))
+		return rddef;
+#endif
+
+	throw DecompilationError("cannot detect RetDec decompiler script. Please set $RETDEC_PATH to the path of the retdec-decompiler.py script.");
 }
 
 fs::path getTmpDirPath()
@@ -102,7 +116,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		decrange << fnc.getStartLine() << "-" << fnc.getEndLine();
 
 		std::vector<std::string> deccmd {
-			rdpath,
+			rdpath.string(),
 			binName,
 			"--cleanup",
 			"--config", config.getConfigFileName(),
