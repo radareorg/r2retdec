@@ -75,12 +75,16 @@ set(RETDEC_CONFIG_SOURCES
 	${source_dir}/src/config/config.cpp
 	${source_dir}/src/config/parameters.cpp
 )
+set(WHEREAMI_SOURCES
+	${source_dir}/deps/whereami/whereami.c
+)
 
 add_custom_command(OUTPUT
 	${RETDEC_SERDES_SOURCES}
 	${RETDEC_COMMON_SOURCES}
 	${RETDEC_UTILS_SOURCES}
 	${RETDEC_CONFIG_SOURCES}
+	${WHEREAMI_SOURCES}
 	DEPENDS retdec-project
 )
 
@@ -90,8 +94,14 @@ add_library(retdec
 	${RETDEC_COMMON_SOURCES}
 	${RETDEC_UTILS_SOURCES}
 	${RETDEC_CONFIG_SOURCES}
+	${WHEREAMI_SOURCES}
 )
 
 add_dependencies(retdec retdec-project)
-target_include_directories(retdec PUBLIC ${source_dir}/include ${source_dir}/src)
-target_link_libraries(retdec jsoncpp whereami)
+target_include_directories(retdec PUBLIC
+	${source_dir}/include
+	${source_dir}/src
+	${source_dir}/deps
+	${source_dir}/deps/whereami
+)
+target_link_libraries(retdec jsoncpp)
