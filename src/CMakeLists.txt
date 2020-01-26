@@ -1,15 +1,18 @@
 # RetDec r2plugin sources.
-set(
-	SOURCE
+set(SOURCES
 	core_plugin.cpp
 	r2info.cpp
 	r2utils.cpp
 	r2cgen.cpp
 )
 
-add_library(core_retdec SHARED ${SOURCE})
+set(ANNOTATION_SOURCES
+	AnnotatedCode.c
+)
 
-target_link_libraries(core_retdec Radare2::libr retdec jsoncpp r2annotations)
+add_library(core_retdec SHARED ${SOURCES} ${ANNOTATION_SOURCES})
+
+target_link_libraries(core_retdec Radare2::libr retdec jsoncpp)
 set_target_properties(core_retdec PROPERTIES
 		OUTPUT_NAME core_retdec
 		PREFIX "")
