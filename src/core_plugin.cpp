@@ -27,6 +27,7 @@ static void printHelp(const RCore &core)
 		CMD_PREFIX, "*", "# Decompiled code is returned to r2 as comment.",
 		"Environment:", "", "",
 		"%RETDEC_PATH" , "", "# Path to the RetDec decompiler script.",
+		"%DEC_SAVE_DIR", "", "# Directory to save decompilation into.",
 		NULL
 	};
 
@@ -63,9 +64,21 @@ fs::path fetchRetdecPath()
 	throw DecompilationError("cannot detect RetDec decompiler script. Please set $RETDEC_PATH to the path of the retdec-decompiler.py script.");
 }
 
-fs::path getTmpDirPath()
+fs::path getOutDirPath()
 {
 	std::error_code err;
+
+	auto outDirRaw = getenv("DEC_OUT_DIR");
+	std::string outDir(outDirRaw != nullptr ? outDirRaw : "");
+	if (outDir != "") {
+		auto outDirPath = fs::path(outDir);
+		if (!is_directory(outDirPath, err)) {
+			throw DecompilationError("invald $DEC_OUT_DIR: not a directory: "+outDir);
+		}
+
+		return outDirPath;
+	}
+
 	auto tmpDir = fs::temp_directory_path(err);
 
 	if (tmpDir.string() == "") {
@@ -78,7 +91,7 @@ fs::path getTmpDirPath()
 		// directory and only when this method is called from r2 console.
 		tmpDir = fs::path("/tmp");
 		if (!is_directory(tmpDir, err)) {
-			throw DecompilationError("cannot find a temporary directory. Please specify a temporary directory by setting $TMPDIR properly.");
+			throw DecompilationError("cannot find a temporary directory on the system. Please specify a temporary directory by setting $TMPDIR, or $DEC_OUT_DIR.");
 		}
 	}
 
@@ -89,9 +102,9 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 {
 	try {
 		R2CGenerator outgen;
-		auto tmpDir = getTmpDirPath();
+		auto outDir = getOutDirPath();
 		auto config = retdec::config::Config::empty(
-				(tmpDir/"rd_config.json").string());
+				(outDir/"rd_config.json").string());
 
 		auto rdpath = fetchRetdecPath();
 
@@ -101,8 +114,8 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 
 		auto fnc = binInfo.fetchCurrentFunction();
 		
-		auto decpath = tmpDir/"rd_dec.json";
-		auto outpath = tmpDir/"rd_out.log";
+		auto decpath = outDir/"rd_dec.json";
+		auto outpath = outDir/"rd_out.log";
 
 		std::ostringstream decrange;
 		decrange << fnc.getStartLine() << "-" << fnc.getEndLine();
