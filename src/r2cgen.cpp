@@ -7,8 +7,13 @@
 using namespace retdec::r2plugin;
 
 std::map<const std::string, RSyntaxHighlightType> R2CGenerator::_hig2token = {
+	// {"nl", ... }
+	// {"ws", ... }
+	// {"punc", ... }
+	// {"op", ... }
 	{"i_var", R_SYNTAX_HIGHLIGHT_TYPE_GLOBAL_VARIABLE},
-	{"i_var", R_SYNTAX_HIGHLIGHT_TYPE_LOCAL_VARIABLE},
+	// {"i_var", R_SYNTAX_HIGHLIGHT_TYPE_LOCAL_VARIABLE},
+	// {"i_mem", R_SYNTAX_HIGHLIGHT_TYPE_DATATYPE},
 	{"i_lab", R_SYNTAX_HIGHLIGHT_TYPE_KEYWORD},
 	{"i_fnc", R_SYNTAX_HIGHLIGHT_TYPE_FUNCTION_NAME},
 	{"i_arg", R_SYNTAX_HIGHLIGHT_TYPE_FUNCTION_PARAMETER},
@@ -16,7 +21,13 @@ std::map<const std::string, RSyntaxHighlightType> R2CGenerator::_hig2token = {
 	{"type" , R_SYNTAX_HIGHLIGHT_TYPE_DATATYPE},
 	{"preproc" , R_SYNTAX_HIGHLIGHT_TYPE_KEYWORD},
 	{"inc", R_SYNTAX_HIGHLIGHT_TYPE_COMMENT},
-	{"cmnt" , R_SYNTAX_HIGHLIGHT_TYPE_COMMENT},
+	{"l_bool", R_SYNTAX_HIGHLIGHT_TYPE_CONSTANT_VARIABLE},
+	{"l_int", R_SYNTAX_HIGHLIGHT_TYPE_CONSTANT_VARIABLE},
+	{"l_fp", R_SYNTAX_HIGHLIGHT_TYPE_CONSTANT_VARIABLE},
+	{"l_str", R_SYNTAX_HIGHLIGHT_TYPE_CONSTANT_VARIABLE},
+	{"l_sym", R_SYNTAX_HIGHLIGHT_TYPE_CONSTANT_VARIABLE},
+	{"l_ptr", R_SYNTAX_HIGHLIGHT_TYPE_CONSTANT_VARIABLE},
+	{"cmnt" , R_SYNTAX_HIGHLIGHT_TYPE_COMMENT}
 };
 
 std::optional<RSyntaxHighlightType> R2CGenerator::highlightTypeForToken(const std::string &token) const
