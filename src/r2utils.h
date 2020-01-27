@@ -21,6 +21,8 @@ public:
 			const std::string &type,
 			char delim = ' ') const;
 
+	std::string stripName(const std::string &name) const;
+
 protected:
 	const std::string getTypeDefinition(const std::string &token) const;
 

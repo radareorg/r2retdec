@@ -72,8 +72,11 @@ Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
 	auto start = r_anal_function_min_addr(&r2fnc);
 	auto end = r_anal_function_max_addr(&r2fnc);
 
-	Function function(start, end, r2fnc.name);
-	function.setRealName(r2fnc.name);
+	FormatUtils fu;
+
+	auto name = fu.stripName(r2fnc.name);
+
+	Function function(start, end, name);
 	function.setStartLine(start);
 	function.setEndLine(end);
 

@@ -58,6 +58,22 @@ std::vector<std::string> FormatUtils::splitTokens(const std::string &type, char 
 	return tokensResult;
 }
 
+std::string FormatUtils::stripName(const std::string &name) const
+{
+	static const std::vector r2Prefix = {"sym.", "fnc.", "imp."};
+
+	std::string_view v = name;
+	for (auto px: r2Prefix) {
+		if (v.length() <= std::strlen(px))
+			continue;
+
+		if (v.compare(0, std::strlen(px), px) == 0)
+			v.remove_prefix(std::strlen(px));
+	}
+
+	return std::string(v);
+}
+
 const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 {
 	static const std::vector<char> structInternals = {'{', ',', '}'}; 
