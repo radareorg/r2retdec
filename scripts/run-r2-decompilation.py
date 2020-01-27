@@ -116,7 +116,7 @@ def main():
         if args.selected_addr:
             r2.cmd('s ' + args.selected_addr)
 
-        out = r2.cmd('#!pipe r2retdec')
+        out = r2.cmd('pdz')
 
         r2.quit()
 
