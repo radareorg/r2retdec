@@ -35,13 +35,8 @@ static void printHelp(const RCore &core)
 
 void run(const std::vector<std::string> cmd)
 {
-	const char* const delim = " ";
-
-	std::ostringstream finalcmd;
-	std::copy(cmd.begin(), cmd.end(),
-		   std::ostream_iterator<std::string>(finalcmd, delim));
-
-	system(finalcmd.str().c_str());
+	FormatUtils fu;
+	system(fu.joinTokens(cmd).c_str());
 }
 
 fs::path fetchRetdecPath()
