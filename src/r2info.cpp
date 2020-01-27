@@ -88,7 +88,7 @@ Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
 
 void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunction &r2fnc) const
 {
-	CTypeConverter tcv;
+	FormatUtils fu;
 
 	auto list = r_anal_var_all_list(_r2core.anal, &r2fnc);
 	ObjectSetContainer locals;
@@ -113,7 +113,7 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 		};
 
 		Object var(locvar->name, variableStorage);
-		var.type = Type(tcv.convert(locvar->type));
+		var.type = Type(fu.convertTypeToLlvm(locvar->type));
 
 		if (locvar->isarg) 
 			args.push_back(var);
@@ -139,10 +139,10 @@ void R2InfoProvider::fetchFunctionCallingconvention(Function &function, RAnalFun
 
 void R2InfoProvider::fetchFunctionReturnType(Function &function, RAnalFunction &r2fnc) const
 {
-	CTypeConverter tcv;
+	FormatUtils fu;
 
 	if (auto returnType = r_type_func_ret(_r2core.anal->sdb_types, r2fnc.name)) {
-		function.returnType = Type(tcv.convert(returnType));
+		function.returnType = Type(fu.convertTypeToLlvm(returnType));
 		return;
 	}
 

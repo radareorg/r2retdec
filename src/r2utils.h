@@ -10,13 +10,23 @@
 namespace retdec {
 namespace r2plugin {
 
-class CTypeConverter {
+class FormatUtils {
 public:
-	const std::string convert(const std::string &ctype) const;
+	const std::string convertTypeToLlvm(const std::string &ctype) const;
+
+	const std::string joinTokens(
+			const std::vector<std::string> &tokens,
+			char delim = ' ') const;
+	std::vector<std::string> splitTokens(
+			const std::string &type,
+			char delim = ' ') const;
+
+protected:
+	const std::string getTypeDefinition(const std::string &token) const;
 
 private:
 	static std::map<const std::string, const std::string> _primitives;
-	static std::vector<std::string> _type_keywords;
+	static std::vector<std::string> _typeKeywords;
 };
 
 }
