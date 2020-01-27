@@ -1,20 +1,35 @@
 include(ExternalProject)
 
-ExternalProject_Add(retdec-project
-	URL https://github.com/avast/retdec/archive/b0240726975a6b1b58c41f0bdeef64686374bfe0.zip
-	URL_HASH SHA256=2c84409b56810378d83721655be1f913d72fd151963573dccdb5c4f04d5229d4
-	# Disable the configure step.
-        CONFIGURE_COMMAND ""	
-	# Disable the update step.
-	UPDATE_COMMAND ""
-	# Disable the build step.
-	BUILD_COMMAND ""
-	# Disable the install step.
-	INSTALL_COMMAND ""
-	LOG_DOWNLOAD ON
-	LOG_CONFIGURE ON
-	LOG_BUILD ON
-)
+if (BUILD_BUNDLED_RETDEC)
+	ExternalProject_Add(retdec-project
+		URL https://github.com/avast/retdec/archive/b0240726975a6b1b58c41f0bdeef64686374bfe0.zip
+		URL_HASH SHA256=2c84409b56810378d83721655be1f913d72fd151963573dccdb5c4f04d5229d4
+		CMAKE_ARGS
+			-DCMAKE_BUILD_TYPE=Release
+			-DCMAKE_INSTALL_PREFIX=${RETDEC_INSTALL_PREFIX}
+		# Disable the update step.
+		UPDATE_COMMAND ""
+		LOG_DOWNLOAD ON
+		LOG_CONFIGURE ON
+		LOG_BUILD OFF
+	)
+else ()
+	ExternalProject_Add(retdec-project
+		URL https://github.com/avast/retdec/archive/b0240726975a6b1b58c41f0bdeef64686374bfe0.zip
+		URL_HASH SHA256=2c84409b56810378d83721655be1f913d72fd151963573dccdb5c4f04d5229d4
+		# Disable the configure step.
+		CONFIGURE_COMMAND ""	
+		# Disable the update step.
+		UPDATE_COMMAND ""
+		# Disable the build step.
+		BUILD_COMMAND ""
+		# Disable the install step.
+		INSTALL_COMMAND ""
+		LOG_DOWNLOAD ON
+		LOG_CONFIGURE ON
+		LOG_BUILD ON
+	)
+endif ()
 
 # Set include directories.
 ExternalProject_Get_Property(retdec-project source_dir)

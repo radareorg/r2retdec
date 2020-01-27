@@ -56,9 +56,6 @@ fs::path fetchRetdecPath()
 #if defined(RETDEC_INSTALL_PREFIX)
 	// If user wanted to install bundled RetDec with retdec-r2plugin.
 	auto rddef = fs::path(RETDEC_INSTALL_PREFIX)/"bin"/"retdec-decompiler.py";
-#elif defined(RETDEC_CUSTOM_INSTALL)
-	// If user specified path to his own installation of RetDec during compilation.
-	auto rddef = fs::path(RETDEC_CUSTOM_INSTALL)/"retdec-decompiler.py";
 	if (fs::exists(rddef))
 		return rddef;
 #endif

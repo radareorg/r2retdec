@@ -45,10 +45,12 @@ endif()
 
 set(RADARE2_INSTALL_PLUGDIR "share/radare2/plugins" CACHE PATH "Directory to install radare2 plugin into")
 
+option(BUILD_BUNDLED_RETDEC "Build retdec with the r2retdec plugin" ON)
+set(RETDEC_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE STRING "RetDec installation prefix (if bundled RetDec build is OFF r2plugin will search this directory implicitly in order to find a RetDec installation)")
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(Radare2 REQUIRED)
 
 add_subdirectory(deps)
-# TODO: add_subdirectory(scripts)
 add_subdirectory(src)
