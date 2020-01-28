@@ -88,6 +88,8 @@ def main():
         if args.project_path and os.path.dirname(args.project_path) != args.output_dir:
             shutil.copy(args.project_path, args.output_dir)
 
+        os.environ['DEC_SAVE_DIR'] = args.output_dir
+
         r2 = r2pipe.open(args.file)
 
         if args.project_path:
