@@ -34,6 +34,7 @@ public:
 
 protected:
 	common::Function convertFunctionObject(RAnalFunction &fnc) const;
+	void fetchExtraArgsData(common::ObjectSequentialContainer &args, RAnalFunction &r2fnc) const;
 
 private:
 	RCore &_r2core;
