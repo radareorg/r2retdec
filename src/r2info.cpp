@@ -80,9 +80,9 @@ Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
 	function.setStartLine(start);
 	function.setEndLine(end);
 
-	fetchFunctionLocalsAndArgs(function, r2fnc);
-	fetchFunctionCallingconvention(function, r2fnc);
 	fetchFunctionReturnType(function, r2fnc);
+	fetchFunctionCallingconvention(function, r2fnc);
+	fetchFunctionLocalsAndArgs(function, r2fnc);
 
 	// TODO: set variadic
 
@@ -109,7 +109,7 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 		break;
 		case R_ANAL_VAR_KIND_SPV:
 		case R_ANAL_VAR_KIND_BPV: {
-			auto stackOffset = locvar->delta;
+			int stackOffset = locvar->delta;
 			// Execute extra pop to match RetDec offset base.
 			// extra POP x86: 8 -> 4 (x64: 8 -> 0)
 			stackOffset -= fetchWordSize()/8;
@@ -178,11 +178,14 @@ void R2InfoProvider::fetchFunctionReturnType(Function &function, RAnalFunction &
 {
 	FormatUtils fu;
 
-	if (auto returnType = r_type_func_ret(_r2core.anal->sdb_types, r2fnc.name)) {
+	char* key = resolve_fcn_name(_r2core.anal, r2fnc.name);
+	if (auto returnType = r_type_func_ret(_r2core.anal->sdb_types, key)) {
 		function.returnType = Type(fu.convertTypeToLlvm(returnType));
+		free(key);
 		return;
 	}
 
+	free(key);
 	function.returnType = Type("void");
 }
 
