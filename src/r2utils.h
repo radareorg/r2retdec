@@ -16,7 +16,7 @@ public:
 
 	const std::string joinTokens(
 			const std::vector<std::string> &tokens,
-			char delim = ' ') const;
+			const std::string &delim = " ") const;
 	std::vector<std::string> splitTokens(
 			const std::string &type,
 			char delim = ' ') const;

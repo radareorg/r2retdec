@@ -35,14 +35,17 @@ const std::vector<std::string> FormatUtils::_typeKeywords = {
 	"signed"
 };
 
-const std::string FormatUtils::joinTokens(const std::vector<std::string> &tokens, char delim) const
+const std::string FormatUtils::joinTokens(const std::vector<std::string> &tokens, const std::string &delim) const
 {
-	char delimStr[] = {delim ,0};
-	std::ostringstream finalstr;
-	std::copy(tokens.begin(), tokens.end(),
-		   std::ostream_iterator<std::string>(finalstr, delimStr));
+	if (tokens.empty()) {
+		return "";
+	}
 
-	return finalstr.str();
+	std::ostringstream finalstr;
+	std::copy(tokens.begin(), tokens.end()-1,
+		   std::ostream_iterator<std::string>(finalstr, delim.c_str()));
+
+	return finalstr.str()+tokens.back();
 }
 
 std::vector<std::string> FormatUtils::splitTokens(const std::string &type, char delim) const
