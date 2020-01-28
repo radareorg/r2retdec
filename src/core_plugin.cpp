@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstring>
 #include <filesystem>
 #include <iostream>
@@ -6,6 +7,7 @@
 
 #include <r_core.h>
 #include <retdec/config/config.h>
+#include <sstream>
 
 #include "AnnotatedCode.h"
 #include "r2cgen.h"
@@ -34,24 +36,37 @@ static void printHelp(const RCore &core)
 	r_cons_cmd_help(help, core.print->flags & R_PRINT_FLAGS_COLOR);
 }
 
+std::string formatPathForCommand(const std::string &path)
+{
+	std::ostringstream str;
+	for (char c: path) {
+		if (c == '"')
+			str << "\\\"";
+		else
+			str << c;
+	}
+
+	return "\""+str.str()+"\"";
+}
+
 std::string prepareParams(const std::vector<std::string> &params)
 {
 	FormatUtils fu;
-	auto preparedParams = fu.joinTokens(params, "\" \"");
+	auto preparedParams = fu.joinTokens(params, " ");
 
-	return "\""+preparedParams+"\"";
+	return preparedParams;
 }
 
 std::string preapreCommand(const std::string &cmd)
 {
-	return "\""+cmd+"\"";
+	return cmd;
 }
 
 void run(const std::string& cmd, const std::vector<std::string> &params, const std::string &redirect)
 {
 	auto systemCMD = preapreCommand(cmd)
 				+" "+prepareParams(params)
-				+" > "+"\""+redirect+"\"";
+				+" > "+redirect;
 
 	system(systemCMD.c_str());
 }
@@ -139,13 +154,14 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		std::vector<std::string> decparams {
 			binName,
 			"--cleanup",
-			"--config", config.getConfigFileName(),
+			"--config", formatPathForCommand(config.getConfigFileName()),
 			"-f", "json-human",
 			"--select-ranges", decrange.str(),
-			"-o", decpath.string()
+			"-o", formatPathForCommand(decpath.string())
+
 		};
 
-		run(rdpath.string(), decparams, outpath.string());
+		run(formatPathForCommand(rdpath), decparams, formatPathForCommand(outpath.string()));
 		return outgen.generateOutput(decpath.string());
 	}
 	catch (const DecompilationError &err) {
