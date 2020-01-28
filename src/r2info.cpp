@@ -152,3 +152,7 @@ void R2InfoProvider::fetchFunctionReturnType(Function &function, RAnalFunction &
 	function.returnType = Type("void");
 }
 
+size_t R2InfoProvider::fetchWordSize() const
+{
+	return r_config_get_i(_r2core.config, "asm.bits");
+}

@@ -30,6 +30,7 @@ public:
 	void fetchFunctionLocalsAndArgs(common::Function &function, RAnalFunction &r2fnc) const;
 	void fetchFunctionCallingconvention(common::Function &function, RAnalFunction &r2fnc) const;
 	void fetchFunctionReturnType(common::Function &function, RAnalFunction &r2fnc) const;
+	size_t fetchWordSize() const;
 
 protected:
 	common::Function convertFunctionObject(RAnalFunction &fnc) const;
