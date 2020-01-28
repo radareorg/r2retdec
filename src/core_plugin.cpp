@@ -68,12 +68,12 @@ fs::path getOutDirPath()
 {
 	std::error_code err;
 
-	auto outDirRaw = getenv("DEC_OUT_DIR");
+	auto outDirRaw = getenv("DEC_SAVE_DIR");
 	std::string outDir(outDirRaw != nullptr ? outDirRaw : "");
 	if (outDir != "") {
 		auto outDirPath = fs::path(outDir);
 		if (!is_directory(outDirPath, err)) {
-			throw DecompilationError("invald $DEC_OUT_DIR: not a directory: "+outDir);
+			throw DecompilationError("invald $DEC_SAVE_DIR: not a directory: "+outDir);
 		}
 
 		return outDirPath;
