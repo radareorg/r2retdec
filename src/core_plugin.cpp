@@ -34,10 +34,26 @@ static void printHelp(const RCore &core)
 	r_cons_cmd_help(help, core.print->flags & R_PRINT_FLAGS_COLOR);
 }
 
-void run(const std::vector<std::string> cmd)
+std::string prepareParams(const std::vector<std::string> &params)
 {
 	FormatUtils fu;
-	system(fu.joinTokens(cmd).c_str());
+	auto preparedParams = fu.joinTokens(params, "\" \"");
+
+	return "\""+preparedParams+"\"";
+}
+
+std::string preapreCommand(const std::string &cmd)
+{
+	return "\""+cmd+"\"";
+}
+
+void run(const std::string& cmd, const std::vector<std::string> &params, const std::string &redirect)
+{
+	auto systemCMD = preapreCommand(cmd)
+				+" "+prepareParams(params)
+				+" > "+"\""+redirect+"\"";
+
+	system(systemCMD.c_str());
 }
 
 fs::path fetchRetdecPath()
@@ -120,18 +136,16 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		std::ostringstream decrange;
 		decrange << fnc.getStartLine() << "-" << fnc.getEndLine();
 
-		std::vector<std::string> deccmd {
-			rdpath.string(),
+		std::vector<std::string> decparams {
 			binName,
 			"--cleanup",
 			"--config", config.getConfigFileName(),
 			"-f", "json-human",
 			"--select-ranges", decrange.str(),
-			"-o", decpath.string(),
-			">", outpath.string()
+			"-o", decpath.string()
 		};
 
-		run(deccmd);
+		run(rdpath.string(), decparams, outpath.string());
 		return outgen.generateOutput(decpath.string());
 	}
 	catch (const DecompilationError &err) {
