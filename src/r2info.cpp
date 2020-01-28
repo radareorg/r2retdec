@@ -95,7 +95,7 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 
 	auto list = r_anal_var_all_list(_r2core.anal, &r2fnc);
 	ObjectSetContainer locals;
-	ObjectSequentialContainer args;
+	ObjectSequentialContainer r2args, r2userArgs;
 	for (RListIter *it = list->head; it; it = it->n) {
 		auto locvar = reinterpret_cast<RAnalVar*>(it->data);
 		if (locvar == nullptr)
@@ -124,20 +124,16 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 		var.type = Type(fu.convertTypeToLlvm(locvar->type));
 		var.setRealName(locvar->name);
 
-		if (locvar->isarg) {
-			// TODO: in future, if RetDec will support specification of 
-			// custom storage of the args by user, this will be the place
-			// where the storage will be stored.
-			continue;
-		}
-		else {
-			locals.insert(var);
-		}
+		if (locvar->isarg)
+			r2args.push_back(var);
+
+		locals.insert(var);
 	}
 
+	fetchExtraArgsData(r2userArgs, r2fnc);
+
 	function.locals = locals;
-	fetchExtraArgsData(args, r2fnc);
-	function.parameters = args;
+	function.parameters = r2userArgs.empty() ? r2args : r2userArgs;
 }
 
 void R2InfoProvider::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFunction &r2fnc) const
