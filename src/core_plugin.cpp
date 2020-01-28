@@ -156,6 +156,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 			"--cleanup",
 			"--config", formatPathForCommand(config.getConfigFileName()),
 			"-f", "json-human",
+			"--select-decode-only",
 			"--select-ranges", decrange.str(),
 			"-o", formatPathForCommand(decpath.string())
 
