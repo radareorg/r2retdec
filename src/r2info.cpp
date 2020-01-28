@@ -122,15 +122,44 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 
 		Object var(locvar->name, variableStorage);
 		var.type = Type(fu.convertTypeToLlvm(locvar->type));
+		var.setRealName(locvar->name);
 
-		if (locvar->isarg) 
-			args.push_back(var);
-		else
+		if (locvar->isarg) {
+			// TODO: in future, if RetDec will support specification of 
+			// custom storage of the args by user, this will be the place
+			// where the storage will be stored.
+			continue;
+		}
+		else {
 			locals.insert(var);
+		}
 	}
 
 	function.locals = locals;
+	fetchExtraArgsData(args, r2fnc);
 	function.parameters = args;
+}
+
+void R2InfoProvider::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFunction &r2fnc) const
+{
+	FormatUtils fu;
+	RAnalFuncArg *arg;
+
+	char* key = resolve_fcn_name(_r2core.anal, r2fnc.name);
+	int nargs = r_type_func_args_count (_r2core.anal->sdb_types, key);
+	if (nargs) {
+		RList *list = r_core_get_func_args(&_r2core, r2fnc.name);
+		for (RListIter *it = list->head; it; it = it->n) {
+			arg = reinterpret_cast<RAnalFuncArg*>(it->data);
+			Object var(arg->name, Storage::undefined());
+			var.setRealName(arg->name);
+			var.type = Type(fu.convertTypeToLlvm(arg->orig_c_type));
+			args.push_back(var);
+		}
+		r_list_free (list);
+	}
+
+	free(key);
 }
 
 void R2InfoProvider::fetchFunctionCallingconvention(Function &function, RAnalFunction &r2fnc) const
