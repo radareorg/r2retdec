@@ -63,7 +63,7 @@ std::vector<std::string> FormatUtils::splitTokens(const std::string &type, char 
 
 std::string FormatUtils::stripName(const std::string &name) const
 {
-	static const std::vector r2Prefix = {"sym.", "fnc.", "imp."};
+	static const std::vector r2Prefix = {"sym.", "fcn.", "imp."};
 
 	std::string_view v = name;
 	for (auto px: r2Prefix) {
