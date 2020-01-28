@@ -103,14 +103,19 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 
 		Storage variableStorage;
 		switch (locvar->kind) {
-		case R_ANAL_VAR_KIND_REG:
+		case R_ANAL_VAR_KIND_REG: {
 			variableStorage = Storage::inRegister(locvar->regname);
-			break;
+		}
+		break;
 		case R_ANAL_VAR_KIND_SPV:
-		case R_ANAL_VAR_KIND_BPV:
-			variableStorage = Storage::onStack(locvar->delta);
-			//TODO: it is possible, that we must do an extre POP x86: 8 -> 4 (x64: 8 -> 0)
-			break;
+		case R_ANAL_VAR_KIND_BPV: {
+			auto stackOffset = locvar->delta;
+			// Execute extra pop to match RetDec offset base.
+			// extra POP x86: 8 -> 4 (x64: 8 -> 0)
+			stackOffset -= fetchWordSize()/8;
+			variableStorage = Storage::onStack(stackOffset);
+		}
+		break;
 		default:
 			continue;
 		};
