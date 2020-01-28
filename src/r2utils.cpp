@@ -6,7 +6,7 @@
 
 using namespace retdec::r2plugin;
 
-std::map<const std::string, const std::string> FormatUtils::_primitives {
+const std::map<const std::string, const std::string> FormatUtils::_primitives {
 	{"void", "void"},
 	{"char", "i8"},
 	{"short", "i16"},
@@ -28,7 +28,7 @@ std::map<const std::string, const std::string> FormatUtils::_primitives {
 	{"double", "double"}
 };
 
-std::vector<std::string> FormatUtils::_typeKeywords = {
+const std::vector<std::string> FormatUtils::_typeKeywords = {
 	"const",
 	"struct",
 	"unsigned",
@@ -78,8 +78,9 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 {
 	static const std::vector<char> structInternals = {'{', ',', '}'}; 
 
-	if (_primitives.count(ctype))
-		return _primitives[ctype];
+	if (_primitives.count(ctype)) {
+		return _primitives.at(ctype);
+	}
 
         // struct a {unsigned char*, unsigned char**}
         //    -> [struct, unsigned, char, *, unsigned, char, **]

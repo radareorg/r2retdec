@@ -27,8 +27,8 @@ protected:
 	const std::string getTypeDefinition(const std::string &token) const;
 
 private:
-	static std::map<const std::string, const std::string> _primitives;
-	static std::vector<std::string> _typeKeywords;
+	static const std::map<const std::string, const std::string> _primitives;
+	static const std::vector<std::string> _typeKeywords;
 };
 
 }
