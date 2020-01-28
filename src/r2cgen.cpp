@@ -57,7 +57,11 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const Json::Value &root) const
 				lastAddr.reset();
 			}
 			else {
-				lastAddr = std::stoi(addrRaw, nullptr, 16);
+				try {
+					lastAddr = std::stol(addrRaw, nullptr, 16);
+				} catch (std::exception &e) {
+					throw DecompilationError("invalid address: "+addrRaw);
+				}
 			}
 			continue;
 		}
