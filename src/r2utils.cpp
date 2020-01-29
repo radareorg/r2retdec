@@ -55,7 +55,7 @@ std::vector<std::string> FormatUtils::splitTokens(const std::string &type, char 
 	std::string token;
 
 	while (getline(iss, token, delim)) {
-		    tokensResult.push_back(token);
+		tokensResult.push_back(token);
 	}
 
 	return tokensResult;
@@ -99,12 +99,12 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 		typeTokens.erase(typeTokens.begin());
 		if (std::find(_typeKeywords.begin(),
 				_typeKeywords.end(),
-				ctype) != _typeKeywords.end()) {
+				token) != _typeKeywords.end()) {
 			token = typeTokens.front();
 			typeTokens.erase(typeTokens.begin());
 		}
 
-		if (token.size() == 1 && std::find(
+		if (token.length() == 1 && std::find(
 					structInternals.begin(),
 					structInternals.end(),
 					token[0]) != structInternals.end()) {
@@ -112,8 +112,18 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 			continue;
 		}
 
-		if (_primitives.count(ctype)) {
+		if (_primitives.count(token)) {
 			converted.push_back(_primitives.at(token));
+			continue;
+		}
+
+		std::smatch cm;
+		if (std::regex_match(token, cm, std::regex("([^\\*]+)(\\*+)}"))) {
+			if (cm.size() != 2) {
+				throw DecompilationError("illegal state");
+			}
+			converted.push_back(cm[0]);
+			converted.push_back(cm[1]);
 			continue;
 		}
 
@@ -124,14 +134,12 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 	
 		// TODO: this method might return definition of arrays in future.
 
-		std::vector<std::string> save(typeTokens);
 		auto typeDefinition = getTypeDefinition(token);
-		if (typeDefinition != "") {
+		if (typeDefinition == "") {
 			// TODO: throw?
 			return "void";
 		}
 
-		std::smatch cm;
 		if (std::regex_match(typeDefinition, cm, std::regex("{(.*)}"))) {
 			if (cm.size() != 1) {
 				throw DecompilationError("illegal state");
@@ -140,7 +148,9 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 			typeTokens.insert(typeTokens.begin(), "}");
 			
 			// In C structs declarations elements are separated by ';'.
-			auto structElemTokens = splitTokens(cm[0], ';');
+			std::string strElems(cm[0]);
+			strElems.erase(std::remove(strElems.begin(), strElems.end(), ' '), strElems.end());
+			auto structElemTokens = splitTokens(strElems, ';');
 			// pop empty string
 			structElemTokens.pop_back();
 			
@@ -154,6 +164,7 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 			// Push begin token
 			typeTokens.push_back("{");
 		}
+		// TODO: primitive
 	}
 
         return joinTokens(converted);
