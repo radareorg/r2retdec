@@ -149,7 +149,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		auto outpath = outDir/"rd_out.log";
 
 		std::ostringstream decrange;
-		decrange << fnc.getStartLine() << "-" << fnc.getEndLine();
+		decrange << fnc.getStart() << "-" << fnc.getEnd();
 
 		std::vector<std::string> decparams {
 			binName,

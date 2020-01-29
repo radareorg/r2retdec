@@ -77,8 +77,6 @@ Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
 	auto name = fu.stripName(r2fnc.name);
 
 	Function function(start, end, name);
-	function.setStartLine(start);
-	function.setEndLine(end);
 
 	fetchFunctionReturnType(function, r2fnc);
 	fetchFunctionCallingconvention(function, r2fnc);
