@@ -30,9 +30,9 @@ static void printHelp(const RCore &core)
 	const char* help[] = {
 		"Usage: " CMD_PREFIX, "", "# Native RetDec decompiler plugin.",
 		CMD_PREFIX, "", "# Decompile current function with the RetDec decompiler.",
-		CMD_PREFIX, "j", "# Dump the current decompiled function as JSON",
+		CMD_PREFIX, "j", "# Dump the current decompiled function as JSON.",
 		CMD_PREFIX, "o", "# Decompile current function side by side with offsets.",
-		CMD_PREFIX, "*", "# Decompiled code is returned to r2 as comment.",
+		CMD_PREFIX, "*", "# Decompiled code is returned to r2 as a comment.",
 		"Environment:", "", "",
 		"%RETDEC_PATH" , "", "# Path to the RetDec decompiler script.",
 		"%DEC_SAVE_DIR", "", "# Directory to save decompilation into.",
