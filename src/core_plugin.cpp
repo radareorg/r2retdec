@@ -1,3 +1,9 @@
+/**
+ * @file src/core_plugin.cpp
+ * @brief Main module of the retdec-r2plugin.
+ * @copyright (c) 2019 Avast Software, licensed under the LGPLv3 license.
+ */
+
 #include <algorithm>
 #include <cstring>
 #include <filesystem>

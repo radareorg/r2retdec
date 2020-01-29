@@ -1,3 +1,8 @@
+/**
+ * @file src/AnnotatedCode.c
+ * @brief Provides API for r2 console output.
+ * @copyright This file originated in https://github.com/radareorg/r2ghidra-dec project under LGPLv3 license.
+ */
 
 #include "AnnotatedCode.h"
 

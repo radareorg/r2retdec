@@ -1,3 +1,9 @@
+/**
+ * @file src/r2cgen.h
+ * @brief C code generation and token marking.
+ * @copyright (c) 2019 Avast Software, licensed under the LGPLv3 license.
+ */
+
 #ifndef RETDEC_R2PLUGIN_R2CGEN_H
 #define RETDEC_R2PLUGIN_R2CGEN_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file src/r2info.cpp
+ * @brief Information gathering from R2 and user.
+ * @copyright (c) 2019 Avast Software, licensed under the LGPLv3 license.
+ */
+
 #ifndef RETDEC_R2PLUGIN_R2_INFO_H
 #define RETDEC_R2PLUGIN_R2_INFO_H
 

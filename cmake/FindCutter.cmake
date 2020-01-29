@@ -1,3 +1,4 @@
+# This file originated in https://github.com/radareorg/r2ghidra-dec project under LGPLv3 license.
 # requires CUTTER_SOURCE_DIR
 # sets CUTTER_INCLUDE_DIRS and Cutter::Cutter
 

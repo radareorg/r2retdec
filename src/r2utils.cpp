@@ -1,3 +1,9 @@
+/**
+ * @file src/r2utils.cpp
+ * @brief Specific output format utilities.
+ * @copyright (c) 2019 Avast Software, licensed under the LGPLv3 license.
+ */
+
 #include <regex>
 #include <sstream>
 
