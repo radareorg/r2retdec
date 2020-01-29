@@ -1,3 +1,9 @@
+/**
+ * @file src/r2cgen.cpp
+ * @brief C code generation and token marking.
+ * @copyright (c) 2019 Avast Software, licensed under the LGPLv3 license.
+ */
+
 #include <fstream>
 #include <optional>
 

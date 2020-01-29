@@ -1,3 +1,5 @@
+#  This file originated in https://github.com/radareorg/r2ghidra-dec project under LGPLv3 license.
+#
 # - Find Radare2 (libr)
 #
 #  This module provides the following imported targets, if found:
