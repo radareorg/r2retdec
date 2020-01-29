@@ -13,6 +13,9 @@ const std::map<const std::string, const std::string> FormatUtils::_primitives {
 	{"int", "i32"},
 	{"long", "i64"},
 	{"size_t", "i64"},
+	{"gid_t", "i32"},
+	{"uid_t", "i32"},
+	{"pid_t", "i32"},
 
 	{"int8_t", "i8"},
 	{"int16_t", "i16"},
