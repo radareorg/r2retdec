@@ -13,7 +13,7 @@ With the bundled version of RetDec you can decompile the following architectures
 
 We officially support Linux and macOS on which this plugin was tested.
 
-### Use from r2 console
+### Use in Radare2 Console
 
 In r2 console you can type `pdz?` to print help:
 
@@ -23,6 +23,9 @@ Usage: pdz   # Native RetDec decompiler plugin.
 | pdzj           # Dump the current decompiled function as JSON.
 | pdzo           # Decompile current function side by side with offsets.
 | pdz*           # Decompiled code is returned to r2 as a comment.
+Environment:
+| %RETDEC_PATH   # Path to the RetDec decompiler script.
+| %DEC_SAVE_DIR  # Directory to save decompilation into.
 ```
 
 The following environment variables may be used to dynamically customize plugin's behavior:
