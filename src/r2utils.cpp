@@ -121,7 +121,7 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 		}
 
 		std::smatch cm;
-		if (std::regex_match(token, cm, std::regex("([^\\*]+)(\\*+)}"))) {
+		if (std::regex_match(token, cm, std::regex("([^*]+)([*]+)"))) {
 			if (cm.size() != 2) {
 				throw DecompilationError("illegal state");
 			}
@@ -130,7 +130,7 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 			continue;
 		}
 
-		if (std::regex_match(token, std::regex("\\*+"))) {
+		if (std::regex_match(token, std::regex("[*]+"))) {
 			converted.push_back(token);
 			continue;
 		}
@@ -143,7 +143,7 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 			return "void";
 		}
 
-		if (std::regex_match(typeDefinition, cm, std::regex("{(.*)}"))) {
+		if (std::regex_match(typeDefinition, cm, std::regex("[{](.*)[}]"))) {
 			if (cm.size() != 1) {
 				throw DecompilationError("illegal state");
 			}
@@ -167,7 +167,7 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 			// Push begin token
 			typeTokens.push_back("{");
 		}
-		// TODO: primitive
+		return "void";
 	}
 
         return joinTokens(converted);
