@@ -31,7 +31,7 @@ public:
 
 	common::Function fetchCurrentFunction() const;
 
-	void fetchFunctions(config::Config &rdconfig) const;
+	void fetchFunctionsAndGlobals(config::Config &rdconfig) const;
 
 	void fetchFunctionLocalsAndArgs(common::Function &function, RAnalFunction &r2fnc) const;
 	void fetchFunctionCallingconvention(common::Function &function, RAnalFunction &r2fnc) const;
@@ -39,6 +39,7 @@ public:
 	size_t fetchWordSize() const;
 
 protected:
+	void fetchGlobals(config::Config &rdconfig) const;
 	common::Function convertFunctionObject(RAnalFunction &fnc) const;
 	void fetchExtraArgsData(common::ObjectSequentialContainer &args, RAnalFunction &r2fnc) const;
 

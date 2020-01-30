@@ -146,7 +146,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		auto rdpath = fetchRetdecPath();
 
 		std::string binName = binInfo.fetchFilePath();
-		binInfo.fetchFunctions(config);
+		binInfo.fetchFunctionsAndGlobals(config);
 		config.generateJsonFile();
 
 		auto fnc = binInfo.fetchCurrentFunction();

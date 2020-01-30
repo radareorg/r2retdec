@@ -55,7 +55,7 @@ Function R2InfoProvider::fetchCurrentFunction() const
 	return convertFunctionObject(*cf);
 }
 
-void R2InfoProvider::fetchFunctions(Config &rconfig) const
+void R2InfoProvider::fetchFunctionsAndGlobals(Config &rconfig) const
 {
 	auto list = r_anal_get_fcns(_r2core.anal);
 	if (list == nullptr)
@@ -71,6 +71,55 @@ void R2InfoProvider::fetchFunctions(Config &rconfig) const
 	}
 
 	rconfig.functions = functions;
+	fetchGlobals(rconfig);
+}
+
+void R2InfoProvider::fetchGlobals(Config &config) const
+{
+	RBinObject *obj = r_bin_cur_object(_r2core.bin);
+	if (obj == nullptr || obj->symbols == nullptr)
+		return;
+
+	auto list = obj->symbols;
+	GlobalVarContainer globals;
+
+	for (RListIter *it = list->head; it; it = it->n) {
+		auto sym = reinterpret_cast<RBinSymbol*>(it->data);
+		if (sym == nullptr)
+			continue;
+
+		std::string type(sym->type);
+		std::string name(sym->name);
+		std::string bind(sym->bind);
+		bool isImported = sym->is_imported;
+	
+		if (type == "FUNC" && isImported) {
+			auto it = config.functions.find(name);
+			if (it != config.functions.end()) {
+				it->setIsDynamicallyLinked();
+			}
+			else {
+				//TODO: do we want to include these functions?
+			}
+		}
+		if (bind == "GLOBAL" && (type == "FUNC" || type == "OBJ")) {
+			if (config.functions.count(name) || config.functions.count("imp."+name)
+					|| sym->vaddr == 0) {
+				continue;
+			}
+			RFlagItem* flag = r_flag_get_i(_r2core.flags, sym->vaddr);
+			if (flag) {
+				name = flag->name;
+			}
+
+			Object var(name, Storage::inMemory(sym->vaddr));
+			var.setRealName(name);
+
+			globals.insert(var);
+		}
+	}
+
+	config.globals = globals;
 }
 
 Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
