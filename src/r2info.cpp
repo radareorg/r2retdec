@@ -83,6 +83,7 @@ void R2InfoProvider::fetchGlobals(Config &config) const
 	auto list = obj->symbols;
 	GlobalVarContainer globals;
 
+	FunctionContainer functions;
 	for (RListIter *it = list->head; it; it = it->n) {
 		auto sym = reinterpret_cast<RBinSymbol*>(it->data);
 		if (sym == nullptr)
@@ -96,7 +97,10 @@ void R2InfoProvider::fetchGlobals(Config &config) const
 		if (type == "FUNC" && isImported) {
 			auto it = config.functions.find(name);
 			if (it != config.functions.end()) {
-				it->setIsDynamicallyLinked();
+				Function f = *it;
+				f.setIsVariadic(true);
+				f.setIsDynamicallyLinked();
+				functions.insert(f);
 			}
 			else {
 				//TODO: do we want to include these functions?
@@ -119,6 +123,13 @@ void R2InfoProvider::fetchGlobals(Config &config) const
 		}
 	}
 
+	if (!functions.empty()) {
+		for (auto f: config.functions) {
+			functions.insert(f);
+		}
+	}
+
+	config.functions = functions;
 	config.globals = globals;
 }
 
