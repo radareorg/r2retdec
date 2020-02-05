@@ -12,6 +12,12 @@
 
 using namespace retdec::r2plugin;
 
+/**
+ * Translation map betwen C types and LLVM IR types. In future we might
+ * consider using some kind of LLVM library method for this but it would
+ * only include LLVM dependency (on the other hand size of this map might
+ * get out of control).
+ */
 const std::map<const std::string, const std::string> FormatUtils::_primitives {
 	{"void", "void"},
 	{"char", "i8"},
@@ -37,6 +43,9 @@ const std::map<const std::string, const std::string> FormatUtils::_primitives {
 	{"double", "double"}
 };
 
+/**
+ * Special keywords that are right now neglected during translation.
+ */
 const std::vector<std::string> FormatUtils::_typeKeywords = {
 	"const",
 	"struct",
@@ -44,6 +53,9 @@ const std::vector<std::string> FormatUtils::_typeKeywords = {
 	"signed"
 };
 
+/**
+ * @brief Joins vector of tokens into one string separated by delim.
+ */
 const std::string FormatUtils::joinTokens(const std::vector<std::string> &tokens, const std::string &delim) const
 {
 	if (tokens.empty()) {
@@ -57,6 +69,9 @@ const std::string FormatUtils::joinTokens(const std::vector<std::string> &tokens
 	return finalstr.str()+tokens.back();
 }
 
+/**
+ * @brief Splits continuous string of tokens separated by delim into vector of such tokens.
+ */
 std::vector<std::string> FormatUtils::splitTokens(const std::string &type, char delim) const
 {
 	std::vector<std::string> tokensResult;
@@ -70,6 +85,9 @@ std::vector<std::string> FormatUtils::splitTokens(const std::string &type, char 
 	return tokensResult;
 }
 
+/**
+ * @brief Strips additional info from function names that is added by Radare2.
+ */
 std::string FormatUtils::stripName(const std::string &name) const
 {
 	static const std::vector r2Prefix = {"sym.", "fcn.", "imp.", "__isoc99_"};
@@ -86,6 +104,11 @@ std::string FormatUtils::stripName(const std::string &name) const
 	return std::string(v);
 }
 
+/**
+ * @brief Provides convertion of C type into LLVM type.
+ *
+ * TODO: provide more complex types parsing.
+ */
 const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 {
 	static const std::vector<char> structInternals = {'{', ',', '}'}; 
@@ -179,6 +202,11 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
         return joinTokens(converted);
 }
 
+/**
+ * @brief Returns definition of a complex type provided by user.
+ *
+ * TODO: this method now returns only void.
+ */
 const std::string FormatUtils::getTypeDefinition(const std::string &token) const
 {
 	return "void";
