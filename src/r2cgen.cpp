@@ -12,6 +12,10 @@
 
 using namespace retdec::r2plugin;
 
+/**
+ * Translation map between decompilation JSON output and r2 understandable
+ * annotations.
+ */
 std::map<const std::string, RSyntaxHighlightType> R2CGenerator::_hig2token = {
 	// {"nl", ... }
 	// {"ws", ... }
@@ -36,6 +40,10 @@ std::map<const std::string, RSyntaxHighlightType> R2CGenerator::_hig2token = {
 	{"cmnt" , R_SYNTAX_HIGHLIGHT_TYPE_COMMENT}
 };
 
+/**
+ * Translaction map interaction method. Usage of this method is preffered to obtain r2 understandable
+ * annotation from JSON config token.
+ */
 std::optional<RSyntaxHighlightType> R2CGenerator::highlightTypeForToken(const std::string &token) const
 {
 	if (_hig2token.count(token)) {
@@ -45,6 +53,11 @@ std::optional<RSyntaxHighlightType> R2CGenerator::highlightTypeForToken(const st
 	return {};
 }
 
+/**
+ * Generates annotated code from RetDec's output obrained as JSON.
+ *
+ * @param root The root of JSON decompilation output.
+ */
 RAnnotatedCode* R2CGenerator::provideAnnotations(const Json::Value &root) const
 {
 	RAnnotatedCode *code = r_annotated_code_new(nullptr);
@@ -112,6 +125,9 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const Json::Value &root) const
 	return code;
 }
 
+/**
+ * Generates output by parsing RetDec's JSON output and calling R2CGenerator::provideAnnotations.
+ */
 RAnnotatedCode* R2CGenerator::generateOutput(const std::string &rdoutJson) const
 {
 	std::ifstream jsonFile(rdoutJson, std::ios::in | std::ios::binary);
