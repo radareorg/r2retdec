@@ -14,6 +14,8 @@ target_link_libraries(core_retdec
 	annotations
 )
 
+target_include_directories(core_retdec PUBLIC ${PROJECT_SOURCE_DIR}/include/)
+
 set_target_properties(core_retdec PROPERTIES
 	OUTPUT_NAME core_retdec
 	PREFIX ""

@@ -1,5 +1,5 @@
 /**
- * @file src/r2cgen.h
+ * @file include/r2plugin/r2cgen.h
  * @brief C code generation and token marking.
  * @copyright (c) 2019 Avast Software, licensed under the LGPLv3 license.
  */
@@ -11,7 +11,7 @@
 #include <optional>
 #include <json/json.h>
 
-#include "AnnotatedCode.h"
+#include <AnnotatedCode.h>
 
 namespace retdec {
 namespace r2plugin {
