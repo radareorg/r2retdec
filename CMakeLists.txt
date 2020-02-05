@@ -43,6 +43,11 @@ else()
 	message(FATAL_ERROR "Unsupported system type: ${CMAKE_SYSTEM_NAME}")
 endif()
 
+option(R2PLUGIN_DOC "Build r2plugin documentation" OFF)
+if (R2PLUGIN_DOC)
+	add_subdirectory(doc)
+endif()
+
 set(RADARE2_INSTALL_PLUGDIR "share/radare2/plugins" CACHE PATH "Directory to install radare2 plugin into")
 
 option(BUILD_BUNDLED_RETDEC "Build retdec with the r2retdec plugin" ON)
