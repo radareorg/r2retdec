@@ -12,6 +12,10 @@ using namespace common;
 using namespace config;
 using namespace r2plugin;
 
+/**
+ * Translation map between tokens representing calling convention type returned
+ * by Radare2 and CallingConventionID that is recognized by RetDec.
+ */
 std::map<const std::string, const CallingConventionID> R2InfoProvider::_r2rdcc = {
 	{"arm32", CallingConventionID::CC_ARM},
 	{"arm64", CallingConventionID::CC_ARM64},
@@ -38,11 +42,17 @@ R2InfoProvider::R2InfoProvider(RCore &core):
 {
 }
 
+/**
+ * @brief Fetches path of the binary file from Radare2.
+ */
 std::string R2InfoProvider::fetchFilePath() const
 {
 	return _r2core.file->binb.bin->file;
 }
 
+/**
+ * @brief Fetches the currently seeked function in Radare2 console.
+ */
 Function R2InfoProvider::fetchCurrentFunction() const
 {
 	RAnalFunction *cf = r_anal_get_fcn_in(_r2core.anal, _r2core.offset, R_ANAL_FCN_TYPE_NULL);
@@ -55,6 +65,9 @@ Function R2InfoProvider::fetchCurrentFunction() const
 	return convertFunctionObject(*cf);
 }
 
+/**
+ * @brief Fetches functions and global variables from Radare2.
+ */
 void R2InfoProvider::fetchFunctionsAndGlobals(Config &rconfig) const
 {
 	auto list = r_anal_get_fcns(_r2core.anal);
@@ -74,6 +87,26 @@ void R2InfoProvider::fetchFunctionsAndGlobals(Config &rconfig) const
 	fetchGlobals(rconfig);
 }
 
+/**
+ * @brief Fetches global variables from the Radare2.
+ *
+ * This method is intended only for internal usage. That is
+ * why this method is private. To obtain functions and global
+ * variables the R2InfoProvider::fetchFunctionsAndGlobals
+ * method is available.
+ *
+ * Reason for this is that currently the global variables are
+ * not supported in Radare2 and fetching them requires sort
+ * of hack by looking into all available symbols and flags.
+ * User may spacify symbol or provide flag on a specified address
+ * and that could be treated as presence of global variable in
+ * some cases.
+ *
+ * While browsing flags and symbols this method provides correction
+ * of fetched functions as some of them might be dynamically linked.
+ * This is another reason why this method is private and interface
+ * to fetch globals is integrated with interface to fetch functions.
+ */
 void R2InfoProvider::fetchGlobals(Config &config) const
 {
 	RBinObject *obj = r_bin_cur_object(_r2core.bin);
@@ -94,6 +127,14 @@ void R2InfoProvider::fetchGlobals(Config &config) const
 		std::string bind(sym->bind);
 		bool isImported = sym->is_imported;
 	
+		// If type is FUNC and flag is set to true
+		// the function should be checked wheter it
+		// was not fetched and should be corrected.
+		//
+		// In future this code should be moved to the fetch
+		// functions method. As this function is private
+		// and this is the intended usage for now I decided
+		// to let it here.
 		if (type == "FUNC" && isImported) {
 			auto it = config.functions.find(name);
 			if (it != config.functions.end()) {
@@ -106,11 +147,14 @@ void R2InfoProvider::fetchGlobals(Config &config) const
 				//TODO: do we want to include these functions?
 			}
 		}
+		// Sometimes when setting flag, the type automatically is set to FUNC.
 		if (bind == "GLOBAL" && (type == "FUNC" || type == "OBJ")) {
 			if (config.functions.count(name) || config.functions.count("imp."+name)
 					|| sym->vaddr == 0) {
+				// This is a function, not a global variable.
 				continue;
 			}
+			// Flags will contain custom name set by user.
 			RFlagItem* flag = r_flag_get_i(_r2core.flags, sym->vaddr);
 			if (flag) {
 				name = flag->name;
@@ -123,6 +167,7 @@ void R2InfoProvider::fetchGlobals(Config &config) const
 		}
 	}
 
+	// If we found at least one dynamically linked function.
 	if (!functions.empty()) {
 		for (auto f: config.functions) {
 			functions.insert(f);
@@ -133,6 +178,10 @@ void R2InfoProvider::fetchGlobals(Config &config) const
 	config.globals = globals;
 }
 
+/**
+ * Converts function object from its representation in Radare2 into
+ * represnetation that is used in RetDec.
+ */
 Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
 {
 	auto start = r_anal_function_min_addr(&r2fnc);
@@ -153,6 +202,18 @@ Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
 	return function;
 }
 
+/**
+ * Fetches local variables and arguments of a functon.
+ *
+ * As there are more types of storage of arguments they can be fetched from multiple sources
+ * in radare2. this is the reason why there is only one interface for fetching arguments and
+ * local variables.
+ *
+ * When user do not provide argument for a function and the function has calling convention
+ * that does not use registers (cdecl), the aruments are are deducted in r2 based on the offset.
+ * This is not, however, projected into function's calling convention and the args are needed to
+ * be fetched with stack variables of the funciton.
+ */
 void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunction &r2fnc) const
 {
 	FormatUtils fu;
@@ -188,6 +249,7 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 		var.type = Type(fu.convertTypeToLlvm(locvar->type));
 		var.setRealName(locvar->name);
 
+		// If variable is argument it is a local variable too.
 		if (locvar->isarg)
 			r2args.push_back(var);
 
@@ -197,9 +259,14 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 	fetchExtraArgsData(r2userArgs, r2fnc);
 
 	function.locals = locals;
+
+	// User spevcified arguments must have higher priority
 	function.parameters = r2userArgs.empty() ? r2args : r2userArgs;
 }
 
+/**
+ * @brief Fetches function arguments defined by user.
+ */
 void R2InfoProvider::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFunction &r2fnc) const
 {
 	FormatUtils fu;
@@ -222,6 +289,9 @@ void R2InfoProvider::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFu
 	free(key);
 }
 
+/**
+ * @brief Fetches the calling convention of the input function from Radare2.
+ */
 void R2InfoProvider::fetchFunctionCallingconvention(Function &function, RAnalFunction &r2fnc) const
 {
 	if (r2fnc.cc != nullptr) {
@@ -234,6 +304,9 @@ void R2InfoProvider::fetchFunctionCallingconvention(Function &function, RAnalFun
 	function.callingConvention = CallingConventionID::CC_UNKNOWN;
 }
 
+/**
+ * @brief Fetches the return type of the input function from Radare2.
+ */
 void R2InfoProvider::fetchFunctionReturnType(Function &function, RAnalFunction &r2fnc) const
 {
 	FormatUtils fu;
@@ -249,6 +322,9 @@ void R2InfoProvider::fetchFunctionReturnType(Function &function, RAnalFunction &
 	function.returnType = Type("void");
 }
 
+/**
+ * @brief Fetch word size of the input file architecture.
+ */
 size_t R2InfoProvider::fetchWordSize() const
 {
 	return r_config_get_i(_r2core.config, "asm.bits");
