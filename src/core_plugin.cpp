@@ -15,10 +15,11 @@
 #include <retdec/config/config.h>
 #include <sstream>
 
-#include "AnnotatedCode.h"
-#include "r2cgen.h"
-#include "r2info.h"
-#include "r2utils.h"
+#include <AnnotatedCode.h>
+
+#include "r2plugin/r2cgen.h"
+#include "r2plugin/r2info.h"
+#include "r2plugin/r2utils.h"
 
 #define CMD_PREFIX "pdz" /**< Plugin activation command in r2 console.**/
 

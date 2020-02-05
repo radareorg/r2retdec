@@ -4,8 +4,8 @@
  * @copyright (c) 2019 Avast Software, licensed under the LGPLv3 license.
  */
 
-#include "r2info.h"
-#include "r2utils.h"
+#include "r2plugin/r2info.h"
+#include "r2plugin/r2utils.h"
 
 using namespace retdec;
 using namespace common;

@@ -1,5 +1,5 @@
 /**
- * @file src/r2utils.h
+ * @file include/r2plugin/r2utils.h
  * @brief Specific output format utilities.
  * @copyright (c) 2019 Avast Software, licensed under the LGPLv3 license.
  */
