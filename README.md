@@ -64,6 +64,7 @@ You have to pass the following parameters to `cmake`:
 You can pass the following addition parameters to `cmake`:
 * `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. Build of the bundled RetDec is by defult turned on.
 * `-DRETDEC_INSTALL_PREFIX=<path>` to specify path where the bundled RetDec version will be installed or to specify path of an existing RetDec installation (default is the value of `CMAKE_INSTALL_PREFIX`).
+* `-DR2PLUGIN_DOC=OFF` optional parameter to build Doxygen documentation.
 
 ## License
 

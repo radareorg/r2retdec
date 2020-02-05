@@ -20,11 +20,14 @@
 #include "r2info.h"
 #include "r2utils.h"
 
-#define CMD_PREFIX "pdz"
+#define CMD_PREFIX "pdz" /**< Plugin activation command in r2 console.**/
 
 namespace fs = std::filesystem;
 using namespace retdec::r2plugin;
 
+/**
+ * @brief Prins help on r2 console.
+ */
 static void printHelp(const RCore &core)
 {
 	const char* help[] = {
@@ -42,7 +45,23 @@ static void printHelp(const RCore &core)
 	r_cons_cmd_help(help, core.print->flags & R_PRINT_FLAGS_COLOR);
 }
 
-std::string formatPathForCommand(const std::string &path)
+/**
+ * @brief Provides sanitization of a command path.
+ *
+ * Purpose of this function is to solve problem when an user
+ * specified paths contain spaces. This would result for example in
+ * misinterpratation of the program and its args.
+ * Sanitization is provided by wrapping the command in double
+ * qoutes. This, however, brings new problem -> existing
+ * double qoutes must be escaped.
+ *
+ * Example:
+ *  User input: /home/user/"my" dir/retdec-decompiler.py
+ *  Fnc output: "/home/user/\"my\" dir/retdec-decompiler.py"
+ *
+ * @param path Full path of the command.
+ */
+std::string sanitizePath(const std::string &path)
 {
 	std::ostringstream str;
 	for (char c: path) {
@@ -55,7 +74,13 @@ std::string formatPathForCommand(const std::string &path)
 	return "\""+str.str()+"\"";
 }
 
-std::string prepareParams(const std::vector<std::string> &params)
+/**
+ * @brief Prepares parameters of a runnable command.
+ *
+ * Joins parameters as tokens separated with spaces. Each parameter
+ * must be properly sanitized before calling this function.
+ */
+std::string prepareCommandParams(const std::vector<std::string> &params)
 {
 	FormatUtils fu;
 	auto preparedParams = fu.joinTokens(params, " ");
@@ -63,20 +88,50 @@ std::string prepareParams(const std::vector<std::string> &params)
 	return preparedParams;
 }
 
+/**
+ * @brief Preapre command for running.
+ *
+ * This function is dedicated for preparation of command for running.
+ * Right now this function only returns its input on output.
+ */
 std::string preapreCommand(const std::string &cmd)
 {
 	return cmd;
 }
 
+/**
+ * @brief Run specified command, with specified parameters and output redirection.
+ *
+ * @param cmd      Command to be runned. In case of full path of the executable the path must be sanitized
+ *                 and existence of the executable should be verified before calling this function.
+ * @param params   Parameters of the command. No sanitization is provided. If a parameter contains spaces
+ *                 it will probably be interprated as two parameters.
+ * @param redirect File where output will be redirected. No sanitization is provided and existence of file
+ *                 is not verified.
+ */
 void run(const std::string& cmd, const std::vector<std::string> &params, const std::string &redirect)
 {
 	auto systemCMD = preapreCommand(cmd)
-				+" "+prepareParams(params)
+				+" "+prepareCommandParams(params)
 				+" > "+redirect;
 
 	system(systemCMD.c_str());
 }
 
+/**
+ * @brief Fetches path of the RetDec decompiler script (retdec-decompiler.py).
+ *
+ * Decompiler cript is search for in following:
+ *   1. Environemnt variable RETDEC_PATH.
+ *     - This provides option to dynamically change RetDec's version.
+ *   2. During compilation set RETEC_INSTALL_PREFIX.
+ *     - This is path where decompiler script will be used when no environment
+ *       variable is provided. Typically it is equal to CMAKE_INSTALL_PREFIX,
+ *       however, user might provide their own path.
+ *
+ * @throws DecompilationError If the RetDec decompiler script is not found in
+ *                            the specified path (environment, compiled path, ...).
+ */
 fs::path fetchRetdecPath()
 {
 	// If user specified environment variable then use it primarily.
@@ -101,6 +156,20 @@ fs::path fetchRetdecPath()
 	throw DecompilationError("cannot detect RetDec decompiler script. Please set $RETDEC_PATH to the path of the retdec-decompiler.py script.");
 }
 
+/**
+ * Fetches the directory for output to be saved to.
+ *
+ * User can specify DEC_SAVE_DIR environment variable to dynamically
+ * customize behavior of this function.
+ *
+ * If DEC_SAVE_DIR is not specified the temporary direcotry is returned
+ * by calling fs::temp_directory_path.
+ *
+ * @throws DecompilationError In case when no the provided directory does
+ *                            not exist or it is not possible to create
+ *                            temporary directory DecompilationError is
+ *                            thrown.
+ */
 fs::path getOutDirPath()
 {
 	std::error_code err;
@@ -135,6 +204,13 @@ fs::path getOutDirPath()
 	return tmpDir;
 }
 
+/**
+ * @brief Main decompilation method. Uses RetDec to decompile input binary.
+ *
+ * Decompiles binary on input by configuring and calling RetDec decompiler script.
+ *
+ * @param binInfo Provides informations gathered from r2 console.
+ */
 RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 {
 	try {
@@ -160,15 +236,15 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		std::vector<std::string> decparams {
 			binName,
 			"--cleanup",
-			"--config", formatPathForCommand(config.getConfigFileName()),
+			"--config", sanitizePath(config.getConfigFileName()),
 			"-f", "json-human",
 			//"--select-decode-only",
 			"--select-ranges", decrange.str(),
-			"-o", formatPathForCommand(decpath.string())
+			"-o", sanitizePath(decpath.string())
 
 		};
 
-		run(formatPathForCommand(rdpath), decparams, formatPathForCommand(outpath.string()));
+		run(sanitizePath(rdpath), decparams, sanitizePath(outpath.string()));
 		return outgen.generateOutput(decpath.string());
 	}
 	catch (const DecompilationError &err) {
@@ -177,6 +253,10 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 	}
 }
 
+/**
+ * Main function representing plugin behavior. Executes actions
+ * based on suffix.
+ */
 static void _cmd(RCore &core, const char &input)
 {
 	void (*outputFunction)(RAnnotatedCode *code) = nullptr;
@@ -209,6 +289,8 @@ static void _cmd(RCore &core, const char &input)
 			return;
 	}
 
+	// This function might be called asynchronously from r2 console (panel menu).
+	// this soultion uses lock_guard that will disable other decompilations.
 	static std::mutex mutex;
 	std::lock_guard<std::mutex> lock (mutex);
 
@@ -221,6 +303,16 @@ static void _cmd(RCore &core, const char &input)
 	outputFunction(code);
 }
 
+/**
+ * R2 console registration method. This method is called
+ * after each command typed into r2. If the function wants
+ * to respond on provided command, provides response and returns true.
+ * Activation method for this function is matching prefix of the input.
+ *  -> prefix(input) == CMD_PREFIX
+ *
+ * Otherwise the function must return false which will indicate that
+ * other command should be executed.
+ */
 static int r2retdec_cmd(void *user, const char* input)
 {
 	RCore& core = *(RCore*)user;
@@ -234,6 +326,7 @@ static int r2retdec_cmd(void *user, const char* input)
 	return false;
 }
 
+// Structure containing plugin info.
 RCorePlugin r_core_plugin_retdec = {
 	/* .name = */ "r2retdec",
 	/* .desc = */ "RetDec integration",
@@ -249,6 +342,8 @@ RCorePlugin r_core_plugin_retdec = {
 #ifdef __cplusplus
 extern "C"
 #endif
+
+// This will register the r2plugin in r2 console.
 R_API RLibStruct radare_plugin = {
 	/* .type = */ R_LIB_TYPE_CORE,
 	/* .data = */ &r_core_plugin_retdec,
