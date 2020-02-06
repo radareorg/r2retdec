@@ -193,11 +193,10 @@ Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
 
 	Function function(start, end, name);
 
+	function.setIsUserDefined();
 	fetchFunctionReturnType(function, r2fnc);
 	fetchFunctionCallingconvention(function, r2fnc);
 	fetchFunctionLocalsAndArgs(function, r2fnc);
-
-	// TODO: set variadic
 
 	return function;
 }
