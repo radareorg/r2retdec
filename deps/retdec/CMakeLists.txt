@@ -2,8 +2,8 @@ include(ExternalProject)
 
 if (BUILD_BUNDLED_RETDEC)
 	ExternalProject_Add(retdec-project
-		URL https://github.com/avast/retdec/archive/b0240726975a6b1b58c41f0bdeef64686374bfe0.zip
-		URL_HASH SHA256=2c84409b56810378d83721655be1f913d72fd151963573dccdb5c4f04d5229d4
+		URL https://github.com/avast/retdec/archive/182a55e64dc15e10c8672b7be4b1f6bc9702214b.zip
+		URL_HASH SHA256=d98726f2d04f71da5246a286bdca5d908da56334179f786c2dc299ee61417cc4
 		CMAKE_ARGS
 			-DCMAKE_BUILD_TYPE=Release
 			-DCMAKE_INSTALL_PREFIX=${RETDEC_INSTALL_PREFIX}
@@ -15,8 +15,8 @@ if (BUILD_BUNDLED_RETDEC)
 	)
 else ()
 	ExternalProject_Add(retdec-project
-		URL https://github.com/avast/retdec/archive/b0240726975a6b1b58c41f0bdeef64686374bfe0.zip
-		URL_HASH SHA256=2c84409b56810378d83721655be1f913d72fd151963573dccdb5c4f04d5229d4
+		URL https://github.com/avast/retdec/archive/182a55e64dc15e10c8672b7be4b1f6bc9702214b.zip
+		URL_HASH SHA256=d98726f2d04f71da5246a286bdca5d908da56334179f786c2dc299ee61417cc4
 		# Disable the configure step.
 		CONFIGURE_COMMAND ""	
 		# Disable the update step.
@@ -35,6 +35,17 @@ endif ()
 ExternalProject_Get_Property(retdec-project source_dir)
 ExternalProject_Get_Property(retdec-project binary_dir)
 
+add_library(rapidjson INTERFACE)
+target_include_directories(rapidjson
+	SYSTEM INTERFACE
+		${source_dir}/deps/rapidjson/include
+)
+target_compile_definitions(rapidjson
+	INTERFACE
+		RAPIDJSON_HAS_STDSTRING=1
+		RAPIDJSON_HAS_CXX11_RVALUE_REFS=1
+)
+
 set(RETDEC_SERDES_SOURCES
 	${source_dir}/src/serdes/address.cpp
 	${source_dir}/src/serdes/architecture.cpp
@@ -51,7 +62,6 @@ set(RETDEC_SERDES_SOURCES
 	${source_dir}/src/serdes/storage.cpp
 	${source_dir}/src/serdes/tool_info.cpp
 	${source_dir}/src/serdes/type.cpp
-	${source_dir}/src/serdes/utils.cpp
 	${source_dir}/src/serdes/vtable.cpp
 )
 set(RETDEC_COMMON_SOURCES
@@ -86,7 +96,6 @@ set(RETDEC_UTILS_SOURCES
 	${source_dir}/src/utils/time.cpp
 )
 set(RETDEC_CONFIG_SOURCES
-	${source_dir}/src/config/base.cpp
 	${source_dir}/src/config/config.cpp
 	${source_dir}/src/config/parameters.cpp
 )
@@ -119,4 +128,4 @@ target_include_directories(retdec PUBLIC
 	${source_dir}/deps
 	${source_dir}/deps/whereami
 )
-target_link_libraries(retdec jsoncpp)
+target_link_libraries(retdec rapidjson)
