@@ -10,7 +10,8 @@ add_library(core_retdec SHARED ${SOURCES})
 
 target_link_libraries(core_retdec
 	Radare2::libr
-	retdec jsoncpp
+	retdec
+	rapidjson
 	annotations
 )
 

@@ -58,7 +58,7 @@ std::optional<RSyntaxHighlightType> R2CGenerator::highlightTypeForToken(const st
  *
  * @param root The root of JSON decompilation output.
  */
-RAnnotatedCode* R2CGenerator::provideAnnotations(const Json::Value &root) const
+RAnnotatedCode* R2CGenerator::provideAnnotations(const rapidjson::Document &root) const
 {
 	RAnnotatedCode *code = r_annotated_code_new(nullptr);
 	if (code == nullptr) {
@@ -68,10 +68,14 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const Json::Value &root) const
 	std::ostringstream planecode;
 	std::optional<unsigned long> lastAddr;
 
-	auto tokens = root["tokens"];
-	for (auto token: tokens) {
-		if (token.isMember("addr")) {
-			std::string addrRaw = token["addr"].asString();
+	if (!root["tokens"].IsArray()) {
+		throw DecompilationError("malformed JSON");
+	}
+
+	auto tokens = root["tokens"].GetArray();
+	for (auto& token: tokens) {
+		if (token.HasMember("addr")) {
+			std::string addrRaw = token["addr"].GetString();
 			if (addrRaw == "") {
 				lastAddr.reset();
 			}
@@ -84,9 +88,9 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const Json::Value &root) const
 			}
 			continue;
 		}
-		else if (token.isMember("val") && token.isMember("kind")) {
+		else if (token.HasMember("val") && token.HasMember("kind")) {
 			unsigned long bpos = planecode.tellp();
-			planecode << token["val"].asString();
+			planecode << token["val"].GetString();
 			unsigned long epos = planecode.tellp();
 
 			if (lastAddr.has_value()) {
@@ -98,7 +102,7 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const Json::Value &root) const
 				r_annotated_code_add_annotation(code, &annotation);
 			}
 
-			auto higlight = highlightTypeForToken(token["kind"].asString());
+			auto higlight = highlightTypeForToken(token["kind"].GetString());
 			if (higlight.has_value()) {
 				RCodeAnnotation annotation = {};
 				annotation.type = R_CODE_ANNOTATION_TYPE_SYNTAX_HIGHLIGHT;
@@ -142,14 +146,9 @@ RAnnotatedCode* R2CGenerator::generateOutput(const std::string &rdoutJson) const
 	jsonFile.read(&jsonContent[0], jsonContent.size());
 	jsonFile.close();
 
-	Json::Value root;
-	std::string errs;
-	std::istringstream json(jsonContent);
-	Json::CharReaderBuilder rbuilder;
-
-	bool success = Json::parseFromStream(rbuilder, json, &root, &errs);
-
-	if (!success || root.isNull() || !root.isObject() ) {
+	rapidjson::Document root;
+	rapidjson::ParseResult success = root.Parse(jsonContent);
+	if (!success) {
 		throw DecompilationError("unable to parse RetDec JSON output");
 	}
 
