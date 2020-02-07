@@ -9,7 +9,7 @@
 
 #include <map>
 #include <optional>
-#include <json/json.h>
+#include <rapidjson/document.h>
 
 #include <AnnotatedCode.h>
 
@@ -21,7 +21,7 @@ public:
 	RAnnotatedCode* generateOutput(const std::string &rdoutJson) const;
 
 protected:
-	RAnnotatedCode* provideAnnotations(const Json::Value &root) const;
+	RAnnotatedCode* provideAnnotations(const rapidjson::Document &root) const;
 	std::optional<RSyntaxHighlightType> highlightTypeForToken(const std::string &token) const;
 
 private:
