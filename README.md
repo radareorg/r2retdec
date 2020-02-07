@@ -1,5 +1,4 @@
 # RetDec Radare2 plugin
-[![License: LGPLv3](https://img.shields.io/github/license/avast/retdec-r2plugin)](https://www.gnu.org/licenses/lgpl-3.0)
 
 RetDec plugin for [Radare2](https://github.com/radareorg/radare2).
 
