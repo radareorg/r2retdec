@@ -28,7 +28,7 @@ Environment:
 | %DEC_SAVE_DIR  # Directory to save decompilation into.
 ```
 
-The following environment variables may be used to dynamically customize plugin's behavior:
+The following environment variables may be used to dynamically customize the plugin's behavior:
 
 ```bash
 $ export RETDEC_PATH=<path> # path to the `retdec-decompiler.py` script to be used for decompilation.
@@ -61,16 +61,16 @@ To build the bundled version of RetDec see [RetDec requirements section](https:/
 You have to pass the following parameters to `cmake`:
 * `-DCMAKE_INSTALL_PREFIX=<path>` to set the installation path to `<path>`. It is important to set the `<path>` to a location where Radare2 can load plugins from (for example `~/.local`).
 
-You can pass the following addition parameters to `cmake`:
-* `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. Build of the bundled RetDec is by defult turned on.
-* `-DRETDEC_INSTALL_PREFIX=<path>` to specify path where the bundled RetDec version will be installed or to specify path of an existing RetDec installation (default is the value of `CMAKE_INSTALL_PREFIX`).
+You can pass the following additional parameters to `cmake`:
+* `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. The build of the bundled RetDec is by default turned on.
+* `-DRETDEC_INSTALL_PREFIX=<path>` to specify the path where the bundled RetDec version will be installed or to specify the path of an existing RetDec installation (default is the value of `CMAKE_INSTALL_PREFIX`).
 * `-DR2PLUGIN_DOC=OFF` optional parameter to build Doxygen documentation.
 
 ## License
 
 Copyright (c) 2019 Avast Software, licensed under the LGPLv3 license. See the [LICENSE](https://github.com/avast/retdec-r2plugin/blob/master/LICENSE) for more details.
 
-RetDec Radare2 plugin incorporates modified files from [r2gidra-dec](https://github.com/radareorg/r2ghidra-dec) project. The original sources are licensed under LGPLv3 license. See the [LICENSE](https://github.com/radareorg/r2ghidra-dec/blob/master/COPYING) for more details.
+RetDec Radare2 plugin incorporates modified files from [r2gidra-dec](https://github.com/radareorg/r2ghidra-dec) project. The original sources are licensed under the LGPLv3 license. See the [LICENSE](https://github.com/radareorg/r2ghidra-dec/blob/master/COPYING) for more details.
 
 RetDec Radare2 plugin uses third-party libraries or other resources listed, along with their licenses, in the [LICENSE-THIRD-PARTY](https://github.com/avast/retdec-r2plugin/blob/master/LICENSE-THIRD-PARTY) file.
 
