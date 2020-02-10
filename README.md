@@ -69,7 +69,7 @@ You can pass the following additional parameters to `cmake`:
 
 ## License
 
-Copyright (c) 2019 Avast Software, licensed under the LGPLv3 license. See the [LICENSE](https://github.com/avast/retdec-r2plugin/blob/master/LICENSE) for more details.
+Copyright (c) 2019 Avast Software, licensed under the LGPLv3 license. See the [LICENSE](https://github.com/avast/retdec-r2plugin/blob/master/COPYING) for more details.
 
 RetDec Radare2 plugin incorporates modified files from [r2gidra-dec](https://github.com/radareorg/r2ghidra-dec) project. The original sources are licensed under the LGPLv3 license. See the [LICENSE](https://github.com/radareorg/r2ghidra-dec/blob/master/COPYING) for more details.
 
