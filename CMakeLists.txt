@@ -39,6 +39,8 @@ elseif(UNIX) # Linux or macOS
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-non-virtual-dtor")
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 else()
 	message(FATAL_ERROR "Unsupported system type: ${CMAKE_SYSTEM_NAME}")
 endif()
