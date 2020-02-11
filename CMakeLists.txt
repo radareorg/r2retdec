@@ -57,7 +57,7 @@ set(CUTTER_SOURCE_DIR CUTTER_SOURCE_DIR-NOTFOUND CACHE STRING "Root directory of
 
 option(BUILD_CUTTER_PLUGIN "Build r2ghidra plugin for Cutter" OFF)
 option(BUILD_BUNDLED_RETDEC "Build retdec with the r2retdec plugin" ON)
-set(RETDEC_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE STRING "RetDec installation prefix (if bundled RetDec build is OFF r2plugin will search this directory implicitly in order to find a RetDec installation)")
+set(RETDEC_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "RetDec installation prefix (if bundled RetDec build is OFF r2plugin will search this directory implicitly in order to find a RetDec installation)")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
