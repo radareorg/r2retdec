@@ -71,19 +71,17 @@ Function R2InfoProvider::fetchCurrentFunction() const
 void R2InfoProvider::fetchFunctionsAndGlobals(Config &rconfig) const
 {
 	auto list = r_anal_get_fcns(_r2core.anal);
-	if (list == nullptr)
-		return;
+	if (list != nullptr) {
+		FunctionContainer functions;
+		for (RListIter *it = list->head; it; it = it->n) {
+			auto fnc = reinterpret_cast<RAnalFunction*>(it->data);
+			if (fnc == nullptr)
+				continue;
+			functions.insert(convertFunctionObject(*fnc));
+		}
 
-	FunctionContainer functions;
-	for (RListIter *it = list->head; it; it = it->n) {
-		auto fnc = reinterpret_cast<RAnalFunction*>(it->data);
-		if (fnc == nullptr)
-			continue;
-		
-		functions.insert(convertFunctionObject(*fnc));
+		rconfig.functions = functions;
 	}
-
-	rconfig.functions = functions;
 	fetchGlobals(rconfig);
 }
 
@@ -172,9 +170,9 @@ void R2InfoProvider::fetchGlobals(Config &config) const
 		for (auto f: config.functions) {
 			functions.insert(f);
 		}
+		config.functions = std::move(functions);
 	}
 
-	config.functions = functions;
 	config.globals = globals;
 }
 
@@ -217,42 +215,45 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 {
 	FormatUtils fu;
 
-	auto list = r_anal_var_all_list(_r2core.anal, &r2fnc);
 	ObjectSetContainer locals;
 	ObjectSequentialContainer r2args, r2userArgs;
-	for (RListIter *it = list->head; it; it = it->n) {
-		auto locvar = reinterpret_cast<RAnalVar*>(it->data);
-		if (locvar == nullptr)
-			continue;
 
-		Storage variableStorage;
-		switch (locvar->kind) {
-		case R_ANAL_VAR_KIND_REG: {
-			variableStorage = Storage::inRegister(locvar->regname);
+	auto list = r_anal_var_all_list(_r2core.anal, &r2fnc);
+	if (list != nullptr) {
+		for (RListIter *it = list->head; it; it = it->n) {
+			auto locvar = reinterpret_cast<RAnalVar*>(it->data);
+			if (locvar == nullptr)
+				continue;
+
+			Storage variableStorage;
+			switch (locvar->kind) {
+			case R_ANAL_VAR_KIND_REG: {
+				variableStorage = Storage::inRegister(locvar->regname);
+			}
+			break;
+			case R_ANAL_VAR_KIND_SPV:
+			case R_ANAL_VAR_KIND_BPV: {
+				int stackOffset = locvar->delta;
+				// Execute extra pop to match RetDec offset base.
+				// extra POP x86: 8 -> 4 (x64: 8 -> 0)
+				stackOffset -= fetchWordSize()/8;
+				variableStorage = Storage::onStack(stackOffset);
+			}
+			break;
+			default:
+				continue;
+			};
+
+			Object var(locvar->name, variableStorage);
+			var.type = Type(fu.convertTypeToLlvm(locvar->type));
+			var.setRealName(locvar->name);
+
+			// If variable is argument it is a local variable too.
+			if (locvar->isarg)
+				r2args.push_back(var);
+
+			locals.insert(var);
 		}
-		break;
-		case R_ANAL_VAR_KIND_SPV:
-		case R_ANAL_VAR_KIND_BPV: {
-			int stackOffset = locvar->delta;
-			// Execute extra pop to match RetDec offset base.
-			// extra POP x86: 8 -> 4 (x64: 8 -> 0)
-			stackOffset -= fetchWordSize()/8;
-			variableStorage = Storage::onStack(stackOffset);
-		}
-		break;
-		default:
-			continue;
-		};
-
-		Object var(locvar->name, variableStorage);
-		var.type = Type(fu.convertTypeToLlvm(locvar->type));
-		var.setRealName(locvar->name);
-
-		// If variable is argument it is a local variable too.
-		if (locvar->isarg)
-			r2args.push_back(var);
-
-		locals.insert(var);
 	}
 
 	fetchExtraArgsData(r2userArgs, r2fnc);
