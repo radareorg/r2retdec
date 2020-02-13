@@ -158,7 +158,7 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 
 		std::smatch cm;
 		if (std::regex_match(token, cm, std::regex("([^*]+)([*]+)"))) {
-			if (cm.size() != 2) {
+			if (cm.size() != 3) {
 				throw DecompilationError("illegal state");
 			}
 			converted.push_back(cm[0]);
@@ -180,7 +180,7 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 		}
 
 		if (std::regex_match(typeDefinition, cm, std::regex("[{](.*)[}]"))) {
-			if (cm.size() != 1) {
+			if (cm.size() != 2) {
 				throw DecompilationError("illegal state");
 			}
 			// Push end token
