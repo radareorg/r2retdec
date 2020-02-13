@@ -4,6 +4,7 @@
  * @copyright (c) 2019 Avast Software, licensed under the LGPLv3 license.
  */
 
+#include <algorithm>
 #include <regex>
 #include <sstream>
 
@@ -101,7 +102,13 @@ std::string FormatUtils::stripName(const std::string &name) const
 			v.remove_prefix(std::strlen(px));
 	}
 
-	return std::string(v);
+	std::string newName(v);
+
+	if (newName.empty() || std::all_of(newName.begin(), newName.end(), ::isxdigit)) {
+		return "fcn_"+newName;
+	}
+
+	return newName;
 }
 
 /**
