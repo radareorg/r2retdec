@@ -42,7 +42,7 @@ This section describes a local build and installation of RetDec Radare2 plugin.
 
 * A compiler supporting c++17
 * CMake (version >= 3.6)
-* Existing Radare2 installation
+* Existing Radare2 installation (version >= 4.2.0)
 
 To build the bundled version of RetDec see [RetDec requirements section](https://github.com/avast/retdec#requirements).
 
