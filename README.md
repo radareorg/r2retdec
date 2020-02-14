@@ -20,6 +20,8 @@ The r2pm package is available for Radare2 version 4.2.0 and newer. To install th
 $ r2pm -i retdec-r2plugin
 ```
 
+This will, however, install only the plugin for r2 console. To use the Cutter plugin you must build this plugin manually. See the [Build and Installation](https://github.com/avast/retdec-r2plugin#build-and-installation) section.
+
 ### Use in Radare2 Console
 
 In r2 console you can type `pdz?` to print help:
