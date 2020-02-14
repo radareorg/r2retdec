@@ -12,6 +12,14 @@ With the bundled version of RetDec you can decompile the following architectures
 
 We officially support Linux and macOS on which this plugin was tested.
 
+### R2PM Installation
+
+The r2pm package is available for Radare2 version 4.2.0 and newer. To install the plugin using r2pm use:
+
+```bash
+$ r2pm -i retdec-r2plugin
+```
+
 ### Use in Radare2 Console
 
 In r2 console you can type `pdz?` to print help:
