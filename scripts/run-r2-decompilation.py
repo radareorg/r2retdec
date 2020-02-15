@@ -67,7 +67,7 @@ def check_args(args):
     args.file_dir = os.path.dirname(args.file)
 
     if args.project_path and not os.path.exists(args.project_path):
-            print_error_and_die('Specified R2 project file does not exist:', args.project_path)
+        print_error_and_die('Specified R2 project file does not exist:', args.project_path)
 
     if not args.output:
         args.output = args.file + '.c'
