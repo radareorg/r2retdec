@@ -18,7 +18,7 @@ else ()
 		URL https://github.com/avast/retdec/archive/182a55e64dc15e10c8672b7be4b1f6bc9702214b.zip
 		URL_HASH SHA256=d98726f2d04f71da5246a286bdca5d908da56334179f786c2dc299ee61417cc4
 		# Disable the configure step.
-		CONFIGURE_COMMAND ""	
+		CONFIGURE_COMMAND ""
 		# Disable the update step.
 		UPDATE_COMMAND ""
 		# Disable the build step.

@@ -124,7 +124,7 @@ void R2InfoProvider::fetchGlobals(Config &config) const
 		std::string name(sym->name);
 		std::string bind(sym->bind);
 		bool isImported = sym->is_imported;
-	
+
 		// If type is FUNC and flag is set to true
 		// the function should be checked wheter it
 		// was not fetched and should be corrected.

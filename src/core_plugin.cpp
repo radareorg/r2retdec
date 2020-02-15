@@ -138,7 +138,7 @@ fs::path fetchRetdecPath()
 	// If user specified environment variable then use it primarily.
 	auto userCustomRaw = getenv("RETDEC_PATH");
 	std::string userCustom(userCustomRaw != nullptr ? userCustomRaw : "");
-	
+
 	if (userCustom != "") {
 		fs::path userCustomPath(userCustom);
 		if (!fs::exists(userCustomPath))
@@ -227,7 +227,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		config.generateJsonFile();
 
 		auto fnc = binInfo.fetchCurrentFunction();
-		
+
 		auto decpath = outDir/"rd_dec.json";
 		auto outpath = outDir/"rd_out.log";
 
@@ -300,7 +300,7 @@ static void _cmd(RCore &core, const char &input)
 	if (code == nullptr) {
 		return;
 	}
-	
+
 	outputFunction(code);
 }
 

@@ -118,7 +118,7 @@ std::string FormatUtils::stripName(const std::string &name) const
  */
 const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 {
-	static const std::vector<char> structInternals = {'{', ',', '}'}; 
+	static const std::vector<char> structInternals = {'{', ',', '}'};
 
 	if (_primitives.count(ctype)) {
 		return _primitives.at(ctype);
@@ -170,7 +170,7 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 			converted.push_back(token);
 			continue;
 		}
-	
+
 		// TODO: this method might return definition of arrays in future.
 
 		auto typeDefinition = getTypeDefinition(token);
@@ -185,14 +185,14 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
 			}
 			// Push end token
 			typeTokens.insert(typeTokens.begin(), "}");
-			
+
 			// In C structs declarations elements are separated by ';'.
 			std::string strElems(cm[0]);
 			strElems.erase(std::remove(strElems.begin(), strElems.end(), ' '), strElems.end());
 			auto structElemTokens = splitTokens(strElems, ';');
 			// pop empty string
 			structElemTokens.pop_back();
-			
+
 			for (auto it = structElemTokens.rbegin();
 					it != structElemTokens.rend(); it++) {
 				typeTokens.insert(typeTokens.begin(), convertTypeToLlvm(*it));

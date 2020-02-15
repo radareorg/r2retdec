@@ -49,7 +49,7 @@ std::optional<RSyntaxHighlightType> R2CGenerator::highlightTypeForToken(const st
 	if (_hig2token.count(token)) {
 		return _hig2token.at(token);
 	}
-	
+
 	return {};
 }
 
