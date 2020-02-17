@@ -2,8 +2,8 @@ include(ExternalProject)
 
 if (BUILD_BUNDLED_RETDEC)
 	ExternalProject_Add(retdec-project
-		URL https://github.com/avast/retdec/archive/182a55e64dc15e10c8672b7be4b1f6bc9702214b.zip
-		URL_HASH SHA256=d98726f2d04f71da5246a286bdca5d908da56334179f786c2dc299ee61417cc4
+		URL https://github.com/avast/retdec/archive/7d6b8882690ff73c2bd7f209db10c5c091fa0359.zip
+		URL_HASH SHA256=2942b2ba2a1a22db6d7b4e0adda4c16876cad4154854b3e4e3bc8fb00200c0d1
 		CMAKE_ARGS
 			-DCMAKE_BUILD_TYPE=Release
 			-DCMAKE_INSTALL_PREFIX=${RETDEC_INSTALL_PREFIX}
@@ -15,8 +15,8 @@ if (BUILD_BUNDLED_RETDEC)
 	)
 else ()
 	ExternalProject_Add(retdec-project
-		URL https://github.com/avast/retdec/archive/182a55e64dc15e10c8672b7be4b1f6bc9702214b.zip
-		URL_HASH SHA256=d98726f2d04f71da5246a286bdca5d908da56334179f786c2dc299ee61417cc4
+		URL https://github.com/avast/retdec/archive/7d6b8882690ff73c2bd7f209db10c5c091fa0359.zip
+		URL_HASH SHA256=2942b2ba2a1a22db6d7b4e0adda4c16876cad4154854b3e4e3bc8fb00200c0d1
 		# Disable the configure step.
 		CONFIGURE_COMMAND ""
 		# Disable the update step.
