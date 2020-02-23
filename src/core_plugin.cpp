@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <cstring>
-#include <filesystem>
 #include <iostream>
 #include <iterator>
 #include <mutex>
@@ -21,9 +20,10 @@
 #include "r2plugin/r2info.h"
 #include "r2plugin/r2utils.h"
 
+#include "filesystem_wrapper.h"
+
 #define CMD_PREFIX "pdz" /**< Plugin activation command in r2 console.**/
 
-namespace fs = std::filesystem;
 using namespace retdec::r2plugin;
 
 /**
