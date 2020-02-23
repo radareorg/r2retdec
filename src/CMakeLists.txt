@@ -13,6 +13,7 @@ target_link_libraries(core_retdec
 	retdec
 	rapidjson
 	annotations
+	stdc++fs
 )
 
 target_include_directories(core_retdec PUBLIC ${PROJECT_SOURCE_DIR}/include/)
