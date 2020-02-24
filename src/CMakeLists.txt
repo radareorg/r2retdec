@@ -13,8 +13,17 @@ target_link_libraries(core_retdec
 	retdec
 	rapidjson
 	annotations
-	stdc++fs
 )
+
+find_library (STD_CPP_FS stdc++fs)
+if (STD_CPP_FS)
+	message("-- Linking with ${STD_CPP_FS} library")
+	target_link_libraries(core_retdec
+		stdc++fs
+	)
+else()
+	message("-- Library stdc++fs NOT FOUND -> linking core_retdec without stdc++fs library")
+endif()
 
 target_include_directories(core_retdec PUBLIC ${PROJECT_SOURCE_DIR}/include/)
 
