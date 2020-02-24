@@ -66,13 +66,13 @@ std::string sanitizePath(const std::string &path)
 {
 	std::ostringstream str;
 	for (char c: path) {
-		if (c == '"')
-			str << "\\\"";
+		if (c == '\'')
+			str << "'\\\''";
 		else
 			str << c;
 	}
 
-	return "\""+str.str()+"\"";
+	return "\'"+str.str()+"\'";
 }
 
 /**
