@@ -235,7 +235,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		decrange << fnc.getStart() << "-" << fnc.getEnd();
 
 		std::vector<std::string> decparams {
-			binName,
+			sanitizePath(binName),
 			"--cleanup",
 			"--config", sanitizePath(config.getConfigFileName()),
 			"-f", "json-human",
