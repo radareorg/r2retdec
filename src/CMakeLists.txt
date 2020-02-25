@@ -15,7 +15,7 @@ target_link_libraries(core_retdec
 	annotations
 )
 
-find_library (STD_CPP_FS stdc++fs)
+find_library(STD_CPP_FS stdc++fs)
 if (STD_CPP_FS)
 	message("-- Linking with ${STD_CPP_FS} library")
 	target_link_libraries(core_retdec
