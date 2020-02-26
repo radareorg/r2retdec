@@ -1,0 +1,22 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: RetDec clone
+      run: git clone https://github.com/avast/retdec
+    - name: Create build dir
+      run: mkdir -p retdec/build
+    - name: Change directory
+      run: cd retdec/build
+    - name: Call cmake
+      run: cmake .. -DCMAKE_INSTALL_PREFIX=install
+    - name: make
+      run: make -j(nproc)
+    - name: Test retdec
+      run: ./install/retdec-decompiler.py
