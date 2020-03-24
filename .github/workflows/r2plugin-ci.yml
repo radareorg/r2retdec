@@ -1,0 +1,317 @@
+## Configuration of Github Actions CI for retdec-r2plugin.
+
+name: retdec-plugin CI
+
+on:
+    push:
+        branches:
+            - master   # Activate on push on master.
+            - 'test-*' # Activate on branch with prefix test.
+
+    pull_request:
+        branches:
+            - master # Activate on pull request.
+
+jobs:
+    ## Prepares specific radare2 version for later usage.
+    ## Version is specified in separate `radare2.version` file.
+    ## Build of radare2 is cached -> build of radare2 on each
+    ## change in master is not required. Each change of
+    ## the file `radare2.version` triggers new build of radare2.
+    prepare-radare2:
+        runs-on: ${{ matrix.os }}
+
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+
+        steps:
+            # File is located in the repoitory -> content is required.
+            - uses: actions/checkout@v2
+
+            - name: Create Build Directory
+              run: mkdir -p build
+
+            ## Specification of Radare2 cache.
+            ## Hash of the file `radare2.version` is incorporated in cache name.
+            ## If the content of `radare2.version` changes then different
+            ## name is checked and previous cache is not hit.
+            - name: Check/Create Cache of Radare2
+              id: radare2-cache
+              uses: actions/cache@v1
+              env:
+                  cache-name: radare2
+              with:
+                  path: build/radare2
+                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
+
+            - name: Clone Radare2 Repository
+              if: steps.radare2-cache.outputs.cache-hit != 'true'
+              run: |
+                    git clone https://github.com/radareorg/radare2 build/radare2
+                    cp $(git ls-files '**/radare2.version') build/
+
+            - name: Checkout Specified Version of Radare2
+              if: steps.radare2-cache.outputs.cache-hit != 'true'
+              run: git checkout $(cat ../radare2.version)
+              working-directory: build/radare2
+
+            - name: Run Configuration Script
+              if: steps.radare2-cache.outputs.cache-hit != 'true'
+              run: ./configure --prefix=${PWD}
+              working-directory: build/radare2
+
+            - name: Build Radare2 on Ubuntu
+              if: (steps.radare2-cache.outputs.cache-hit != 'true' )
+                        && (matrix.os != 'macos-latest')
+              run: make -j $(nproc) && make install
+              working-directory: build/radare2
+
+            - name: Build Radare2 on macOS
+              if: (steps.radare2-cache.outputs.cache-hit != 'true')
+                        && (matrix.os == 'macos-latest')
+              run: make -j $(sysctl -n hw.ncpu) && make install
+              working-directory: build/radare2
+
+    ## Prepares RetDec Regression Tests Framework.
+    ## Creates cache of virtual environment to be used in testing. Hash of content
+    ## of file `requirements.txt` is prepended to the name of cache so that
+    ## virtual environment is rebuilt in case of new dependecy is added.
+    prepare-retdec-framework:
+        runs-on: ${{ matrix.os }}
+        
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+
+        steps:
+            - name: Create Build Directory
+              run: mkdir -p build
+
+            - name: Clone RetDec RT Framework
+              run: git clone https://github.com/avast/retdec-regression-tests-framework
+              working-directory: build    
+          
+            - name: Create/Check Cache of RetDec RT Framework Virtual Environment
+              id: retdec-fw-cache
+              uses: actions/cache@v1
+              env:
+                  cache-name: retdec-fw-venv
+              with:
+                  path: build/retdec-regression-tests-framework/.venv
+                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/requirements.txt') }}
+              
+            - name: Install Missing Packages on Ubuntu
+              if: steps.retdec-fw-cache.outputs.cache-hit != 'true' && matrix.os == 'ubuntu-latest'
+              run:  sudo apt-get install python3-venv
+              
+            - name: Create Virtual Environemnt
+              if: steps.retdec-fw-cache.outputs.cache-hit != 'true'
+              run: python3 -m venv .venv
+              working-directory: build/retdec-regression-tests-framework
+          
+            - name: Install Requirements
+              if: steps.retdec-fw-cache.outputs.cache-hit != 'true'
+              run: |
+                    . .venv/bin/activate
+                    pip3 install wheel
+                    pip3 install r2pipe
+                    pip3 install -r requirements.txt
+              working-directory: build/retdec-regression-tests-framework
+
+    ## Build of the RetDec-R2plugin and bundled RetDec.
+    ## The build is cached so that RetDec is not built on each change in master.
+    ## Cached build is completly rebuilt in case of update of bundled RetDec version.
+    build-r2plugin:
+        runs-on: ${{ matrix.os }}
+        
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+                type: [Release, Debug]
+
+        needs: [prepare-radare2]
+
+        steps:
+            - uses: actions/checkout@v2
+              
+            - name: Create Build Directory
+              run: mkdir -p build/r2plugin
+
+            - name: Create/Check Cache of RetDec R2plugin
+              id: r2plugin-cache
+              uses: actions/cache@v1
+              env:
+                  cache-name: r2plugin-cached-build
+              with:
+                  path: build/r2plugin
+                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
+        
+            - name: Extract Radare2 Installation
+              id: radare2-cache
+              uses: actions/cache@v1
+              env:
+                  cache-name: radare2
+              with:
+                  path: build/radare2
+                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
+      
+            - name: Install Missing Packages on macOS
+              if: matrix.os == 'macos-latest'
+              run: brew install pkg-config autoconf automake libtool
+              
+            - name: Build CMake
+              if: steps.r2plugin-cache.cache-hit != 'true'
+              run: |
+                    export PATH=${PWD}/../radare2/bin:${PATH}
+                    export LD_LIBRARY_PATH=${PWD}/../radare2/lib:${PWD}/../radare2/lib64:${LD_LIBRARY_PATH}
+                    export PKG_CONFIG_PATH=${PWD}/../radare2/lib/pkgconfig:${PKG_CONFIG_PATH}
+                    cmake ../.. \
+                        -DCMAKE_INSTALL_PREFIX=${HOME}/.local \
+                        -DBUILD_BUNDLED_RETDEC=ON \
+                        -DBUILD_CUTTER_PLUGIN=OFF \
+                        -DCMAKE_BUILD_TYPE=${{ matrix.type }} \
+                        -DRETDEC_INSTALL_PREFIX=install \
+                        -DCMAKE_LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/
+              working-directory: build/r2plugin
+            
+            - name: Build Step Make on Ubuntu
+              if: matrix.os != 'macos-latest'
+              run: make -j$(nproc) install
+              working-directory: build/r2plugin
+
+            - name: Build Step Make on macOS
+              if: matrix.os == 'macos-latest'
+              run: make -j $(sysctl -n hw.ncpu) install
+              working-directory: build/r2plugin
+
+    ## Run tests on RetDec R2plugin
+    ## After this step artifacts are published.
+    run-tests:
+        runs-on: ${{ matrix.os }}
+        
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+                type: [Release, Debug]
+                
+        needs: [prepare-radare2, prepare-retdec-framework, build-r2plugin]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Create Build Directory
+              run: mkdir -p build
+ 
+            - name: Extract Radare2 Cache
+              id: radare2-cache
+              uses: actions/cache@v1
+              env:
+                  cache-name: radare2
+              with:
+                  path: build/radare2
+                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
+
+            - name: Extract R2Plugin Cache
+              id: r2plugin-cache
+              uses: actions/cache@v1
+              env:
+                  cache-name: r2plugin-cached-build
+              with:
+                  path: build/r2plugin
+                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
+            
+            - name: Install Cached RetDec R2Plugin
+              run: make install
+              working-directory: build/r2plugin
+
+            - name: Verify Installation of R2plugin
+              run: ls ${HOME}/.local/share/radare2/plugins/core_retdec.so || ls ${HOME}/.local/share/radare2/plugins/core_retdec.dylib
+
+            # Prepare files for publishing, resulting structure:
+            #   RetDec-R2Plugin-OS-Type
+            #   |_ bin
+            #   |  \_ retdec-*
+            #   |
+            #   |_ share
+            #   |  \__ retdec/support/*.ord
+            #   |   \_ radare2/plugins/core_retdec.so
+            #   |
+            #   |_ CHANGELOG.md
+            #   |_ LICENSE
+            #   |_ LICENSE-THIRD-PARTY
+            #   \_ README.md
+            - name: Prepare Files for Publishing
+              run: |
+                    cp -r ${HOME}/.local/share build/r2plugin/install/
+                    cp LICENSE* CHANGELOG.md README.md build/r2plugin/install/
+
+            - name: Archive Artifacts
+              uses: actions/upload-artifact@v1
+              with:
+                  name: RetDec-R2Plugin-Build-${{ runner.os }}-${{ matrix.type }}
+                  path: build/r2plugin/install
+            
+            - name: Clone RetDec for Tests
+              run: git clone https://github.com/avast/retdec
+              working-directory: build
+
+            - name: Clone RetDec RT Framework
+              run: git clone https://github.com/avast/retdec-regression-tests-framework
+              working-directory: build
+          
+            - name: Clone RetDec RT
+              run: git clone https://github.com/avast/retdec-regression-tests
+              working-directory: build
+          
+            - name: Extract RetDec RT Framework Cache
+              id: retdec-fw-cache
+              uses: actions/cache@v1
+              env:
+                  cache-name: retdec-fw-venv
+              with:
+                  path: build/retdec-regression-tests-framework/.venv
+                  key: ${{ runner.os }}-${{ env.cache-name }}
+          
+            - name: Prepare Test settings
+              run: |
+                    cat <<EOF > ${PWD}/build/retdec-regression-tests-framework/config_local.ini
+                    [runner]
+                    ; Path to the extracted Clang package containing subdirectories such as bin, include, lib, share.
+                    clang_dir = ${PWD}/build/clang
+                    ; Path to the cloned repository containing regression tests.
+                    tests_root_dir = ${PWD}/build/retdec-regression-tests
+                    ; Path to the RetDec's build directory.
+                    retdec_build_dir = ${PWD}/build/r2plugin/deps/retdec/retdec-project-prefix/src/retdec-project-build
+                    ; Path to the RetDec's installation directory.
+                    retdec_install_dir = ${PWD}/build/r2plugin/install
+                    ; Path to the cloned RetDec repository.
+                    retdec_repo_dir = ${PWD}/build/retdec
+                    r2plugin_tests_enabled = 1
+                    r2plugin_script = ${PWD}/scripts/run-r2-decompilation.py
+                    EOF
+
+            - name: Prepare Ubuntu
+              if: matrix.os == 'ubuntu-latest'
+              run: |
+                   sudo apt-get install gcc-multilib # Install x86 binaries support on Ubuntu
+                   wget --no-proxy https://releases.llvm.org/3.9.1/clang+llvm-3.9.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz -O llvm.tar.xz
+              working-directory: build
+
+            - name: Prepare macOS
+              if: matrix.os == 'macos-latest'
+              run: wget --no-proxy https://releases.llvm.org/3.9.0/clang+llvm-3.9.0-x86_64-apple-darwin.tar.xz -O llvm.tar.xz
+              working-directory: build
+
+            - name: Extract Clang
+              run: tar -xJf llvm.tar.xz && mv clang* clang
+              working-directory: build
+
+            - name: Run tests
+              run: |
+                    . .venv/bin/activate
+                    export PATH=${PWD}/../radare2/bin:${PATH}
+                    export LD_LIBRARY_PATH=${PWD}/../radare2/lib:${PWD}/../radare2/lib64:${LD_LIBRARY_PATH}
+                    export PKG_CONFIG_PATH=${PWD}/../radare2/lib/pkgconfig:${PKG_CONFIG_PATH}
+                    python3 ./runner.py tools.r2plugin
+              working-directory: build/retdec-regression-tests-framework
