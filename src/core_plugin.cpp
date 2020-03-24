@@ -116,7 +116,9 @@ void run(const std::string& cmd, const std::vector<std::string> &params, const s
 				+" "+prepareCommandParams(params)
 				+" > "+redirect;
 
-	system(systemCMD.c_str());
+	if (int exitCode = system(systemCMD.c_str())) {
+		throw DecompilationError("decompilation was not successful: exit code: "+std::to_string(exitCode));
+	}
 }
 
 /**
