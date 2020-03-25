@@ -1,5 +1,7 @@
 # RetDec Radare2 plugin
 
+![retdec-r2plugin CI](https://github.com/avast/retdec-r2plugin/workflows/retdec-r2plugin%20CI/badge.svg?branch=master)
+
 RetDec plugin for [Radare2](https://github.com/radareorg/radare2).
 
 The plugin integrates RetDec decompiler into Radare2 console. RetDec Radare2 plugin is shipped with a bundled RetDec version, but you can use your own version (specified below).
