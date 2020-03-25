@@ -79,6 +79,12 @@ You can pass the following additional parameters to `cmake`:
 * `-DBUILD_CUTTER_PLUGIN=OFF` setting to ON will try to build Cutter plugin. This option may, however, require setting `CUTTER_SOURCE_DIR`. The Cutter must be built with support for plugin loading, see [Cutter documentation](https://cutter.re/docs/plugins.html).
 * `-DCUTTER_SOURCE_DIR` path to the `${CUTTER_REPO_ROOT}/src` used to compile Cutter plugin.
 
+*Note*: retdec-r2plugin requires [filesystem](https://en.cppreference.com/w/cpp/filesystem) library to be linked with the plugin. CMake will try to find the library in the system but on GCC 7 it might not be able to do so automatically. In that case you must specify a path where this library is located in the system to the cmake by adding:
+* `-DCMAKE_LIBRARY_PATH=${PATH_TO_FILESTSTEM_DIR}`
+
+On GCC 7 is `stdc++fs` located in:
+* `-DCMAKE_LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/`
+
 ## License
 
 Copyright (c) 2019 Avast Software, licensed under the LGPLv3 license. See the [LICENSE](https://github.com/avast/retdec-r2plugin/blob/master/LICENSE) file for more details.
