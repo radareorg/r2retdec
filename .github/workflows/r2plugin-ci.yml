@@ -221,8 +221,14 @@ jobs:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
             
-            - name: Install Cached RetDec R2Plugin
-              run: make install
+            - name: Install Cached RetDec R2Plugin on Ubuntu
+              if: matrix.os != 'macos-latest'
+              run: make -j$(nproc) install
+              working-directory: build/r2plugin
+
+            - name: Install Cached RetDec R2Plugin on macOS
+              if: matrix.os == 'macos-latest'
+              run: make -j $(sysctl -n hw.ncpu) install
               working-directory: build/r2plugin
 
             - name: Verify Installation of R2plugin
