@@ -1,6 +1,6 @@
 ## Configuration of Github Actions CI for retdec-r2plugin.
 
-name: retdec-plugin CI
+name: retdec-r2plugin CI
 
 on:
     push:
