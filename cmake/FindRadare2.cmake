@@ -25,6 +25,16 @@ if(WIN32)
 				/usr/local/include/libr
 				/usr/include/libr)
 
+	# Support local installation.
+	find_path(Radare2_MAIN_INCLUDE
+			NAMES r_userconf.h
+			HINTS
+				"$ENV{HOME}/bin/prefix/radare2/include"
+				/usr/local/include/libr
+				/usr/include/libr)
+
+	list(APPEND Radare2_INCLUDE_DIRS ${Radare2_MAIN_INCLUDE})
+
 	set(Radare2_LIBRARY_NAMES
 			core
 			config
