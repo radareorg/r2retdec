@@ -16,6 +16,7 @@
 
 #include <AnnotatedCode.h>
 
+#include "r2plugin/cmd_exec.h"
 #include "r2plugin/r2cgen.h"
 #include "r2plugin/r2info.h"
 #include "r2plugin/r2utils.h"
@@ -25,6 +26,7 @@
 #define CMD_PREFIX "pdz" /**< Plugin activation command in r2 console.**/
 
 using namespace retdec::r2plugin;
+using ce = retdec::r2plugin::CmdExec;
 using fu = retdec::r2plugin::FormatUtils;
 
 /**
@@ -45,80 +47,6 @@ static void printHelp(const RCore &core)
 	};
 
 	r_cons_cmd_help(help, core.print->flags & R_PRINT_FLAGS_COLOR);
-}
-
-/**
- * @brief Provides sanitization of a command path.
- *
- * Purpose of this function is to solve problem when an user
- * specified paths contain spaces. This would result for example in
- * misinterpratation of the program and its args.
- * Sanitization is provided by wrapping the command in double
- * qoutes. This, however, brings new problem -> existing
- * double qoutes must be escaped.
- *
- * Example:
- *  User input: /home/user/"my" dir/retdec-decompiler.py
- *  Fnc output: "/home/user/\"my\" dir/retdec-decompiler.py"
- *
- * @param path Full path of the command.
- */
-std::string sanitizePath(const std::string &path)
-{
-	std::ostringstream str;
-	for (char c: path) {
-		if (c == '\'')
-			str << "'\\\''";
-		else
-			str << c;
-	}
-
-	return "\'"+str.str()+"\'";
-}
-
-/**
- * @brief Prepares parameters of a runnable command.
- *
- * Joins parameters as tokens separated with spaces. Each parameter
- * must be properly sanitized before calling this function.
- */
-std::string prepareCommandParams(const std::vector<std::string> &params)
-{
-	auto preparedParams = fu::joinTokens(params, " ");
-
-	return preparedParams;
-}
-
-/**
- * @brief Preapre command for running.
- *
- * This function is dedicated for preparation of command for running.
- * Right now this function only returns its input on output.
- */
-std::string preapreCommand(const std::string &cmd)
-{
-	return cmd;
-}
-
-/**
- * @brief Run specified command, with specified parameters and output redirection.
- *
- * @param cmd      Command to be runned. In case of full path of the executable the path must be sanitized
- *                 and existence of the executable should be verified before calling this function.
- * @param params   Parameters of the command. No sanitization is provided. If a parameter contains spaces
- *                 it will probably be interprated as two parameters.
- * @param redirect File where output will be redirected. No sanitization is provided and existence of file
- *                 is not verified.
- */
-void run(const std::string& cmd, const std::vector<std::string> &params, const std::string &redirect)
-{
-	auto systemCMD = preapreCommand(cmd)
-				+" "+prepareCommandParams(params)
-				+" > "+redirect;
-
-	if (int exitCode = system(systemCMD.c_str())) {
-		throw DecompilationError("decompilation was not successful: exit code: "+std::to_string(exitCode));
-	}
 }
 
 /**
@@ -143,7 +71,7 @@ fs::path fetchRetdecPath()
 
 	if (userCustom != "") {
 		fs::path userCustomPath(userCustom);
-		if (!fs::exists(userCustomPath))
+		if (!fs::is_regular_file(userCustomPath))
 			throw DecompilationError("invalid $RETDEC_PATH set: "+userCustom);
 
 		return userCustomPath;
@@ -152,7 +80,7 @@ fs::path fetchRetdecPath()
 #if defined(RETDEC_INSTALL_PREFIX)
 	// If user wanted to install bundled RetDec with retdec-r2plugin.
 	auto rddef = fs::path(RETDEC_INSTALL_PREFIX)/"bin"/"retdec-decompiler.py";
-	if (fs::exists(rddef))
+	if (fs::is_regular_file(rddef))
 		return rddef;
 #endif
 
@@ -237,21 +165,22 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		decrange << fnc.getStart() << "-" << fnc.getEnd();
 
 		std::vector<std::string> decparams {
-			sanitizePath(binName),
+			ce::sanitizePath(binName),
 			"--cleanup",
-			"--config", sanitizePath(config.getConfigFileName()),
+			"--config", ce::sanitizePath(config.getConfigFileName()),
 			"-f", "json-human",
 			//"--select-decode-only",
 			"--select-ranges", decrange.str(),
-			"-o", sanitizePath(decpath.string())
+			"-o", ce::sanitizePath(decpath.string())
 
 		};
 
-		run(sanitizePath(rdpath.string()), decparams, sanitizePath(outpath.string()));
+		ce::execute("python", ce::sanitizePath(rdpath.string()),
+			decparams, ce::sanitizePath(outpath.string()));
 		return outgen.generateOutput(decpath.string());
 	}
-	catch (const DecompilationError &err) {
-		std::cerr << "retdec-r2plugin: " << err.what() << std::endl;
+	catch (const std::exception &err) {
+		std::cerr << "retdec-r2plugin: decompilation was not successful: " << err.what() << std::endl;
 		return nullptr;
 	}
 }
