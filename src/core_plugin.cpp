@@ -247,7 +247,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 
 		};
 
-		run(sanitizePath(rdpath), decparams, sanitizePath(outpath.string()));
+		run(sanitizePath(rdpath.string()), decparams, sanitizePath(outpath.string()));
 		return outgen.generateOutput(decpath.string());
 	}
 	catch (const DecompilationError &err) {
