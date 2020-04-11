@@ -14,6 +14,14 @@
 using namespace retdec::r2plugin;
 
 /**
+ * Empty body for the destructor. The will forbid FormatUtils class
+ * to be instanciated.
+ */
+FormatUtils::~FormatUtils()
+{
+}
+
+/**
  * Translation map betwen C types and LLVM IR types. In future we might
  * consider using some kind of LLVM library method for this but it would
  * only include LLVM dependency (on the other hand size of this map might
@@ -57,7 +65,7 @@ const std::vector<std::string> FormatUtils::_typeKeywords = {
 /**
  * @brief Joins vector of tokens into one string separated by delim.
  */
-const std::string FormatUtils::joinTokens(const std::vector<std::string> &tokens, const std::string &delim) const
+const std::string FormatUtils::joinTokens(const std::vector<std::string> &tokens, const std::string &delim)
 {
 	if (tokens.empty()) {
 		return "";
@@ -73,7 +81,7 @@ const std::string FormatUtils::joinTokens(const std::vector<std::string> &tokens
 /**
  * @brief Splits continuous string of tokens separated by delim into vector of such tokens.
  */
-std::vector<std::string> FormatUtils::splitTokens(const std::string &type, char delim) const
+std::vector<std::string> FormatUtils::splitTokens(const std::string &type, char delim)
 {
 	std::vector<std::string> tokensResult;
 	std::istringstream iss(type);
@@ -89,7 +97,7 @@ std::vector<std::string> FormatUtils::splitTokens(const std::string &type, char 
 /**
  * @brief Strips additional info from function names that is added by Radare2.
  */
-std::string FormatUtils::stripName(const std::string &name) const
+std::string FormatUtils::stripName(const std::string &name)
 {
 	static const std::vector r2Prefix = {"sym.", "fcn.", "imp.", "__isoc99_"};
 
@@ -116,7 +124,7 @@ std::string FormatUtils::stripName(const std::string &name) const
  *
  * TODO: provide more complex types parsing.
  */
-const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
+const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype)
 {
 	static const std::vector<char> structInternals = {'{', ',', '}'};
 
@@ -214,7 +222,7 @@ const std::string FormatUtils::convertTypeToLlvm(const std::string &ctype) const
  *
  * TODO: this method now returns only void.
  */
-const std::string FormatUtils::getTypeDefinition(const std::string &token) const
+const std::string FormatUtils::getTypeDefinition(const std::string &token)
 {
 	return "void";
 }

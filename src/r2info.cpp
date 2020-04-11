@@ -7,10 +7,10 @@
 #include "r2plugin/r2info.h"
 #include "r2plugin/r2utils.h"
 
-using namespace retdec;
-using namespace common;
-using namespace config;
-using namespace r2plugin;
+using namespace retdec::common;
+using namespace retdec::config;
+using namespace retdec::r2plugin;
+using fu = retdec::r2plugin::FormatUtils;
 
 /**
  * Translation map between tokens representing calling convention type returned
@@ -185,9 +185,7 @@ Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
 	auto start = r_anal_function_min_addr(&r2fnc);
 	auto end = r_anal_function_max_addr(&r2fnc);
 
-	FormatUtils fu;
-
-	auto name = fu.stripName(r2fnc.name);
+	auto name = fu::stripName(r2fnc.name);
 
 	Function function(start, end, name);
 
@@ -213,8 +211,6 @@ Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
  */
 void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunction &r2fnc) const
 {
-	FormatUtils fu;
-
 	ObjectSetContainer locals;
 	ObjectSequentialContainer r2args, r2userArgs;
 
@@ -245,7 +241,7 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 			};
 
 			Object var(locvar->name, variableStorage);
-			var.type = Type(fu.convertTypeToLlvm(locvar->type));
+			var.type = Type(fu::convertTypeToLlvm(locvar->type));
 			var.setRealName(locvar->name);
 
 			// If variable is argument it is a local variable too.
@@ -269,7 +265,6 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
  */
 void R2InfoProvider::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFunction &r2fnc) const
 {
-	FormatUtils fu;
 	RAnalFuncArg *arg;
 
 	char* key = resolve_fcn_name(_r2core.anal, r2fnc.name);
@@ -280,7 +275,7 @@ void R2InfoProvider::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFu
 			arg = reinterpret_cast<RAnalFuncArg*>(it->data);
 			Object var(arg->name, Storage::undefined());
 			var.setRealName(arg->name);
-			var.type = Type(fu.convertTypeToLlvm(arg->orig_c_type));
+			var.type = Type(fu::convertTypeToLlvm(arg->orig_c_type));
 			args.push_back(var);
 		}
 		r_list_free (list);
@@ -309,11 +304,9 @@ void R2InfoProvider::fetchFunctionCallingconvention(Function &function, RAnalFun
  */
 void R2InfoProvider::fetchFunctionReturnType(Function &function, RAnalFunction &r2fnc) const
 {
-	FormatUtils fu;
-
 	char* key = resolve_fcn_name(_r2core.anal, r2fnc.name);
 	if (auto returnType = r_type_func_ret(_r2core.anal->sdb_types, key)) {
-		function.returnType = Type(fu.convertTypeToLlvm(returnType));
+		function.returnType = Type(fu::convertTypeToLlvm(returnType));
 		free(key);
 		return;
 	}

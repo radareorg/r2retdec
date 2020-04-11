@@ -25,6 +25,7 @@
 #define CMD_PREFIX "pdz" /**< Plugin activation command in r2 console.**/
 
 using namespace retdec::r2plugin;
+using fu = retdec::r2plugin::FormatUtils;
 
 /**
  * @brief Prins help on r2 console.
@@ -83,8 +84,7 @@ std::string sanitizePath(const std::string &path)
  */
 std::string prepareCommandParams(const std::vector<std::string> &params)
 {
-	FormatUtils fu;
-	auto preparedParams = fu.joinTokens(params, " ");
+	auto preparedParams = fu::joinTokens(params, " ");
 
 	return preparedParams;
 }

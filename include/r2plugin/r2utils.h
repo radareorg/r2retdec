@@ -17,20 +17,23 @@ namespace retdec {
 namespace r2plugin {
 
 class FormatUtils {
+private:
+	~FormatUtils();
+
 public:
-	const std::string convertTypeToLlvm(const std::string &ctype) const;
+	static const std::string convertTypeToLlvm(const std::string &ctype);
 
-	const std::string joinTokens(
+	static const std::string joinTokens(
 			const std::vector<std::string> &tokens,
-			const std::string &delim = " ") const;
-	std::vector<std::string> splitTokens(
+			const std::string &delim = " ");
+	static std::vector<std::string> splitTokens(
 			const std::string &type,
-			char delim = ' ') const;
+			char delim = ' ');
 
-	std::string stripName(const std::string &name) const;
+	static std::string stripName(const std::string &name);
 
 protected:
-	const std::string getTypeDefinition(const std::string &token) const;
+	static const std::string getTypeDefinition(const std::string &token);
 
 private:
 	static const std::map<const std::string, const std::string> _primitives;
