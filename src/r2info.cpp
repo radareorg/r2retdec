@@ -268,7 +268,10 @@ void R2InfoProvider::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFu
 	RAnalFuncArg *arg;
 
 	char* key = resolve_fcn_name(_r2core.anal, r2fnc.name);
-	int nargs = r_type_func_args_count (_r2core.anal->sdb_types, key);
+	if (!key || !_r2core.anal|| !_r2core.anal->sdb_types)
+		return;
+
+	int nargs = r_type_func_args_count(_r2core.anal->sdb_types, key);
 	if (nargs) {
 		RList *list = r_core_get_func_args(&_r2core, r2fnc.name);
 		for (RListIter *it = list->head; it; it = it->n) {
@@ -280,8 +283,6 @@ void R2InfoProvider::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFu
 		}
 		r_list_free (list);
 	}
-
-	free(key);
 }
 
 /**
@@ -304,15 +305,14 @@ void R2InfoProvider::fetchFunctionCallingconvention(Function &function, RAnalFun
  */
 void R2InfoProvider::fetchFunctionReturnType(Function &function, RAnalFunction &r2fnc) const
 {
-	char* key = resolve_fcn_name(_r2core.anal, r2fnc.name);
-	if (auto returnType = r_type_func_ret(_r2core.anal->sdb_types, key)) {
-		function.returnType = Type(fu::convertTypeToLlvm(returnType));
-		free(key);
-		return;
-	}
-
-	free(key);
 	function.returnType = Type("void");
+	char* key = resolve_fcn_name(_r2core.anal, r2fnc.name);
+
+	if (!key || !_r2core.anal || !_r2core.anal->sdb_types)
+		return;
+
+	if (auto returnType = r_type_func_ret(_r2core.anal->sdb_types, key))
+		function.returnType = Type(fu::convertTypeToLlvm(returnType));
 }
 
 /**
