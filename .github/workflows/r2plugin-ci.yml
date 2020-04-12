@@ -79,7 +79,7 @@ jobs:
     ## virtual environment is rebuilt in case of new dependecy is added.
     prepare-retdec-framework:
         runs-on: ${{ matrix.os }}
-        
+
         strategy:
             matrix:
                 os: [ubuntu-latest, macos-latest]
@@ -91,7 +91,7 @@ jobs:
             - name: Clone RetDec RT Framework
               run: git clone https://github.com/avast/retdec-regression-tests-framework
               working-directory: build    
-          
+
             - name: Create/Check Cache of RetDec RT Framework Virtual Environment
               id: retdec-fw-cache
               uses: actions/cache@v1
@@ -100,16 +100,16 @@ jobs:
               with:
                   path: build/retdec-regression-tests-framework/.venv
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/requirements.txt') }}
-              
+
             - name: Install Missing Packages on Ubuntu
               if: steps.retdec-fw-cache.outputs.cache-hit != 'true' && matrix.os == 'ubuntu-latest'
               run:  sudo apt-get install python3-venv
-              
+
             - name: Create Virtual Environemnt
               if: steps.retdec-fw-cache.outputs.cache-hit != 'true'
               run: python3 -m venv .venv
               working-directory: build/retdec-regression-tests-framework
-          
+
             - name: Install Requirements
               if: steps.retdec-fw-cache.outputs.cache-hit != 'true'
               run: |
@@ -124,7 +124,7 @@ jobs:
     ## Cached build is completly rebuilt in case of update of bundled RetDec version.
     build-r2plugin:
         runs-on: ${{ matrix.os }}
-        
+
         strategy:
             matrix:
                 os: [ubuntu-latest, macos-latest]
@@ -137,7 +137,7 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-              
+
             - name: Create Build Directory
               run: mkdir -p build/r2plugin
 
@@ -149,7 +149,7 @@ jobs:
               with:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
-        
+
             - name: Extract Radare2 Installation
               id: radare2-cache
               uses: actions/cache@v1
@@ -158,11 +158,11 @@ jobs:
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
-      
+
             - name: Install Missing Packages on macOS
               if: matrix.os == 'macos-latest'
               run: brew install pkg-config autoconf automake libtool
-              
+
             - name: Build CMake
               if: steps.r2plugin-cache.cache-hit != 'true'
               run: |
@@ -177,7 +177,7 @@ jobs:
                         -DRETDEC_INSTALL_PREFIX=install \
                         -DCMAKE_LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/
               working-directory: build/r2plugin
-            
+
             - name: Build Step Make on Ubuntu
               if: matrix.os != 'macos-latest'
               run: make -j$(nproc) install
@@ -192,7 +192,7 @@ jobs:
     ## After this step artifacts are published.
     run-tests:
         runs-on: ${{ matrix.os }}
-        
+
         strategy:
             matrix:
                 os: [ubuntu-latest, macos-latest]
@@ -200,7 +200,7 @@ jobs:
 
             # Let other builds finish.
             fail-fast: false
-                
+
         needs: [prepare-radare2, prepare-retdec-framework, build-r2plugin]
 
         steps:
@@ -208,7 +208,7 @@ jobs:
 
             - name: Create Build Directory
               run: mkdir -p build
- 
+
             - name: Extract Radare2 Cache
               id: radare2-cache
               uses: actions/cache@v1
@@ -226,7 +226,7 @@ jobs:
               with:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
-            
+
             - name: Install Cached RetDec R2Plugin on Ubuntu
               if: matrix.os != 'macos-latest'
               run: make -j$(nproc) install
@@ -263,7 +263,7 @@ jobs:
               with:
                   name: RetDec-R2Plugin-Build-${{ runner.os }}-${{ matrix.type }}
                   path: build/r2plugin/install
-            
+
             - name: Clone RetDec for Tests
               run: git clone https://github.com/avast/retdec
               working-directory: build
@@ -271,11 +271,11 @@ jobs:
             - name: Clone RetDec RT Framework
               run: git clone https://github.com/avast/retdec-regression-tests-framework
               working-directory: build
-          
+
             - name: Clone RetDec RT
               run: git clone https://github.com/avast/retdec-regression-tests
               working-directory: build
-          
+
             - name: Extract RetDec RT Framework Cache
               id: retdec-fw-cache
               uses: actions/cache@v1
@@ -284,7 +284,7 @@ jobs:
               with:
                   path: build/retdec-regression-tests-framework/.venv
                   key: ${{ runner.os }}-${{ env.cache-name }}
-          
+
             - name: Prepare Test settings
               run: |
                     cat <<EOF > ${PWD}/build/retdec-regression-tests-framework/config_local.ini
