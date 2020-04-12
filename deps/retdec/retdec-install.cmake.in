@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.6)
+
+project(retdec NONE)
+
+include(ExternalProject)
+
+ExternalProject_Add(retdec
+	URL https://github.com/avast/retdec/archive/db0cd3570f97dad247cb09893a7a49cd39b0cfee.zip
+	URL_HASH SHA256=6bf41c31b7fec1cae5d01ca890fb48e18108f4dea5d9cd7e777e7156bdd9f333
+
+	CMAKE_ARGS
+		# Install on passed location.
+		-D CMAKE_INSTALL_PREFIX=@RETDEC_INSTALL_DIR@
+		# Enable only those RetDec components that are actually used.
+		@RETDEC_ENABLE_OPTIONS@
+		# Propagate some basic defines.
+		-D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+		-D CMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+		-D CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+)

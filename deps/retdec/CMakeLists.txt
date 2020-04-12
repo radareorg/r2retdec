@@ -1,132 +1,67 @@
-include(ExternalProject)
+cmake_minimum_required(VERSION 3.8)
 
-if (BUILD_BUNDLED_RETDEC)
-	ExternalProject_Add(retdec-project
-		URL https://github.com/avast/retdec/archive/db0cd3570f97dad247cb09893a7a49cd39b0cfee.zip
-		URL_HASH SHA256=6bf41c31b7fec1cae5d01ca890fb48e18108f4dea5d9cd7e777e7156bdd9f333
-		CMAKE_ARGS
-			-DCMAKE_BUILD_TYPE=Release
-			-DCMAKE_INSTALL_PREFIX=${RETDEC_INSTALL_PREFIX}
-		# Disable the update step.
-		UPDATE_COMMAND ""
-		LOG_DOWNLOAD ON
-		LOG_CONFIGURE ON
-		LOG_BUILD OFF
-	)
-else ()
-	ExternalProject_Add(retdec-project
-		URL https://github.com/avast/retdec/archive/db0cd3570f97dad247cb09893a7a49cd39b0cfee.zip
-		URL_HASH SHA256=6bf41c31b7fec1cae5d01ca890fb48e18108f4dea5d9cd7e777e7156bdd9f333
-		# Disable the configure step.
-		CONFIGURE_COMMAND ""
-		# Disable the update step.
-		UPDATE_COMMAND ""
-		# Disable the build step.
-		BUILD_COMMAND ""
-		# Disable the install step.
-		INSTALL_COMMAND ""
-		LOG_DOWNLOAD ON
-		LOG_CONFIGURE ON
-		LOG_BUILD ON
-	)
-endif ()
-
-# Set include directories.
-ExternalProject_Get_Property(retdec-project source_dir)
-ExternalProject_Get_Property(retdec-project binary_dir)
-
-add_library(rapidjson INTERFACE)
-target_include_directories(rapidjson
-	SYSTEM INTERFACE
-		${source_dir}/deps/rapidjson/include
+project(retdec-build-system-tests
+	LANGUAGES C CXX
 )
-target_compile_definitions(rapidjson
-	INTERFACE
+
+macro(retdec_install)
+	set(RETDEC_DOWNLOAD_DIR "${CMAKE_CURRENT_BINARY_DIR}/retdec-download")
+	if (RETDEC_INSTALL_PREFIX)
+		set(RETDEC_INSTALL_DIR "${RETDEC_INSTALL_PREFIX}")
+	else ()
+		set(RETDEC_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/retdec-install")
+	endif ()
+
+	# Configure RetDec installation script.
+	set(RETDEC_ENABLE_OPTIONS "${ARGV0}")
+	configure_file(
+		"${PROJECT_SOURCE_DIR}/deps/retdec/retdec-install.cmake.in"
+		"${RETDEC_DOWNLOAD_DIR}/CMakeLists.txt"
+	)
+
+	add_library(rapidjson INTERFACE)
+	target_include_directories(rapidjson
+		SYSTEM INTERFACE
+		${RETDEC_DOWNLOAD_DIR}/deps/rapidjson/include
+	)
+	target_compile_definitions(rapidjson
+		INTERFACE
 		RAPIDJSON_HAS_STDSTRING=1
 		RAPIDJSON_HAS_CXX11_RVALUE_REFS=1
-)
+	)
 
-set(RETDEC_SERDES_SOURCES
-	${source_dir}/src/serdes/address.cpp
-	${source_dir}/src/serdes/architecture.cpp
-	${source_dir}/src/serdes/basic_block.cpp
-	${source_dir}/src/serdes/calling_convention.cpp
-	${source_dir}/src/serdes/class.cpp
-	${source_dir}/src/serdes/file_format.cpp
-	${source_dir}/src/serdes/file_type.cpp
-	${source_dir}/src/serdes/function.cpp
-	${source_dir}/src/serdes/language.cpp
-	${source_dir}/src/serdes/object.cpp
-	${source_dir}/src/serdes/pattern.cpp
-	${source_dir}/src/serdes/std.cpp
-	${source_dir}/src/serdes/storage.cpp
-	${source_dir}/src/serdes/tool_info.cpp
-	${source_dir}/src/serdes/type.cpp
-	${source_dir}/src/serdes/vtable.cpp
-)
-set(RETDEC_COMMON_SOURCES
-	${source_dir}/src/common/address.cpp
-	${source_dir}/src/common/architecture.cpp
-	${source_dir}/src/common/basic_block.cpp
-	${source_dir}/src/common/calling_convention.cpp
-	${source_dir}/src/common/class.cpp
-	${source_dir}/src/common/file_format.cpp
-	${source_dir}/src/common/file_type.cpp
-	${source_dir}/src/common/function.cpp
-	${source_dir}/src/common/language.cpp
-	${source_dir}/src/common/object.cpp
-	${source_dir}/src/common/pattern.cpp
-	${source_dir}/src/common/storage.cpp
-	${source_dir}/src/common/tool_info.cpp
-	${source_dir}/src/common/type.cpp
-	${source_dir}/src/common/vtable.cpp
-)
-set(RETDEC_UTILS_SOURCES
-	${source_dir}/src/utils/alignment.cpp
-	${source_dir}/src/utils/byte_value_storage.cpp
-	${source_dir}/src/utils/binary_path.cpp
-	${source_dir}/src/utils/conversion.cpp
-	${source_dir}/src/utils/dynamic_buffer.cpp
-	${source_dir}/src/utils/file_io.cpp
-	${source_dir}/src/utils/filesystem_path.cpp
-	${source_dir}/src/utils/math.cpp
-	${source_dir}/src/utils/memory.cpp
-	${source_dir}/src/utils/string.cpp
-	${source_dir}/src/utils/system.cpp
-	${source_dir}/src/utils/time.cpp
-)
-set(RETDEC_CONFIG_SOURCES
-	${source_dir}/src/config/config.cpp
-	${source_dir}/src/config/parameters.cpp
-)
-set(WHEREAMI_SOURCES
-	${source_dir}/deps/whereami/whereami.c
-)
+	# Configure RetDec build.
+	execute_process(
+		COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -A "${CMAKE_GENERATOR_PLATFORM}" .
+		WORKING_DIRECTORY "${RETDEC_DOWNLOAD_DIR}"
+	)
+	
+	# Build and install RetDec.
+	if(MSVC)
+		execute_process(
+			COMMAND "${CMAKE_COMMAND}" --build . --config Release -- -m
+			WORKING_DIRECTORY "${RETDEC_DOWNLOAD_DIR}"
+		)
+	else()
+		include(ProcessorCount)
+		ProcessorCount(N)
+		execute_process(
+			COMMAND "${CMAKE_COMMAND}" --build . -- -j${N}
+			WORKING_DIRECTORY "${RETDEC_DOWNLOAD_DIR}"
+		)
+	endif()
 
-add_custom_command(OUTPUT
-	${RETDEC_SERDES_SOURCES}
-	${RETDEC_COMMON_SOURCES}
-	${RETDEC_UTILS_SOURCES}
-	${RETDEC_CONFIG_SOURCES}
-	${WHEREAMI_SOURCES}
-	DEPENDS retdec-project
-)
+	# Add RetDec installation directory to CMake prefix
+	# -> find_package() will be able to find RetDec and its components.
+	# NOTE:
+	#   This may cause confusion between multiple installed RetDecs.
+	#   E.g. utils & yaracpp installed, retdec-config.cmake from utils tries
+	#   to find yaracpp config because it thinks it is its component.
+	#list(APPEND CMAKE_PREFIX_PATH "${RETDEC_INSTALL_DIR}")
+	# This does not have the same problem.
+	set(retdec_DIR "${RETDEC_INSTALL_DIR}/share/retdec/cmake")
+endmacro()
 
-# Add libraries.
-add_library(retdec
-	${RETDEC_SERDES_SOURCES}
-	${RETDEC_COMMON_SOURCES}
-	${RETDEC_UTILS_SOURCES}
-	${RETDEC_CONFIG_SOURCES}
-	${WHEREAMI_SOURCES}
-)
-
-add_dependencies(retdec retdec-project)
-target_include_directories(retdec PUBLIC
-	${source_dir}/include
-	${source_dir}/src
-	${source_dir}/deps
-	${source_dir}/deps/whereami/include
-	${source_dir}/deps/whereami/include/whereami
-)
-target_link_libraries(retdec rapidjson)
+macro(retdec_install_config)
+	retdec_install("-D RETDEC_ENABLE_CONFIG=ON")
+endmacro()
