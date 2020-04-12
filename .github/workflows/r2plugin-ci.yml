@@ -148,7 +148,7 @@ jobs:
                   cache-name: r2plugin-cached-build
               with:
                   path: build/r2plugin
-                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
+                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/retdec-install.cmake.in') }}
 
             - name: Extract Radare2 Installation
               id: radare2-cache
@@ -225,7 +225,7 @@ jobs:
                   cache-name: r2plugin-cached-build
               with:
                   path: build/r2plugin
-                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
+                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/retdec-install.cmake.in') }}
 
             - name: Install Cached RetDec R2Plugin on Ubuntu
               if: matrix.os != 'macos-latest'
