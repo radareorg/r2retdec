@@ -130,6 +130,9 @@ jobs:
                 os: [ubuntu-latest, macos-latest]
                 type: [Release, Debug]
 
+            # Let other builds finish.
+            fail-fast: false
+
         needs: [prepare-radare2]
 
         steps:
@@ -194,6 +197,9 @@ jobs:
             matrix:
                 os: [ubuntu-latest, macos-latest]
                 type: [Release, Debug]
+
+            # Let other builds finish.
+            fail-fast: false
                 
         needs: [prepare-radare2, prepare-retdec-framework, build-r2plugin]
 
