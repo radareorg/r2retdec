@@ -308,8 +308,9 @@ jobs:
             - name: Prepare Ubuntu
               if: matrix.os == 'ubuntu-latest'
               run: |
-                   sudo apt-get install gcc-multilib # Install x86 binaries support on Ubuntu
-                   wget --no-proxy https://releases.llvm.org/3.9.1/clang+llvm-3.9.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz -O llvm.tar.xz
+                    sudo apt-get update
+                    sudo apt-get install gcc-multilib # Install x86 binaries support on Ubuntu
+                    wget --no-proxy https://releases.llvm.org/3.9.1/clang+llvm-3.9.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz -O llvm.tar.xz
               working-directory: build
 
             - name: Prepare macOS
