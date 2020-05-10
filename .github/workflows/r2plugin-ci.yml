@@ -103,7 +103,9 @@ jobs:
 
             - name: Install Missing Packages on Ubuntu
               if: steps.retdec-fw-cache.outputs.cache-hit != 'true' && matrix.os == 'ubuntu-latest'
-              run:  sudo apt-get install python3-venv
+              run: |
+                    sudo apt-get update
+                    sudo apt-get install python3-venv
 
             - name: Create Virtual Environemnt
               if: steps.retdec-fw-cache.outputs.cache-hit != 'true'
