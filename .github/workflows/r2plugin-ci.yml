@@ -147,7 +147,7 @@ jobs:
               id: r2plugin-cache
               uses: actions/cache@v1
               env:
-                  cache-name: r2plugin-cached-build
+                  cache-name: retdec-r2plugin-cache
               with:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/retdec-install.cmake.in') }}
@@ -224,7 +224,7 @@ jobs:
               id: r2plugin-cache
               uses: actions/cache@v1
               env:
-                  cache-name: r2plugin-cached-build
+                  cache-name: retdec-r2plugin-cache
               with:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/retdec-install.cmake.in') }}
