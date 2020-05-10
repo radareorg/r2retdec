@@ -23,7 +23,8 @@ jobs:
 
         strategy:
             matrix:
-                os: [ubuntu-latest, macos-latest]
+                #os: [ubuntu-latest, macos-latest]
+                os: [windows-latest]
 
         steps:
             # File is located in the repoitory -> content is required.
@@ -57,13 +58,32 @@ jobs:
               working-directory: build/radare2
 
             - name: Run Configuration Script
-              if: steps.radare2-cache.outputs.cache-hit != 'true'
+              if: (steps.radare2-cache.outputs.cache-hit != 'true')
+                        && (matrix.os != 'windows-latest')
               run: ./configure --prefix=${PWD}
+              working-directory: build/radare2
+
+            - name: Build Radare2 on Windows
+              if: (steps.radare2-cache.outputs.cache-hit != 'true' )
+                        && (matrix.os == 'windows-latest')
+              run: |
+                  "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
+                  meson build --buildtype debug --backend vs2019 --prefix %cd%
+                  msbuild build\radare2.sln /p:Configuration=Release /m
+                  meson install -C build --no-rebuild
+              shell: cmd
+              working-directory: build/radare2
+
+            - name: Check Radare2 Installation Windows
+              if: matrix.os == 'windows-latest'
+              run: |
+                    ls
+                    ls bin
               working-directory: build/radare2
 
             - name: Build Radare2 on Ubuntu
               if: (steps.radare2-cache.outputs.cache-hit != 'true' )
-                        && (matrix.os != 'macos-latest')
+                        && (matrix.os == 'ubuntu-latest')
               run: make -j $(nproc) && make install
               working-directory: build/radare2
 
@@ -82,7 +102,8 @@ jobs:
 
         strategy:
             matrix:
-                os: [ubuntu-latest, macos-latest]
+                #os: [ubuntu-latest, macos-latest]
+                os: [windows-latest]
 
         steps:
             - name: Create Build Directory
@@ -197,7 +218,8 @@ jobs:
 
         strategy:
             matrix:
-                os: [ubuntu-latest, macos-latest]
+                #os: [ubuntu-latest, macos-latest]
+                os: [windows-latest]
                 type: [Release, Debug]
 
             # Let other builds finish.
