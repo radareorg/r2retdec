@@ -181,7 +181,7 @@ jobs:
               working-directory: build/r2plugin
 
             - name: Build Step Make on Ubuntu
-              if: matrix.os != 'macos-latest'
+              if: matrix.os == 'ubuntu-latest'
               run: make -j$(nproc) install
               working-directory: build/r2plugin
 
@@ -230,7 +230,7 @@ jobs:
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/retdec-install.cmake.in') }}
 
             - name: Install Cached RetDec R2Plugin on Ubuntu
-              if: matrix.os != 'macos-latest'
+              if: matrix.os == 'ubuntu-latest'
               run: make -j$(nproc) install
               working-directory: build/r2plugin
 
