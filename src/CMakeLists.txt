@@ -1,11 +1,3 @@
-if (BUILD_BUNDLED_RETDEC)
-	retdec_install()
-else ()
-	retdec_install_config()
-endif ()
-
-find_package(retdec REQUIRED COMPONENTS config)
-
 # RetDec r2plugin sources.
 set(SOURCES
 	core_plugin.cpp
