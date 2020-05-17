@@ -21,6 +21,7 @@ if(WIN32)
 	find_path(Radare2_INCLUDE_DIRS
 			NAMES r_core.h r_bin.h r_util.h
 			HINTS
+				"${RADARE_INSTALL_PATH}/include/libr"
 				"$ENV{HOME}/bin/prefix/radare2/include/libr"
 				/usr/local/include/libr
 				/usr/include/libr)
@@ -29,6 +30,7 @@ if(WIN32)
 	find_path(Radare2_MAIN_INCLUDE
 			NAMES r_userconf.h
 			HINTS
+				"${RADARE_INSTALL_PATH}/include"
 				"$ENV{HOME}/bin/prefix/radare2/include"
 				/usr/local/include/libr
 				/usr/include/libr)
@@ -66,6 +68,7 @@ if(WIN32)
 		find_library(Radare2_LIBRARY_${libname}
 				r_${libname}
 				HINTS
+					"${RADARE_INSTALL_PATH}/lib"
 					"$ENV{HOME}/bin/prefix/radare2/lib"
 					/usr/local/lib
 					/usr/lib)
