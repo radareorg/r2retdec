@@ -50,6 +50,8 @@ if (R2PLUGIN_DOC)
 	add_subdirectory(doc)
 endif()
 
+get_filename_component(RADARE_INSTALL_PATH "${RADARE_INSTALL_PATH}" REALPATH BASE_DIR "${CMAKE_BINARY_DIR}")
+
 set(RADARE2_INSTALL_PLUGDIR "share/radare2/plugins" CACHE PATH "Directory to install radare2 plugin into")
 set(CUTTER_INSTALL_PLUGDIR "share/RadareOrg/Cutter/plugins/native" CACHE PATH "Directory to install Cutter plugin into")
 
