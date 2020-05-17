@@ -202,6 +202,7 @@ jobs:
                         -DCMAKE_BUILD_TYPE=release \
                         -DRETDEC_INSTALL_PREFIX=install \
                         -DRADARE_INSTALL_PATH="C:\Users\peter\projects\actions\build\r2plugin\..\radare2"
+              working-directory: build/r2plugin
 
             - name: Build Step Make on Ubuntu
               if: matrix.os == 'ubuntu-latest'
