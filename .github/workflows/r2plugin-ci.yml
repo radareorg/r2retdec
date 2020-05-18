@@ -71,9 +71,6 @@ jobs:
                     meson build --buildtype release --backend vs2019 --prefix %cd%
                     msbuild build\radare2.sln /p:Configuration=Release /m
                     meson install -C build --no-rebuild
-                    ls
-                    ls bin
-                    ls lib
               shell: cmd
               working-directory: build/radare2
 
@@ -199,13 +196,7 @@ jobs:
             - name: Build CMake on Windows
               if: steps.r2plugin-cache.cache-hit != 'true' && matrix.os == 'windows-latest'
               run: |
-                    cmake ..\.. \
-                        -DCMAKE_INSTALL_PREFIX="$HOME/.local" \
-                        -DBUILD_BUNDLED_RETDEC=ON \
-                        -DBUILD_CUTTER_PLUGIN=OFF \
-                        -DCMAKE_BUILD_TYPE=release \
-                        -DRETDEC_INSTALL_PREFIX=install \
-                        -DRADARE_INSTALL_PATH="..\radare2"
+                    cmake ..\..  -DCMAKE_INSTALL_PREFIX="$HOME/.local" -DBUILD_BUNDLED_RETDEC=ON -DBUILD_CUTTER_PLUGIN=OFF -DCMAKE_BUILD_TYPE=release -DRETDEC_INSTALL_PREFIX=install -DRADARE_INSTALL_PATH="..\radare2"
               working-directory: build/r2plugin
 
             - name: Build Step Make on Ubuntu
