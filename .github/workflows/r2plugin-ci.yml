@@ -40,7 +40,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2-cch
+                  cache-name: radare2-cb
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
@@ -66,7 +66,14 @@ jobs:
               if: (steps.radare2-cache.outputs.cache-hit != 'true' )
                         && (matrix.os == 'windows-latest')
               run: |
-                    call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64 & meson build --buildtype release --backend vs2019 --prefix %cd% & msbuild build\radare2.sln /p:Configuration=Release /m & meson install -C build --no-rebuild
+                    pip install meson
+                    call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+                    meson build --buildtype release --backend vs2019 --prefix %cd%
+                    msbuild build\radare2.sln /p:Configuration=Release /m
+                    meson install -C build --no-rebuild
+                    ls
+                    ls bin
+                    ls lib
               shell: cmd
               working-directory: build/radare2
 
@@ -165,7 +172,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2-cch
+                  cache-name: radare2-cb
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
@@ -241,7 +248,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2-cch
+                  cache-name: radare2-cb
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
