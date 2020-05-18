@@ -40,7 +40,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2
+                  cache-name: radare2-cch
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
@@ -168,7 +168,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2
+                  cache-name: radare2-cch
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
@@ -244,7 +244,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2
+                  cache-name: radare2-cch
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
