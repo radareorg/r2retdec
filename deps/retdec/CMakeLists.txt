@@ -9,8 +9,8 @@ else ()
 endif ()
 
 FetchContent_Declare(retdec
-	URL https://github.com/avast/retdec/archive/c169e9dd55ccca71d61eda05c50c9a2e9426e1e0.zip
-	URL_HASH SHA256=e2ebbd243c1d370539772f37b71ff158d89fb082d0a3f80303c4810c952e3571
+	URL https://github.com/avast/retdec/archive/e0d5a60e604c3443ae9f095da88be5e1bcbf659b.zip
+	URL_HASH SHA256=9caa2bd5c06547b3dc5468b839a8d3a0cd3394f7f9da36db1a5ca06172af4962
 	)
 
 FetchContent_GetProperties(retdec)
@@ -24,6 +24,6 @@ if(NOT retdec_POPULATED)
 
 	add_subdirectory(
 		${retdec_SOURCE_DIR}
-		${RETDEC_INSTALL_DIR}
+		${retdec_BINARY_DIR}
 	)
 endif()
