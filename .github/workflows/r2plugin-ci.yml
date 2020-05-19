@@ -322,7 +322,7 @@ jobs:
                     ; Path to the RetDec's build directory.
                     retdec_build_dir = ${PWD}/build/r2plugin/deps/retdec/retdec-project-prefix/src/retdec-project-build
                     ; Path to the RetDec's installation directory.
-                    retdec_install_dir = ${PWD}/build/r2plugin/install
+                    retdec_install_dir = ${HOME}/.local
                     ; Path to the cloned RetDec repository.
                     retdec_repo_dir = ${PWD}/build/retdec
                     r2plugin_tests_enabled = 1
