@@ -83,6 +83,11 @@ fs::path fetchRetdecPath()
 	if (fs::is_regular_file(rddef))
 		return rddef;
 #endif
+#if defined(PLUGIN_INSTALL_PREFIX)
+	auto pluginPrefix = fs::path(PLUGIN_INSTALL_PREFIX)/"bin"/"retdec-decompier.py";
+	if (fs::is_regular_file(pluginPrefix))
+		return pluginPrefix;
+#endif
 
 	throw DecompilationError("cannot detect RetDec decompiler script. Please set $RETDEC_PATH to the path of the retdec-decompiler.py script.");
 }
