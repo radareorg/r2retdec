@@ -89,7 +89,10 @@ if(WIN32)
 else()
 	# support sys/user.sh install
 	set(Radare2_CMAKE_PREFIX_PATH_TEMP ${CMAKE_PREFIX_PATH})
-	list(APPEND CMAKE_PREFIX_PATH "$ENV{HOME}/bin/prefix/radare2")
+	list(APPEND CMAKE_PREFIX_PATH
+		"$ENV{HOME}/bin/prefix/radare2"
+		"/usr/local"
+	)
 
 	find_package(PkgConfig REQUIRED)
 	pkg_search_module(Radare2 IMPORTED_TARGET REQUIRED r_core)
