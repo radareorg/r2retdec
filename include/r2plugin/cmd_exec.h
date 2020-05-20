@@ -26,10 +26,14 @@ public:
 		const std::string &interpret,
 		const std::string &cmd,
 		const std::vector<std::string> &args,
-		const std::string &redirect = "");
+		const std::string &outRedir = "",
+		const std::string &errRedir = "");
 
 
 	static std::string sanitizePath(const std::string &path);
+
+public:
+	static std::string NUL;
 
 protected:
 	static std::string prepareCommandParams(const std::vector<std::string> &args);

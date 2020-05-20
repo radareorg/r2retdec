@@ -63,7 +63,7 @@ static void printHelp(const RCore &core)
  * @throws DecompilationError If the RetDec decompiler script is not found in
  *                            the specified path (environment, compiled path, ...).
  */
-fs::path fetchRetdecPath()
+std::pair<std::string,  fs::path> fetchRDPathAndInterpret()
 {
 	// If user specified environment variable then use it primarily.
 	auto userCustomRaw = getenv("RETDEC_PATH");
@@ -74,22 +74,40 @@ fs::path fetchRetdecPath()
 		if (!fs::is_regular_file(userCustomPath))
 			throw DecompilationError("invalid $RETDEC_PATH set: "+userCustom);
 
-		return userCustomPath;
+		return {"python", userCustomPath};
 	}
 
 #if defined(RETDEC_INSTALL_PREFIX)
 	// If user wanted to install bundled RetDec with retdec-r2plugin.
 	auto rddef = fs::path(RETDEC_INSTALL_PREFIX)/"bin"/"retdec-decompiler.py";
 	if (fs::is_regular_file(rddef))
-		return rddef;
+		return {"python", rddef};
 #endif
 #if defined(PLUGIN_INSTALL_PREFIX)
 	auto pluginPrefix = fs::path(PLUGIN_INSTALL_PREFIX)/"bin"/"retdec-decompier.py";
 	if (fs::is_regular_file(pluginPrefix))
-		return pluginPrefix;
+		return {"python", pluginPrefix};
 #endif
 
-	throw DecompilationError("cannot detect RetDec decompiler script. Please set $RETDEC_PATH to the path of the retdec-decompiler.py script.");
+	try {
+		ce::execute(
+			"",
+			"retdec-decompiler.py",
+			{"--help"},
+			ce::NUL,
+			ce::NUL
+		);
+
+		return {"", "retdec-decompiler.py"};
+	}
+	catch (const ExecutionError &e) {
+	}
+
+	throw DecompilationError(
+		"cannot detect RetDec decompiler script."
+		"Please set $RETDEC_PATH to the path "
+		"of the retdec-decompiler.py script."
+	);
 }
 
 /**
@@ -155,7 +173,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		auto config = retdec::config::Config::empty(
 				(outDir/"rd_config.json").string());
 
-		auto rdpath = fetchRetdecPath();
+		auto [interpret, rdpath] = fetchRDPathAndInterpret();
 
 		std::string binName = binInfo.fetchFilePath();
 		binInfo.fetchFunctionsAndGlobals(config);
@@ -165,6 +183,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 
 		auto decpath = outDir/"rd_dec.json";
 		auto outpath = outDir/"rd_out.log";
+		auto errpath = outDir/"rd_err.log";
 
 		std::ostringstream decrange;
 		decrange << fnc.getStart() << "-" << fnc.getEnd();
@@ -180,8 +199,13 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 
 		};
 
-		ce::execute("python", ce::sanitizePath(rdpath.string()),
-			decparams, ce::sanitizePath(outpath.string()));
+		ce::execute(
+			interpret,
+			ce::sanitizePath(rdpath.string()),
+			decparams,
+			ce::sanitizePath(outpath.string()),
+			ce::sanitizePath(errpath.string())
+		);
 		return outgen.generateOutput(decpath.string());
 	}
 	catch (const std::exception &err) {

@@ -25,20 +25,29 @@ CmdExec::~CmdExec()
  *                 and existence of the executable should be verified before calling this function.
  * @param args     Parameters of the command. No sanitization is provided. If a parameter contains spaces
  *                 it will probably be interprated as two parameters.
- * @param redirect File where output will be redirected. No sanitization is provided and existence of file
+ * @param outRedir File where output will be redirected. No sanitization is provided and existence of file
  *                 is not verified.
+ * @param errRedir File where stderr will be redirected. No sanitization iw provided and existence of file
+ * 		   is not verified.
  */
 void CmdExec::execute(
 		const std::string &interpret,
 		const std::string &cmd,
 		const std::vector<std::string> &args,
-		const std::string &redirect)
+		const std::string &outRedir,
+		const std::string &errRedir)
 {
-	auto systemCMD = interpret+" "+prepareCommand(cmd)
+	auto systemCMD = prepareCommand(cmd)
 				+" "+prepareCommandParams(args);
+	
+	if (!interpret.empty())
+		systemCMD = interpret + " " + systemCMD;
 
-	if (redirect != "")
-		systemCMD += " > " + redirect;
+	if (outRedir != "")
+		systemCMD += " > " + outRedir;
+
+	if (errRedir != "")
+		systemCMD += " 2> " + errRedir;
 
 	if (int exitCode = system(systemCMD.c_str()))
 		throw ExecutionError("exit code: "+std::to_string(exitCode));
@@ -123,3 +132,9 @@ std::string CmdExec::doSanitizePath(
 
 	return str.str();
 }
+
+#if defined(unix) || defined(__unix__) || defined(__unix) || defined(__APPLE__)
+	std::string CmdExec::NUL = "/dev/null";
+#else
+	std::string CmdExec::NUL = "nul";
+#endif
