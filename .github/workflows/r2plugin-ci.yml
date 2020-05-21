@@ -320,7 +320,7 @@ jobs:
                     ; Path to the cloned repository containing regression tests.
                     tests_root_dir = ${PWD}/build/retdec-regression-tests
                     ; Path to the RetDec's build directory.
-                    retdec_build_dir = ${PWD}/build/r2plugin/deps/retdec/retdec-project-prefix/src/retdec-project-build
+                    retdec_build_dir = ${PWD}/build/r2plugin/_deps/retdec-build
                     ; Path to the RetDec's installation directory.
                     retdec_install_dir = ${HOME}/.local
                     ; Path to the cloned RetDec repository.
