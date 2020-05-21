@@ -280,14 +280,16 @@ jobs:
             #   |_ LICENSE-THIRD-PARTY
             #   \_ README.md
             - name: Prepare Files for Publishing
+              if: matrix.type == 'Release'
               run: |
                     cp -r ${HOME}/.local/share build/r2plugin/install/
                     cp LICENSE* CHANGELOG.md README.md build/r2plugin/install/
 
             - name: Archive Artifacts
+              if: matrix.type == 'Release'
               uses: actions/upload-artifact@v1
               with:
-                  name: RetDec-R2Plugin-Build-${{ runner.os }}-${{ matrix.type }}
+                  name: RetDec-R2Plugin-Build-${{ runner.os }}
                   path: build/r2plugin/install
 
             - name: Clone RetDec for Tests
