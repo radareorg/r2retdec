@@ -64,9 +64,10 @@ set(RETDEC_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "RetDec installatio
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(Radare2 REQUIRED)
-if(BUILD_CUTTER_PLUGIN)
-	add_subdirectory(cutter-plugin)
-endif()
 
 add_subdirectory(deps)
 add_subdirectory(src)
+
+if(BUILD_CUTTER_PLUGIN)
+	add_subdirectory(cutter-plugin)
+endif()

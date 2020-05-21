@@ -1,24 +1,33 @@
-# This file originated in https://github.com/radareorg/r2ghidra-dec project under LGPLv3 license.
-# requires CUTTER_SOURCE_DIR
-# sets CUTTER_INCLUDE_DIRS and Cutter::Cutter
+cmake_minimum_required(VERSION 3.8)
 
-if(CUTTER_SOURCE_DIR)
+include(FetchContent)
+
+FetchContent_Declare(cutter
+	GIT_REPOSITORY https://github.com/radareorg/cutter
+	GIT_TAG v1.10.3
+)
+
+FetchContent_GetProperties(cutter)
+if(NOT Cutter_POPULATED)
+	FetchContent_Populate(cutter)
 	find_path(Cutter_SOURCE_ROOT
 			NAMES core/Cutter.h
-			PATHS "${CUTTER_SOURCE_DIR}"
+			PATHS "${cutter_SOURCE_DIR}"
 			PATH_SUFFIXES src
-			NO_DEFAULT_PATH)
-else()
-	set(Cutter_SOURCE_ROOT Cutter_SOURCE_ROOT-NOTFOUND)
+			NO_DEFAULT_PATH
+	)
 endif()
 
+message(${Cutter_SOURCE_ROOT})
+
 include(FindPackageHandleStandardArgs)
+
 find_package_handle_standard_args(Cutter
 		REQUIRED_VARS Cutter_SOURCE_ROOT
 		FAIL_MESSAGE "#######################################################
 Could not find Cutter headers. Make sure CUTTER_SOURCE_DIR is set to the root of the Cutter source repository.
-#######################################################
-")
+#######################################################"
+)
 
 if(Cutter_FOUND)
 	set(CUTTER_INCLUDE_DIRS "${Cutter_SOURCE_ROOT}" "${Cutter_SOURCE_ROOT}/common" "${Cutter_SOURCE_ROOT}/core")

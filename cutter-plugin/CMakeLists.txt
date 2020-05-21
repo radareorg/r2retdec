@@ -17,7 +17,7 @@ add_library(r2retdec_cutter SHARED ${SOURCE})
 target_link_libraries(r2retdec_cutter Qt5::Widgets)
 target_link_libraries(r2retdec_cutter Radare2::libr)
 
-find_package(Cutter REQUIRED)
+#find_package(Cutter REQUIRED)
 target_link_libraries(r2retdec_cutter Cutter::Cutter)
 
 if(APPLE)
