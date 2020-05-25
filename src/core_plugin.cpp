@@ -84,7 +84,8 @@ std::pair<std::string,  fs::path> fetchRDPathAndInterpret()
 		return {"python", rddef};
 #endif
 #if defined(PLUGIN_INSTALL_PREFIX)
-	auto pluginPrefix = fs::path(PLUGIN_INSTALL_PREFIX)/"bin"/"retdec-decompier.py";
+	auto pluginPrefix = fs::path(PLUGIN_INSTALL_PREFIX)/"bin"/"retdec-decompiler.py";
+
 	if (fs::is_regular_file(pluginPrefix))
 		return {"python", pluginPrefix};
 #endif
