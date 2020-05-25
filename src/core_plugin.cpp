@@ -134,7 +134,10 @@ fs::path getOutDirPath()
 	if (outDir != "") {
 		auto outDirPath = fs::path(outDir);
 		if (!is_directory(outDirPath, err)) {
-			throw DecompilationError("invald $DEC_SAVE_DIR: not a directory: "+outDir);
+			throw DecompilationError(
+				"invald $DEC_SAVE_DIR: not a directory: "
+				+outDir
+			);
 		}
 
 		return outDirPath;
@@ -152,7 +155,11 @@ fs::path getOutDirPath()
 		// directory and only when this method is called from r2 console.
 		tmpDir = fs::path("/tmp");
 		if (!is_directory(tmpDir, err)) {
-			throw DecompilationError("cannot find a temporary directory on the system. Please specify a temporary directory by setting $TMPDIR, or $DEC_OUT_DIR.");
+			throw DecompilationError(
+				"cannot find a temporary directory on the system. "
+				"Please specify a temporary directory by setting "
+				"$TMPDIR, or $DEC_OUT_DIR."
+			);
 		}
 	}
 
