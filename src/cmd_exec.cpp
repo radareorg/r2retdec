@@ -4,6 +4,7 @@
  * @copyright (c) 2020 Avast Software, licensed under the LGPLv3 license.
  */
 
+#include <cassert>
 #include <sstream>
 
 #include "r2plugin/cmd_exec.h"
@@ -21,6 +22,7 @@ CmdExec::~CmdExec()
 /**
  * @brief Run specified command, with specified parameters and output redirection.
  *
+ * @param interpret Provides program that will interpet the cmd. In case of executable empty string should be provided.
  * @param cmd      Command to be runned. In case of full path of the executable the path must be sanitized
  *                 and existence of the executable should be verified before calling this function.
  * @param args     Parameters of the command. No sanitization is provided. If a parameter contains spaces
@@ -37,11 +39,20 @@ void CmdExec::execute(
 		const std::string &outRedir,
 		const std::string &errRedir)
 {
-	auto systemCMD = prepareCommand(cmd)
-				+" "+prepareCommandParams(args);
-	
+	// Make sure at least one is assigned.
+	assert(
+		!(interpret.empty() && cmd.empty())
+		&& "Neither interpet nor cmd were provided."
+	);
+
+	std::string systemCMD = "";
 	if (!interpret.empty())
-		systemCMD = interpret + " " + systemCMD;
+		systemCMD += interpret + " ";
+
+	if (!cmd.empty())
+		systemCMD += prepareCommand(cmd) + " ";
+
+	systemCMD += prepareCommandParams(args);
 
 	if (outRedir != "")
 		systemCMD += " > " + outRedir;
@@ -120,6 +131,9 @@ std::string CmdExec::doSanitizePath(
 		char quoteType,
 		const std::string &sanitized)
 {
+	if (path.empty())
+		return path;
+
 	std::ostringstream str;
 	str << quoteType;
 	for (char c: path) {

@@ -98,7 +98,7 @@ std::pair<std::string,  fs::path> fetchRDPathAndInterpret()
 			ce::NUL
 		);
 
-		return {"", "retdec-decompiler.py"};
+		return {"retdec-decompiler.py", ""};
 	}
 	catch (const ExecutionError &e) {
 	}
