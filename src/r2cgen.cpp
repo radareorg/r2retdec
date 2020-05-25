@@ -81,7 +81,7 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const rapidjson::Document &root
 			}
 			else {
 				try {
-					lastAddr = std::stol(addrRaw, nullptr, 16);
+					lastAddr = std::stoll(addrRaw, nullptr, 16);
 				} catch (std::exception &e) {
 					throw DecompilationError("invalid address: "+addrRaw);
 				}
