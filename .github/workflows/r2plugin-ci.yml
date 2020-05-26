@@ -122,11 +122,11 @@ jobs:
 
             - name: Install virtualenv on Windows
               if: matrix.os == 'windows-latest'
-              run: python3 -m pip install virtualenv
+              run: python -m pip install virtualenv
 
             - name: Create Virtual Environemnt
               if: steps.retdec-fw-cache.outputs.cache-hit != 'true'
-              run: python3 -m venv .venv
+              run: python -m venv .venv
               working-directory: build/retdec-regression-tests-framework
 
             - name: Install Requirements
