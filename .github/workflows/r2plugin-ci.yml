@@ -371,8 +371,8 @@ jobs:
             - name: Prepare Windows
               if: matrix.os == 'windows-latest'
               run: |
-                  C:\msys64\usr\bin\pacman -S mingw-w64-i686-gcc
-                  C:\msys64\usr\bin\pacman -S mingw-w64-x86_64-gcc
+                  C:\msys64\usr\bin\pacman -S mingw-w64-i686-gcc --noconfirm
+                  C:\msys64\usr\bin\pacman -S mingw-w64-x86_64-gcc --noconfirm
 
             - name: Extract Clang
               if: matrix.os != 'windows-latest'
