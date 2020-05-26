@@ -274,6 +274,40 @@ jobs:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
 
+            - name: Prepare Ubuntu
+              if: matrix.os == 'ubuntu-latest'
+              run: |
+                    sudo apt-get update
+                    sudo apt-get install gcc-multilib # Install x86 binaries support on Ubuntu
+                    wget --no-proxy https://releases.llvm.org/3.9.1/clang+llvm-3.9.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz -O llvm.tar.xz
+              working-directory: build
+
+            - name: Prepare macOS
+              if: matrix.os == 'macos-latest'
+              run: wget --no-proxy https://releases.llvm.org/3.9.0/clang+llvm-3.9.0-x86_64-apple-darwin.tar.xz -O llvm.tar.xz
+              working-directory: build
+
+            - name: Prepare Windows
+              if: matrix.os == 'macos-windows'
+              run: wget https://releases.llvm.org/3.9.1/LLVM-3.9.1-win64.exe -OutFile llvm.exe
+              working-directory: build
+
+            - name: Prepare Windows
+              if: matrix.os == 'windows-latest'
+              run: |
+                  C:\msys64\usr\bin\pacman -S mingw-w64-i686-gcc --noconfirm
+                  C:\msys64\usr\bin\pacman -S mingw-w64-x86_64-gcc --noconfirm
+
+            - name: Extract Clang
+              if: matrix.os != 'windows-latest'
+              run: tar -xJf llvm.tar.xz && mv clang* clang
+              working-directory: build
+
+            - name: Extract Clang on Windows
+              if: matrix.os == 'windows-latest'
+              run: .\llvm.exe /S /D=$(Get-Location)\clang
+              working-directory: build
+
             - name: Install Cached RetDec R2Plugin on Ubuntu
               if: matrix.os == 'ubuntu-latest'
               run: make -j$(nproc) install
@@ -361,29 +395,24 @@ jobs:
                     r2plugin_script = ${PWD}/scripts/run-r2-decompilation.py
                     EOF
 
-            - name: Prepare Ubuntu
-              if: matrix.os == 'ubuntu-latest'
-              run: |
-                    sudo apt-get update
-                    sudo apt-get install gcc-multilib # Install x86 binaries support on Ubuntu
-                    wget --no-proxy https://releases.llvm.org/3.9.1/clang+llvm-3.9.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz -O llvm.tar.xz
-              working-directory: build
-
-            - name: Prepare macOS
-              if: matrix.os == 'macos-latest'
-              run: wget --no-proxy https://releases.llvm.org/3.9.0/clang+llvm-3.9.0-x86_64-apple-darwin.tar.xz -O llvm.tar.xz
-              working-directory: build
-
-            - name: Prepare Windows
+            - name: Prepare Test settings on Windows
               if: matrix.os == 'windows-latest'
               run: |
-                  C:\msys64\usr\bin\pacman -S mingw-w64-i686-gcc --noconfirm
-                  C:\msys64\usr\bin\pacman -S mingw-w64-x86_64-gcc --noconfirm
-
-            - name: Extract Clang
-              if: matrix.os != 'windows-latest'
-              run: tar -xJf llvm.tar.xz && mv clang* clang
-              working-directory: build
+                    $PWD = (Get-Location).path
+                    echo "[runner]
+                    ; Path to the extracted Clang package containing subdirectories such as bin, include, lib, share.
+                    clang_dir = $PWD\build\clang
+                    ; Path to the cloned repository containing regression tests.
+                    tests_root_dir = $PWD\build\retdec-regression-tests
+                    ; Path to the RetDec's build directory.
+                    retdec_build_dir = $PWD\build\r2plugin\_deps\retdec-build
+                    ; Path to the RetDec's installation directory.
+                    retdec_install_dir = $HOME\.local
+                    ; Path to the cloned RetDec repository.
+                    retdec_repo_dir = $PWD\build\retdec
+                    r2plugin_tests_enabled = 1
+                    r2plugin_script = $PWD\scripts\run-r2-decompilation.py" `
+                        > "$($(Get-Location).path)\build\retdec-regression-tests-framework\config_local.ini"
 
             - name: Run tests
               if: matrix.os != 'windows-latest'
@@ -399,7 +428,7 @@ jobs:
               if: matrix.os == 'windows-latest'
               run: |
                     .venv/Scripts/activate
-                    $env:Path += ";$(Get-Location).path\..\radare2\bin"
+                    $env:Path += ";$($(Get-Location).path)\..\radare2\bin"
                     $nixPath = (($(Get-Location).path -replace "\\","/") -replace "C:","/c")
                     C:\msys64\usr\bin\bash.exe -l -c "python $nixPath/runner.py tools.r2plugin"
               working-directory: build/retdec-regression-tests-framework
