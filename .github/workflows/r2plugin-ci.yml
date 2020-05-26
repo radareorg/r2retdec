@@ -344,6 +344,13 @@ jobs:
               run: wget --no-proxy https://releases.llvm.org/3.9.0/clang+llvm-3.9.0-x86_64-apple-darwin.tar.xz -O llvm.tar.xz
               working-directory: build
 
+            - name: Prepare Windows
+              if: matrix.os == 'windows-latest'
+              run: |
+                    pacman -S mingw-w64-i686-gcc
+                    pacman -S mingw-w64-x86_64-gcc
+              shell: C:\msys64\usr\bin\bash
+
             - name: Extract Clang
               run: tar -xJf llvm.tar.xz && mv clang* clang
               working-directory: build
