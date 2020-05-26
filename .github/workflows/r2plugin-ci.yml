@@ -288,7 +288,7 @@ jobs:
               working-directory: build
 
             - name: Prepare Windows
-              if: matrix.os == 'macos-windows'
+              if: matrix.os == 'windows-latest'
               run: wget https://releases.llvm.org/3.9.1/LLVM-3.9.1-win64.exe -OutFile llvm.exe
               working-directory: build
 
