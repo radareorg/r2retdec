@@ -388,3 +388,12 @@ jobs:
                     export PKG_CONFIG_PATH=${PWD}/../radare2/lib/pkgconfig:${PKG_CONFIG_PATH}
                     python3 ./runner.py tools.r2plugin
               working-directory: build/retdec-regression-tests-framework
+
+            - name: Run tests on Windows
+              if: matrix.os == 'windows-latest'
+              run: |
+                    .venv/Scripts/activate
+                    $env:Path += ";$(Get-Location).path\..\radare2\bin"
+                    $nixPath = (($(Get-Location).path -replace "\\","/") -replace "C:","/c")
+                    C:\msys64\usr\bin\bash.exe -l -c "python $nixPath/runner.py tools.r2plugin"
+              working-directory: build/retdec-regression-tests-framework
