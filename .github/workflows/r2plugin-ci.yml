@@ -221,7 +221,7 @@ jobs:
 
         strategy:
             matrix:
-                os: [ubuntu-latest, macos-latest]
+                os: [ubuntu-latest, macos-latest, windows-latest]
                 type: [Release, Debug]
 
             # Let other builds finish.
@@ -263,7 +263,13 @@ jobs:
               run: make -j $(sysctl -n hw.ncpu) install
               working-directory: build/r2plugin
 
+            - name: Install Cached RetDec R2Plugin on Windows
+              if: matrix.os == 'windows-latest'
+              run: cmake --build . --config Release --target install -- -m
+              working-directory: build/r2plugin
+
             - name: Verify Installation of R2plugin
+              if: matrix.os != 'windows-latest'
               run: ls ${HOME}/.local/share/radare2/plugins/core_retdec.so || ls ${HOME}/.local/share/radare2/plugins/core_retdec.dylib
 
             # Prepare files for publishing, resulting structure:
@@ -282,7 +288,7 @@ jobs:
             - name: Prepare Files for Publishing
               if: matrix.type == 'Release'
               run: |
-                    cp -r ${HOME}/.local/share build/r2plugin/install/
+                    cp -r ~/.local/share build/r2plugin/install/
                     cp LICENSE* CHANGELOG.md README.md build/r2plugin/install/
 
             - name: Archive Artifacts
@@ -314,6 +320,7 @@ jobs:
                   key: ${{ runner.os }}-${{ env.cache-name }}
 
             - name: Prepare Test settings
+              if: matrix.os != 'windows-latest'
               run: |
                     cat <<EOF > ${PWD}/build/retdec-regression-tests-framework/config_local.ini
                     [runner]
@@ -352,10 +359,12 @@ jobs:
               shell: C:\msys64\usr\bin\bash
 
             - name: Extract Clang
+              if: matrix.os != 'windows-latest'
               run: tar -xJf llvm.tar.xz && mv clang* clang
               working-directory: build
 
             - name: Run tests
+              if: matrix.os != 'windows-latest'
               run: |
                     . .venv/bin/activate
                     export PATH=${PWD}/../radare2/bin:${PATH}
