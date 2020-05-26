@@ -211,7 +211,7 @@ jobs:
 
             - name: Build Step Make on Windows
               if: matrix.os == 'windows-latest'
-              run: cmake --build . --config Release -- -m
+              run: cmake --build . --config Release --target install -- -m
               working-directory: build/r2plugin
 
     ## Run tests on RetDec R2plugin
