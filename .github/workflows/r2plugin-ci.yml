@@ -303,6 +303,7 @@ jobs:
               run: |
                   C:\msys64\usr\bin\pacman -S mingw-w64-i686-gcc --noconfirm
                   C:\msys64\usr\bin\pacman -S mingw-w64-x86_64-gcc --noconfirm
+                  choco install 7zip
 
             - name: Extract Clang
               if: matrix.os != 'windows-latest'
@@ -311,7 +312,10 @@ jobs:
 
             - name: Extract Clang on Windows
               if: matrix.os == 'windows-latest'
-              run: .\llvm.exe /S /D=$(Get-Location)\clang
+              run: |
+                    mkdir clang
+                    cd clang
+                    7z x ..\llvm.exe
               working-directory: build
 
             - name: Install Cached RetDec R2Plugin on Ubuntu
@@ -425,6 +429,7 @@ jobs:
               run: |
                     cat "$($(Get-Location).path)\build\retdec-regression-tests-framework\config_local.ini"
                     ls build
+                    ls build/clang
 
             - name: Run tests
               if: matrix.os != 'windows-latest'
