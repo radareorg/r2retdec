@@ -40,7 +40,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2-cb
+                  cache-name: radare2-cache-build
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
@@ -109,7 +109,7 @@ jobs:
               id: retdec-fw-cache
               uses: actions/cache@v1
               env:
-                  cache-name: retdec-fw-venv
+                  cache-name: retdec-fw-cache
               with:
                   path: build/retdec-regression-tests-framework/.venv
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/requirements.txt') }}
@@ -175,7 +175,7 @@ jobs:
               id: r2plugin-cache
               uses: actions/cache@v1
               env:
-                  cache-name: retdec-r2plugin-cache
+                  cache-name: r2plugin-cache
               with:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
@@ -184,7 +184,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2-cb
+                  cache-name: radare2-cache-build
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
@@ -260,7 +260,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2-cb
+                  cache-name: radare2-cache-build
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
@@ -269,7 +269,7 @@ jobs:
               id: r2plugin-cache
               uses: actions/cache@v1
               env:
-                  cache-name: retdec-r2plugin-cache
+                  cache-name: r2plugin-cache
               with:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
@@ -372,7 +372,7 @@ jobs:
               id: retdec-fw-cache
               uses: actions/cache@v1
               env:
-                  cache-name: retdec-fw-venv
+                  cache-name: retdec-fw-cache
               with:
                   path: build/retdec-regression-tests-framework/.venv
                   key: ${{ runner.os }}-${{ env.cache-name }}
