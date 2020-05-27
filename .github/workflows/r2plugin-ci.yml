@@ -289,7 +289,8 @@ jobs:
 
             - name: Prepare Windows
               if: matrix.os == 'windows-latest'
-              run: wget https://releases.llvm.org/3.9.1/LLVM-3.9.1-win64.exe -OutFile llvm.exe
+              run: curl https://releases.llvm.org/3.9.1/LLVM-3.9.1-win64.exe -o llvm.exe
+              shell: cmd
               working-directory: build
 
             - name: Prepare Windows
@@ -413,6 +414,12 @@ jobs:
                     r2plugin_tests_enabled = 1
                     r2plugin_script = $PWD\scripts\run-r2-decompilation.py" `
                         > "$($(Get-Location).path)\build\retdec-regression-tests-framework\config_local.ini"
+
+            - name: Verify configuration on Windows
+              if: matrix.os == 'windows-latest'
+              run: |
+                    cat "$($(Get-Location).path)\build\retdec-regression-tests-framework\config_local.ini"
+                    ls build
 
             - name: Run tests
               if: matrix.os != 'windows-latest'
