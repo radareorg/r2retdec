@@ -40,7 +40,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2-cache-build
+                  cache-name: radare2-chb
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
@@ -68,8 +68,8 @@ jobs:
               run: |
                     pip install meson
                     call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
-                    meson build --buildtype release --backend vs2019 --prefix %cd%
-                    msbuild build\radare2.sln /p:Configuration=Release /m
+                    meson build --buildtype debug --backend vs2019 --prefix %cd%
+                    msbuild build\radare2.sln /p:Configuration=Debug /m
                     meson install -C build --no-rebuild
               shell: cmd
               working-directory: build/radare2
@@ -189,7 +189,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2-cache-build
+                  cache-name: radare2-chb
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
@@ -265,7 +265,7 @@ jobs:
               id: radare2-cache
               uses: actions/cache@v1
               env:
-                  cache-name: radare2-cache-build
+                  cache-name: radare2-chb
               with:
                   path: build/radare2
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
@@ -444,8 +444,14 @@ jobs:
             - name: Run tests on Windows
               if: matrix.os == 'windows-latest'
               run: |
-                    .venv/Scripts/activate
-                    $env:Path += ";$($(Get-Location).path)\..\radare2\bin"
-                    $nixPath = (($(Get-Location).path -replace "\\","/") -replace "C:","/c")
-                    C:\msys64\usr\bin\bash.exe -l -c "python $nixPath/runner.py tools.r2plugin"
+                    $nixPath = ((($(Get-Location).path -replace "\\","/") -replace "C:","/c") -replace "D:","/d")
+                    C:\msys64\usr\bin\bash.exe -l -c "
+                    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+                    python get-pip.py
+                    python -m pip install wheel
+                    python -m pip install r2pipe
+                    python -m pip install -r $nixPath/requirements.txt
+                    export PATH=`"$nixPath/../radare2/bin:`$PATH`"
+                    python $nixPath/runner.py tools.r2plugin
+                    "
               working-directory: build/retdec-regression-tests-framework
