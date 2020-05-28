@@ -109,7 +109,7 @@ jobs:
               id: retdec-fw-cache
               uses: actions/cache@v1
               env:
-                  cache-name: retdec-fw-cache
+                  cache-name: retdec-test-fw-cache
               with:
                   path: build/retdec-regression-tests-framework/.venv
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/requirements.txt') }}
@@ -148,7 +148,7 @@ jobs:
               if: steps.retdec-fw-cache.outputs.cache-hit != 'true'
                     && matrix.os == 'windows-latest'
               run: |
-                    .venv\Scripts\activate.bat
+                    .venv\Scripts\activate
                     pip3 install wheel
                     pip3 install r2pipe
                     pip3 install -r requirements.txt
@@ -381,7 +381,7 @@ jobs:
               id: retdec-fw-cache
               uses: actions/cache@v1
               env:
-                  cache-name: retdec-fw-cache
+                  cache-name: retdec-test-fw-cache
               with:
                   path: build/retdec-regression-tests-framework/.venv
                   key: ${{ runner.os }}-${{ env.cache-name }}
