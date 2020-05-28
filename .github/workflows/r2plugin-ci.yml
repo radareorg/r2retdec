@@ -441,8 +441,12 @@ jobs:
                     python3 ./runner.py tools.r2plugin
               working-directory: build/retdec-regression-tests-framework
 
+              # Tests on Windows are turned off.
+              # This is caused by radare2.exe not giving output/giving output of r2p.
+              # When this error is resolved removing `false` should result in
+              # tests being enabled.
             - name: Run tests on Windows
-              if: matrix.os == 'windows-latest'
+              if: false && matrix.os == 'windows-latest'
               run: |
                     $nixPath = ((($(Get-Location).path -replace "\\","/") -replace "C:","/c") -replace "D:","/d")
                     C:\msys64\usr\bin\bash.exe -l -c "
