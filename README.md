@@ -16,7 +16,7 @@ We officially support Linux and macOS on which this plugin was tested.
 
 ### R2PM Installation
 
-The r2pm package is available for Radare2 version 4.2.0 and newer. To install the plugin using r2pm use:
+The r2pm package is available for Radare2 version 4.5.0 and newer. To install the plugin using r2pm use:
 
 ```bash
 $ r2pm -i retdec-r2plugin
@@ -54,7 +54,7 @@ This section describes a local build and installation of RetDec Radare2 plugin.
 
 * A compiler supporting c++17
 * CMake (version >= 3.6)
-* Existing Radare2 installation (version >= 4.2.0)
+* Existing Radare2 installation (version >= 4.5.0)
 
 To build the bundled version of RetDec see [RetDec requirements section](https://github.com/avast/retdec#requirements).
 
@@ -76,8 +76,7 @@ You can pass the following additional parameters to `cmake`:
 * `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. The build of the bundled RetDec is by default turned on.
 * `-DRETDEC_INSTALL_PREFIX=<path>` to specify the path where the bundled RetDec version will be installed or to specify the path of an existing RetDec installation (default is the value of `CMAKE_INSTALL_PREFIX`).
 * `-DR2PLUGIN_DOC=OFF` optional parameter to build Doxygen documentation.
-* `-DBUILD_CUTTER_PLUGIN=OFF` setting to ON will try to build Cutter plugin. This option may, however, require setting `CUTTER_SOURCE_DIR`. The Cutter must be built with support for plugin loading, see [Cutter documentation](https://cutter.re/docs/plugins.html).
-* `-DCUTTER_SOURCE_DIR` path to the `${CUTTER_REPO_ROOT}/src` used to compile Cutter plugin.
+* `-DBUILD_CUTTER_PLUGIN=OFF` setting to ON will try to build Cutter plugin. The Cutter must be built with support for plugin loading, see [Cutter documentation](https://cutter.re/docs/plugins.html).
 
 *Note*: retdec-r2plugin requires [filesystem](https://en.cppreference.com/w/cpp/filesystem) library to be linked with the plugin. CMake will try to find the library in the system but on GCC 7 it might not be able to do so automatically. In that case you must specify a path where this library is located in the system to the cmake by adding:
 * `-DCMAKE_LIBRARY_PATH=${PATH_TO_FILESTSTEM_DIR}`
