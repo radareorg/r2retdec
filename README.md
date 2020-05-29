@@ -80,10 +80,10 @@ You have to pass the following parameters to `cmake`:
 * `-DCMAKE_INSTALL_PREFIX=<path>` to set the installation path to `<path>`. It is important to set the `<path>` to a location where Radare2 can load plugins from (for example `~/.local`).
 
 You can pass the following additional parameters to `cmake`:
-* `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. The build of the bundled RetDec is by default turned on.
-* `-DRETDEC_INSTALL_PREFIX=<path>` to specify the path where the bundled RetDec version will be installed or to specify the path of an existing RetDec installation (default is the value of `CMAKE_INSTALL_PREFIX`).
+* `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. The build of the bundled RetDec is by default turned on. RetDec will be installed to `CMAKE_INSTALL_PREFIX`.
+* `-DRETDEC_INSTALL_PREFIX=<path>` specify path to be searched when RetDec is not found at `CMAKE_INSTALL_PREFIX`.
 * `-DR2PLUGIN_DOC=OFF` optional parameter to build Doxygen documentation.
-* `-DBUILD_CUTTER_PLUGIN=OFF` setting to ON will try to build Cutter plugin. The Cutter must be built with support for plugin loading, see [Cutter documentation](https://cutter.re/docs/plugins.html).
+* `-DBUILD_CUTTER_PLUGIN=OFF` setting to ON will build the Cutter plugin. Cutter must be built with support for plugin loading, see [Cutter documentation](https://cutter.re/docs/plugins.html).
 
 *Note*: retdec-r2plugin requires [filesystem](https://en.cppreference.com/w/cpp/filesystem) library to be linked with the plugin. CMake will try to find the library in the system but on GCC 7 it might not be able to do so automatically. In that case you must specify a path where this library is located in the system to the cmake by adding:
 * `-DCMAKE_LIBRARY_PATH=${PATH_TO_FILESTSTEM_DIR}`
