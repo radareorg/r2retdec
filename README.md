@@ -12,7 +12,7 @@ With the bundled version of RetDec you can decompile the following architectures
 
 ## Installation and Use
 
-We officially support Linux and macOS on which this plugin was tested.
+The plugin was tested and should work on following operating systems: Linux, macOS and Windows.
 
 ### R2PM Installation
 
@@ -68,6 +68,13 @@ To build the bundled version of RetDec see [RetDec requirements section](https:/
   * `cmake .. -DCMAKE_INSTALL_PREFIX=<path>`
   * `make -jN` (`N` is the number of processes to use for parallel build, typically number of cores + 1 gives fastest compilation time)
   * `make install`
+* Windows:
+  * Open a command prompt (e.g. `cmd.exe`)
+  * `cd retdec-r2plugin`
+  * `mkdir build && cd build`
+  * `cmake .. -DCMAKE_INSTALL_PREFIX=<path>`
+  * `cmake --build . --config Release -- -m`
+  * `cmake --build . --config Release --target install`
 
 You have to pass the following parameters to `cmake`:
 * `-DCMAKE_INSTALL_PREFIX=<path>` to set the installation path to `<path>`. It is important to set the `<path>` to a location where Radare2 can load plugins from (for example `~/.local`).
