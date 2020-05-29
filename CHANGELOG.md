@@ -2,6 +2,7 @@
 
 ## dev
 
+* Required Radare2 version >= 4.5.0
 * RetDec is searched in PATH.
 * Build of Cutter plugin no longer requires path to the Cutter repo.
 * Updated bundled RetDec to v4.0
