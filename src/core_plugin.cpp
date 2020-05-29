@@ -316,7 +316,8 @@ extern "C"
 R_API RLibStruct radare_plugin = {
 	/* .type = */ R_LIB_TYPE_CORE,
 	/* .data = */ &r_core_plugin_retdec,
-	/* .version = */ R2_VERSION,
+	/* .version = */ nullptr, // Do not require certain version.
+	                          // Might be source of errors on older releases.
 	/* .free = */ nullptr,
 	/* .pkgname */ "retdec-r2plugin"
 };
