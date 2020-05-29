@@ -198,9 +198,20 @@ jobs:
               if: matrix.os == 'macos-latest'
               run: brew install pkg-config autoconf automake libtool
 
+              # Qt is needed for the Cutter Plugin
+            - name: Install Qt5 on Ubuntu
+              if: matrix.os == 'ubuntu-latest'
+              run: sudo apt install qt5-default
+
+            - name: Install Qt5 on macOS
+              if: matrix.os == 'macos-latest'
+              run: brew install qt5
+
             - name: Build CMake
               if: steps.r2plugin-cache.cache-hit != 'true' && matrix.os != 'windows-latest'
               run: |
+                    # Next line is only for macOS
+                    export PATH=/usr/local/opt/qt/bin:${PATH}
                     export PATH=${PWD}/../radare2/bin:${PATH}
                     export LD_LIBRARY_PATH=${PWD}/../radare2/lib:${PWD}/../radare2/lib64:${LD_LIBRARY_PATH}
                     export PKG_CONFIG_PATH=${PWD}/../radare2/lib/pkgconfig:${PKG_CONFIG_PATH}
@@ -219,7 +230,7 @@ jobs:
                     cmake ..\.. `
                         -DCMAKE_INSTALL_PREFIX="$HOME/.local" `
                         -DBUILD_BUNDLED_RETDEC=ON `
-                        -DBUILD_CUTTER_PLUGIN=ON `
+                        -DBUILD_CUTTER_PLUGIN=OFF `
                         -DCMAKE_BUILD_TYPE=release `
                         -DRETDEC_INSTALL_PREFIX=install `
                         -DRADARE_INSTALL_PATH="..\radare2"
@@ -317,6 +328,15 @@ jobs:
                     cd clang
                     7z x ..\llvm.exe
               working-directory: build
+
+              # Qt is needed for the Cutter Plugin
+            - name: Install Qt5 on Ubuntu
+              if: matrix.os == 'ubuntu-latest'
+              run: sudo apt install qt5-default
+
+            - name: Install Qt5 on macOS
+              if: matrix.os == 'macos-latest'
+              run: brew install qt5
 
             - name: Install Cached RetDec R2Plugin on Ubuntu
               if: matrix.os == 'ubuntu-latest'
