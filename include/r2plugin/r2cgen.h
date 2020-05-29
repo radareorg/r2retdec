@@ -11,7 +11,7 @@
 #include <optional>
 #include <rapidjson/document.h>
 
-#include <AnnotatedCode.h>
+#include <r_util/r_annotated_code.h>
 
 namespace retdec {
 namespace r2plugin {
