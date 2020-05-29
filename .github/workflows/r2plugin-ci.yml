@@ -207,7 +207,7 @@ jobs:
                     cmake ../.. \
                         -DCMAKE_INSTALL_PREFIX=${HOME}/.local \
                         -DBUILD_BUNDLED_RETDEC=ON \
-                        -DBUILD_CUTTER_PLUGIN=OFF \
+                        -DBUILD_CUTTER_PLUGIN=ON \
                         -DCMAKE_BUILD_TYPE=${{ matrix.type }} \
                         -DRETDEC_INSTALL_PREFIX=install \
                         -DCMAKE_LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/
@@ -219,7 +219,7 @@ jobs:
                     cmake ..\.. `
                         -DCMAKE_INSTALL_PREFIX="$HOME/.local" `
                         -DBUILD_BUNDLED_RETDEC=ON `
-                        -DBUILD_CUTTER_PLUGIN=OFF `
+                        -DBUILD_CUTTER_PLUGIN=ON `
                         -DCMAKE_BUILD_TYPE=release `
                         -DRETDEC_INSTALL_PREFIX=install `
                         -DRADARE_INSTALL_PATH="..\radare2"
