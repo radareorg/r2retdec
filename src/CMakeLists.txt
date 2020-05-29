@@ -12,7 +12,6 @@ target_link_libraries(core_retdec
 	Radare2::libr
 	retdec
 	rapidjson
-	annotations
 )
 
 find_library(STD_CPP_FS stdc++fs)

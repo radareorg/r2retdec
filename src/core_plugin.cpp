@@ -14,7 +14,7 @@
 #include <retdec/config/config.h>
 #include <sstream>
 
-#include <AnnotatedCode.h>
+#include <r_util/r_annotated_code.h>
 
 #include "r2plugin/r2cgen.h"
 #include "r2plugin/r2info.h"
@@ -267,24 +267,24 @@ static void _cmd(RCore &core, const char &input)
 	switch (input) {
 		case '\0':
 			outputFunction = [](RAnnotatedCode *code) -> void {
-				r_annotated_code_print(code, nullptr);
+				r_core_annotated_code_print(code, nullptr);
 			};
 			break;
 
 		case 'o':
 			outputFunction = [](RAnnotatedCode *code) -> void {
 				RVector *offsets = r_annotated_code_line_offsets(code);
-				r_annotated_code_print(code, offsets);
+				r_core_annotated_code_print(code, offsets);
 				r_vector_free(offsets);
 			};
 			break;
 
 		case 'j':
-			outputFunction = r_annotated_code_print_json;
+			outputFunction = r_core_annotated_code_print_json;
 			break;
 
 		case '*':
-			outputFunction = r_annotated_code_print_comment_cmds;
+			outputFunction = r_core_annotated_code_print_comment_cmds;
 			break;
 
 		default:
