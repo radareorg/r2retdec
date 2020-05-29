@@ -353,6 +353,7 @@ jobs:
             - name: Prepare Files for Publishing
               if: matrix.type == 'Release'
               run: |
+                    cp -r ~/.local/bin build/r2plugin/install/
                     cp -r ~/.local/share build/r2plugin/install/
                     cp LICENSE* build/r2plugin/install/
                     cp CHANGELOG.md build/r2plugin/install/
