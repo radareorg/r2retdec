@@ -18,15 +18,11 @@ if(NOT Cutter_POPULATED)
 	)
 endif()
 
-message(${Cutter_SOURCE_ROOT})
-
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(Cutter
 		REQUIRED_VARS Cutter_SOURCE_ROOT
-		FAIL_MESSAGE "#######################################################
-Could not find Cutter headers. Make sure CUTTER_SOURCE_DIR is set to the root of the Cutter source repository.
-#######################################################"
+		FAIL_MESSAGE "Fetching Cutter sources failed"
 )
 
 if(Cutter_FOUND)
