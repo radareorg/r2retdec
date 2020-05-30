@@ -27,7 +27,7 @@ public:
     QString getName() const          { return "RetDec Decompiler (retdec-r2plugin)"; }
     QString getAuthor() const        { return "Avast"; }
     QString getDescription() const   { return "RetDec plugin for Cutter"; }
-    QString getVersion() const       { return "0.1.1"; }
+    QString getVersion() const       { return "0.1.2"; }
 };
 
 
