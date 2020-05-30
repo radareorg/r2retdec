@@ -89,6 +89,17 @@ std::pair<std::string,  fs::path> fetchRDPathAndInterpret()
 	if (fs::is_regular_file(pluginPrefix))
 		return {"python", pluginPrefix};
 #endif
+	auto homeDirRaw = getenv("HOME");
+	if (homeDirRaw == nullptr)
+		homeDirRaw = getenv("HOMEPATH");
+
+	if (homeDirRaw != nullptr) {
+		std::string homeDir(homeDirRaw);
+		auto localInstall = fs::path(homeDir)/".local"/"bin"/"retdec-decompiler.py";
+
+		if (fs::is_regular_file(localInstall))
+			return {"python", localInstall};
+	}
 
 	try {
 		ce::execute(
