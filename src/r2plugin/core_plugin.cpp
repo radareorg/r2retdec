@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <mutex>
@@ -95,19 +96,24 @@ std::optional<fs::path> checkCustomRetDecPath()
  *                            temporary directory DecompilationError is
  *                            thrown.
  */
-fs::path getOutDirPath()
+fs::path getOutDirPath(const fs::path &suffix = "")
 {
 	std::error_code err;
 
 	auto outDirRaw = getenv("DEC_SAVE_DIR");
 	std::string outDir(outDirRaw != nullptr ? outDirRaw : "");
-	if (outDir != "") {
+	if (!outDir.empty()) {
 		auto outDirPath = fs::path(outDir);
 		if (!is_directory(outDirPath, err)) {
 			throw DecompilationError(
 				"invald $DEC_SAVE_DIR: not a directory: "
 				+outDir
 			);
+		}
+
+		if (!suffix.empty()) {
+			outDirPath /= suffix;
+			fs::create_directories(outDirPath);
 		}
 
 		return outDirPath;
@@ -131,6 +137,11 @@ fs::path getOutDirPath()
 				"$TMPDIR, or $DEC_OUT_DIR."
 			);
 		}
+	}
+
+	if (!suffix.empty()) {
+		tmpDir /= suffix;
+		fs::create_directories(tmpDir);
 	}
 
 	return tmpDir;
@@ -160,8 +171,21 @@ void initConfigParameters(
 	const R2InfoProvider& binInfo,
 	ut64 addr)
 {
-	auto outDir = getOutDirPath();
+	// Fetch current function
 	auto fnc = binInfo.fetchFunction(addr);
+
+	// Fetch binary name -> will be used for cacheing
+	std::string binName = binInfo.fetchFilePath();
+
+	// Create hex from bin name
+	std::ostringstream str, hexAddr;
+	str << std::hex << std::hash<std::string>{}(binName);
+	hexAddr << std::hex << addr;
+
+	// Function is identified as : NAME@HEX_ADDR
+	auto outName = fs::path(str.str())/(fnc.getName()+"@0x"+hexAddr.str());
+
+	auto outDir = getOutDirPath(outName);
 
 	auto decpath = outDir/"rd_dec.json";
 	auto outpath = outDir/"rd_out.log";
@@ -192,40 +216,40 @@ RAnnotatedCode* decompileWithScript(
 		const R2InfoProvider &binInfo,
 		ut64 addr)
 {
-		R2CGenerator outgen;
-		auto config = retdec::config::Config::empty();
+	R2CGenerator outgen;
+	auto config = retdec::config::Config::empty();
 
-		binInfo.fetchFunctionsAndGlobals(config);
+	binInfo.fetchFunctionsAndGlobals(config);
 
-		auto fnc = binInfo.fetchFunction(addr);
+	auto fnc = binInfo.fetchFunction(addr);
 
-		initConfigParameters(config, binInfo, addr);
+	initConfigParameters(config, binInfo, addr);
 
-		config.generateJsonFile();
+	config.generateJsonFile();
 
-		std::ostringstream decrange;
-		decrange << fnc.getStart() << "-" << fnc.getEnd();
+	std::ostringstream decrange;
+	decrange << fnc.getStart() << "-" << fnc.getEnd();
 
-		std::vector<std::string> decparams {
-			ce::sanitizePath(config.parameters.getInputFile()),
-			"--cleanup",
-			"--config", ce::sanitizePath(config.generateJsonFile()),
-			"-f", "json-human",
-			//"--select-decode-only",
-			"--select-ranges", decrange.str(),
-			"-o", ce::sanitizePath(config.parameters.getOutputFile())
+	std::vector<std::string> decparams {
+		ce::sanitizePath(config.parameters.getInputFile()),
+		"--cleanup",
+		"--config", ce::sanitizePath(config.generateJsonFile()),
+		"-f", "json-human",
+		//"--select-decode-only",
+		"--select-ranges", decrange.str(),
+		"-o", ce::sanitizePath(config.parameters.getOutputFile())
 
-		};
+	};
 
-		ce::execute(
-			"",
-			ce::sanitizePath(rdpath.string()),
-			decparams,
-			ce::sanitizePath(config.parameters.getLogFile()),
-			ce::sanitizePath(config.parameters.getErrFile())
-		);
+	ce::execute(
+		"",
+		ce::sanitizePath(rdpath.string()),
+		decparams,
+		ce::sanitizePath(config.parameters.getLogFile()),
+		ce::sanitizePath(config.parameters.getErrFile())
+	);
 
-		return outgen.generateOutput(config.parameters.getOutputFile());
+	return outgen.generateOutput(config.parameters.getOutputFile());
 }
 
 /**
