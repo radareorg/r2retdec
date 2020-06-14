@@ -11,7 +11,10 @@
 #include <mutex>
 
 #include <r_core.h>
+#include <retdec/retdec/retdec.h>
+#include <retdec/utils/binary_path.h>
 #include <retdec/config/config.h>
+#include <retdec/config/parameters.h>
 #include <sstream>
 
 #include <r_util/r_annotated_code.h>
@@ -145,7 +148,10 @@ fs::path getOutDirPath()
  * @param binInfo Provides informations gathered from r2 console.
  * @param addr Decompiles the function at this offset.
  */
-RAnnotatedCode* decompileWithScript(const fs::path &rdpath, const R2InfoProvider &binInfo, ut64 addr)
+RAnnotatedCode* decompileWithScript(
+		const fs::path &rdpath,
+		const R2InfoProvider &binInfo,
+		ut64 addr)
 {
 		R2CGenerator outgen;
 		auto outDir = getOutDirPath();
@@ -183,7 +189,27 @@ RAnnotatedCode* decompileWithScript(const fs::path &rdpath, const R2InfoProvider
 			ce::sanitizePath(outpath.string()),
 			ce::sanitizePath(errpath.string())
 		);
+
 		return outgen.generateOutput(decpath.string());
+}
+
+retdec::config::Config loadDefaultConfig()
+{
+// TODO: First Check Installed Path
+
+// Fallback to default Radare2 Plugin directory
+	auto plugdir = r_str_home (R2_HOME_PLUGINS);
+	auto plugPath = fs::path(plugdir); free(plugdir);
+	auto configPath = plugPath/"decompiler-config.json";
+
+	if (!fs::exists(configPath)) {
+		throw DecompilationError("unable to locate decompiler configuration");
+	}
+
+	auto rdConf = retdec::config::Config::fromFile(configPath);
+	rdConf.parameters.fixRelativePaths(fs::canonical(plugPath/".."/".."/"retdec"));
+
+	return rdConf;
 }
 
 /**
@@ -200,12 +226,48 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 			return decompileWithScript(*rdpath, binInfo, addr);
 		}
 
-		throw DecompilationError("Not implemented path");
+		auto outDir = getOutDirPath();
+		auto config = loadDefaultConfig();
+
+		std::string binName = binInfo.fetchFilePath();
+		binInfo.fetchFunctionsAndGlobals(config);
+
+		auto fnc = binInfo.fetchCurrentFunction(addr);
+
+		auto decpath = outDir/"rd_dec.json";
+		auto outpath = outDir/"rd_out.log";
+		auto errpath = outDir/"rd_err.log";
+		auto outconfig = outDir/"rd_config.json";
+
+		config.parameters.setInputFile(binName);
+		config.parameters.setOutputFile(decpath.string());
+		config.parameters.setOutputConfigFile(outconfig);
+		config.parameters.setOutputFormat("json-human");
+		config.parameters.selectedRanges.insert(fnc);
+		config.parameters.setIsVerboseOutput(false);
+		config.parameters.setIsSelectedDecodeOnly(true);
+
+		config.generateJsonFile();
+
+		if (auto rc = retdec::decompile(config)) {
+			throw DecompilationError(
+				"decompliation ended with error code "
+				+ std::to_string(rc) +
+				"for more details check " + errpath.string()
+			);
+		}
+
+		R2CGenerator outgen;
+		return outgen.generateOutput(decpath.string());
 	}
 	catch (const std::exception &err) {
 		std::cerr << "retdec-r2plugin: decompilation was not successful: " << err.what() << std::endl;
-		return nullptr;
 	}
+	catch (...) {
+		std::cerr << "retdec-r2plugin: unkown decompilation error" << std::endl;
+	}
+
+	return nullptr;
 }
 
 /**

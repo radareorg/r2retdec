@@ -11,6 +11,7 @@ add_library(core_retdec SHARED ${SOURCES})
 
 target_link_libraries(core_retdec
 	Radare2::libr
+	retdec::retdec
 	retdec::config
 	rapidjson
 )
@@ -39,3 +40,4 @@ target_compile_definitions(core_retdec
 )
 
 install(TARGETS core_retdec DESTINATION "${RADARE2_INSTALL_PLUGDIR}")
+install(FILES decompiler-config.json DESTINATION "${RADARE2_INSTALL_PLUGDIR}")
