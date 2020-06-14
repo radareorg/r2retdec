@@ -9,9 +9,9 @@ else ()
 endif ()
 
 FetchContent_Declare(retdec
-	URL https://github.com/avast/retdec/archive/094ff8cebe1ccc8c0f7093599f9d5a4c4e7bbce6.zip
-	URL_HASH SHA256=c1bb88a5e95a6f617b2ccf1210aa4eaa675e1bb3964332083fc74c5d38367ca0
-	)
+	URL https://github.com/avast/retdec/archive/897260e6aef40877c5b66b579b67c145321e9ab9.zip
+	URL_HASH SHA256=817a0af3027e7c1dad4df9e4b143908ebec214fc62ecaa861994ec0aa0cfaeb7
+)
 
 FetchContent_GetProperties(retdec)
 if(NOT retdec_POPULATED)
