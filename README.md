@@ -35,14 +35,14 @@ Usage: pdz   # Native RetDec decompiler plugin.
 | pdzo           # Decompile current function side by side with offsets.
 | pdz*           # Decompiled code is returned to r2 as a comment.
 Environment:
-| %RETDEC_PATH   # Path to the RetDec decompiler script.
+| %RETDEC_PATH   # Path to the RetDec decompiler executable.
 | %DEC_SAVE_DIR  # Directory to save decompilation into.
 ```
 
 The following environment variables may be used to dynamically customize the plugin's behavior:
 
 ```bash
-$ export RETDEC_PATH=<path> # path to the `retdec-decompiler.py` script to be used for decompilation.
+$ export RETDEC_PATH=<path> # path to the `retdec-decompiler.py` executable to be used for decompilation.
 $ export DEC_SAVE_DIR=<path> # custom path for output of decompilation to be saved to.
 ```
 
