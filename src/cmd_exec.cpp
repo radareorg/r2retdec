@@ -1,7 +1,7 @@
 /**
  * @file src/cmd_exec.cpp
  * @brief Implements command execution logic for supported OSs.
- * @copyright (c) 2020 Avast Software, licensed under the LGPLv3 license.
+ * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
 #include <cassert>

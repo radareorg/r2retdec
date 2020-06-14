@@ -93,9 +93,7 @@ On GCC 7 is `stdc++fs` located in:
 
 ## License
 
-Copyright (c) 2019 Avast Software, licensed under the LGPLv3 license. See the [LICENSE](https://github.com/avast/retdec-r2plugin/blob/master/LICENSE) file for more details.
-
-RetDec Radare2 plugin incorporates modified files from [r2gidra-dec](https://github.com/radareorg/r2ghidra-dec) project. The original sources are licensed under the LGPLv3 license. See the [COPYING](https://github.com/radareorg/r2ghidra-dec/blob/master/COPYING) file for more details.
+Copyright (c) 2019 Avast Software, licensed under the MIT license. See the [LICENSE](https://github.com/avast/retdec-r2plugin/blob/master/LICENSE) file for more details.
 
 RetDec Radare2 plugin uses third-party libraries or other resources listed, along with their licenses, in the [LICENSE-THIRD-PARTY](https://github.com/avast/retdec-r2plugin/blob/master/LICENSE-THIRD-PARTY) file.
 

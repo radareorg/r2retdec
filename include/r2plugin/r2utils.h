@@ -1,7 +1,7 @@
 /**
  * @file include/r2plugin/r2utils.h
  * @brief Specific output format utilities.
- * @copyright (c) 2019 Avast Software, licensed under the LGPLv3 license.
+ * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
 #ifndef RETDEC_R2PLUGIN_R2UTILS_H

@@ -1,7 +1,7 @@
 /**
  * @file include/r2plugin/cmd_exec.h
  * @brief Implements command execution logic for supported OSs.
- * @copyright (c) 2020 Avast Software, licensed under the LGPLv3 license.
+ * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
 #ifndef R2PLUGIN_CMD_RUNNER_H
