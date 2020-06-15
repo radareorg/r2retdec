@@ -1,5 +1,5 @@
 /**
- * @file src/core_plugin.cpp
+ * @file src/r2plugin/core_plugin.cpp
  * @brief Main module of the retdec-r2plugin.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
@@ -17,12 +17,9 @@
 #include <retdec/config/parameters.h>
 #include <sstream>
 
-#include <r_util/r_annotated_code.h>
-
 #include "r2plugin/cmd_exec.h"
 #include "r2plugin/r2retdec.h"
 #include "r2plugin/r2cgen.h"
-#include "r2plugin/r2info.h"
 #include "r2plugin/r2utils.h"
 
 #include "filesystem_wrapper.h"
@@ -217,6 +214,9 @@ retdec::config::Config loadDefaultConfig()
  *
  * Decompiles binary on input by configuring and calling RetDec decompiler executable.
  *
+ * TODO:
+ *  - merge similiar code from decompileWithScript
+ *  - return error messages instead of printing them
  * @param binInfo Provides informations gathered from r2 console.
  */
 RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
@@ -245,7 +245,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 		config.parameters.setOutputFormat("json-human");
 		config.parameters.selectedRanges.insert(fnc);
 		config.parameters.setIsVerboseOutput(false);
-		config.parameters.setIsSelectedDecodeOnly(true);
+		//config.parameters.setIsSelectedDecodeOnly(true);
 
 		config.generateJsonFile();
 

@@ -1,5 +1,5 @@
 /**
- * @file src/r2cgen.cpp
+ * @file src/r2plugin/r2cgen.cpp
  * @brief C code generation and token marking.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */

@@ -1,43 +1,5 @@
-# RetDec r2plugin sources.
-set(SOURCES
-	core_plugin.cpp
-	cmd_exec.cpp
-	r2info.cpp
-	r2utils.cpp
-	r2cgen.cpp
-)
+add_subdirectory(r2plugin)
 
-add_library(core_retdec SHARED ${SOURCES})
-
-target_link_libraries(core_retdec
-	Radare2::libr
-	retdec::retdec
-	retdec::config
-	rapidjson
-)
-
-find_library(STD_CPP_FS stdc++fs)
-if (STD_CPP_FS)
-	message("-- Linking with ${STD_CPP_FS} library")
-	target_link_libraries(core_retdec
-		stdc++fs
-	)
-else()
-	message("-- Library stdc++fs NOT FOUND -> linking core_retdec without stdc++fs library")
+if(BUILD_CUTTER_PLUGIN)
+	add_subdirectory(cutter-plugin)
 endif()
-
-target_include_directories(core_retdec PUBLIC ${PROJECT_SOURCE_DIR}/include/)
-
-set_target_properties(core_retdec PROPERTIES
-	OUTPUT_NAME core_retdec
-	PREFIX ""
-)
-
-target_compile_definitions(core_retdec
-	PRIVATE
-	"-DRETDEC_INSTALL_PREFIX=\"${RETDEC_INSTALL_PREFIX}\""
-	"-DPLUGIN_INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\""
-)
-
-install(TARGETS core_retdec DESTINATION "${RADARE2_INSTALL_PLUGDIR}")
-install(FILES decompiler-config.json DESTINATION "${RADARE2_INSTALL_PLUGDIR}")

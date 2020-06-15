@@ -1,5 +1,5 @@
 /**
- * @file src/r2info.cpp
+ * @file src/r2plugin/r2info.cpp
  * @brief Information gathering from R2 and user.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */

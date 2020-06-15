@@ -67,7 +67,3 @@ find_package(Radare2 REQUIRED)
 
 add_subdirectory(deps)
 add_subdirectory(src)
-
-if(BUILD_CUTTER_PLUGIN)
-	add_subdirectory(cutter-plugin)
-endif()

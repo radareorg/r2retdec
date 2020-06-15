@@ -1,5 +1,5 @@
 /**
- * @file src/cmd_exec.cpp
+ * @file src/r2plugin/cmd_exec.cpp
  * @brief Implements command execution logic for supported OSs.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
