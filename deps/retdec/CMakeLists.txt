@@ -26,4 +26,13 @@ if(NOT retdec_POPULATED)
 		${retdec_SOURCE_DIR}
 		${retdec_BINARY_DIR}
 	)
+
+	install(
+		DIRECTORY
+			"${retdec_SOURCE_DIR}/support/ordinals"
+			"${retdec_SOURCE_DIR}/support/yara_patterns"
+			"${retdec_SOURCE_DIR}/support/types"
+		DESTINATION
+			"${RADARE2_INSTALL_PLUGDIR}/support/retdec/"
+	)
 endif()

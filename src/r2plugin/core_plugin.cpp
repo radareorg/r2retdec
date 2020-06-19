@@ -152,18 +152,21 @@ RAnnotatedCode* decompileWithScript(
 {
 		R2CGenerator outgen;
 		auto outDir = getOutDirPath();
-		auto config = retdec::config::Config::empty(
-				(outDir/"rd_config.json").string());
+		auto config = retdec::config::Config::empty();
 
 		std::string binName = binInfo.fetchFilePath();
 		binInfo.fetchFunctionsAndGlobals(config);
-		config.generateJsonFile();
 
 		auto fnc = binInfo.fetchCurrentFunction(addr);
 
 		auto decpath = outDir/"rd_dec.json";
 		auto outpath = outDir/"rd_out.log";
 		auto errpath = outDir/"rd_err.log";
+		auto outconfig = outDir/"rd_config.json";
+
+		config.parameters.setOutputConfigFile(outconfig);
+
+		config.generateJsonFile();
 
 		std::ostringstream decrange;
 		decrange << fnc.getStart() << "-" << fnc.getEnd();
@@ -204,7 +207,7 @@ retdec::config::Config loadDefaultConfig()
 	}
 
 	auto rdConf = retdec::config::Config::fromFile(configPath);
-	rdConf.parameters.fixRelativePaths(fs::canonical(plugPath/".."/".."/"retdec"));
+	rdConf.parameters.fixRelativePaths(plugPath);
 
 	return rdConf;
 }

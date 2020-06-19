@@ -22,18 +22,18 @@
         "timeout": 0,
         "maxMemoryLimit": 0,
         "maxMemoryLimitHalfRam": true,
-        "ordinalNumDirectory": "./plugins/retdec/ordinals/",
+        "ordinalNumDirectory": "./support/retdec/ordinals/",
         "staticSignPaths": [],
         "libraryTypeInfoPaths": [
-            "./plugins/retdec/types/arm.json",
-            "./plugins/retdec/types/cstdlib.json",
-            "./plugins/retdec/types/linux.json",
-            "./plugins/retdec/types/windows.json",
-            "./plugins/retdec/types/windrivers.json"
+            "./support/retdec/types/arm.json",
+            "./support/retdec/types/cstdlib.json",
+            "./support/retdec/types/linux.json",
+            "./support/retdec/types/windows.json",
+            "./support/retdec/types/windrivers.json"
         ],
         "cryptoPatternPaths": [
-            "./plugins/retdec/yara_patterns/signsrch/signsrch.yarac",
-            "./plugins/retdec/yara_patterns/signsrch/signsrch_regex.yarac"
+            "./support/retdec/yara_patterns/signsrch/signsrch.yarac",
+            "./support/retdec/yara_patterns/signsrch/signsrch_regex.yarac"
         ],
         "llvmPasses" : [
             "retdec-provider-init",
