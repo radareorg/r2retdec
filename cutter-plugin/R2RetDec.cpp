@@ -7,7 +7,7 @@
  */
 
 #include "R2RetDec.h"
-#include "../include/r2plugin/r2retdec.h"
+#include "r2plugin/r2retdec.h"
 #include <Cutter.h>
 
 #include <QJsonDocument>

@@ -16,6 +16,7 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets)
 add_library(r2retdec_cutter SHARED ${SOURCE})
 target_link_libraries(r2retdec_cutter Qt5::Widgets)
 target_link_libraries(r2retdec_cutter Radare2::libr)
+target_link_libraries(r2retdec_cutter core_retdec)
 
 #find_package(Cutter REQUIRED)
 target_link_libraries(r2retdec_cutter Cutter::Cutter)
