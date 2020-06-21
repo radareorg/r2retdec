@@ -29,7 +29,7 @@ public:
 public:
 	std::string fetchFilePath() const;
 
-	common::Function fetchCurrentFunction() const;
+	common::Function fetchCurrentFunction(ut64 addr) const;	
 
 	void fetchFunctionsAndGlobals(config::Config &rdconfig) const;
 
