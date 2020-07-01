@@ -16,6 +16,13 @@ target_link_libraries(core_retdec
 	rapidjson
 )
 
+if (APPLE)
+	target_link_libraries(core_retdec
+		-Wl,-force_load retdec::bin2llvmir
+		-Wl,-force_load retdec::llvmir2hll
+	)
+endif()
+
 find_library(STD_CPP_FS stdc++fs)
 if (STD_CPP_FS)
 	message("-- Linking with ${STD_CPP_FS} library")
