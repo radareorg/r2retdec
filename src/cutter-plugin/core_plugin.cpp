@@ -1,5 +1,5 @@
 /**
- * @file src/cutter-plugin/core_plugin.h
+ * @file src/cutter-plugin/core_plugin.cpp
  * @brief Main module of the retdec-cutter-plugin.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
