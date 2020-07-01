@@ -16,10 +16,17 @@ target_link_libraries(core_retdec
 	rapidjson
 )
 
-if (APPLE)
+if (MSVC)
+	# TODO
+elseif (APPLE)
 	target_link_libraries(core_retdec
 		-Wl,-force_load retdec::bin2llvmir
 		-Wl,-force_load retdec::llvmir2hll
+	)
+else ()
+	target_link_libraries(core_retdec
+		-Wl,--whole-archive retdec::bin2llvmir -Wl,--no-whole-archive
+		-Wl,--whole-archive retdec::llvmir2hll -Wl,--no-whole-archive
 	)
 endif()
 
