@@ -10,10 +10,10 @@ set(SOURCES
 add_library(core_retdec SHARED ${SOURCES})
 
 target_link_libraries(core_retdec
-	Radare2::libr
 	retdec::retdec
 	retdec::config
 	rapidjson
+	Radare2::libr
 )
 
 if (MSVC)
