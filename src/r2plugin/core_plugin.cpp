@@ -247,8 +247,9 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 		config.parameters.setOutputConfigFile(outconfig);
 		config.parameters.setOutputFormat("json-human");
 		config.parameters.selectedRanges.insert(fnc);
-		config.parameters.setIsVerboseOutput(false);
-		//config.parameters.setIsSelectedDecodeOnly(true);
+		config.parameters.setIsVerboseOutput(true);
+		config.parameters.setLogFile(outpath.string());
+		config.parameters.setErrFile(errpath.string());
 
 		config.generateJsonFile();
 
