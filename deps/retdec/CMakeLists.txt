@@ -10,7 +10,7 @@ endif ()
 
 FetchContent_Declare(retdec
 	GIT_REPOSITORY https://github.com/avast/retdec
-	GIT_TAG 3e452dc7657a09058d269e0fef7cc8f863f53d99
+	GIT_TAG b59f811f2310e9abe03cfac5ad1023254708f969
 )
 
 FetchContent_GetProperties(retdec)
