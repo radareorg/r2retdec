@@ -103,7 +103,7 @@ jobs:
 
             - name: Clone RetDec RT Framework
               run: git clone https://github.com/avast/retdec-regression-tests-framework
-              working-directory: build    
+              working-directory: build
 
             - name: Create/Check Cache of RetDec RT Framework Virtual Environment
               id: retdec-fw-cache

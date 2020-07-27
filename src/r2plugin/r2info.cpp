@@ -52,7 +52,7 @@ std::string R2InfoProvider::fetchFilePath() const
 
 /**
  * @brief Fetches the function at the address passed as parameter.
- * 
+ *
  * @param addr Analyzes the function at the given address.
  */
 Function R2InfoProvider::fetchCurrentFunction(ut64 addr) const

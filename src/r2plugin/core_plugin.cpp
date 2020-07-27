@@ -141,7 +141,7 @@ fs::path getOutDirPath()
  *
  * Decompiles binary on input by configuring and calling RetDec decompiler script.
  * Decompiles the binary given by the offset passed addr.
- * 
+ *
  * @param binInfo Provides informations gathered from r2 console.
  * @param addr Decompiles the function at this offset.
  */
