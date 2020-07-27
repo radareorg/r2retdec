@@ -7,7 +7,7 @@
  */
 
 #include "R2RetDec.h"
-
+#include "r2plugin/r2retdec.h"
 #include <Cutter.h>
 
 #include <QJsonDocument>
@@ -22,51 +22,9 @@ R2RetDec::R2RetDec(QObject *parent)
 
 void R2RetDec::decompileAt(RVA addr)
 {
-	if(task)
-		return;
-
-	AnnotatedCode code = {};
-
-	task = new R2Task ("pdzj @ " + QString::number(addr));
-
-	connect(task, &R2Task::finished, this, [this]() {
-		AnnotatedCode code = {};
-		QString s;
-
-		QJsonObject json = task->getResultJson().object();
-		delete task;
-		task = nullptr;
-		if(json.isEmpty())
-		{
-			code.code = tr("Failed to parse JSON from r2retdec");
-			emit finished(code);
-			return;
-		}
-
-		auto root = json;
-		code.code = root["code"].toString();
-
-		for(QJsonValueRef annotationValue : root["annotations"].toArray())
-		{
-			QJsonObject annotationObject = annotationValue.toObject();
-			CodeAnnotation annotation = {};
-			annotation.start = (size_t)annotationObject["start"].toVariant().toULongLong();
-			annotation.end = (size_t)annotationObject["end"].toVariant().toULongLong();
-			if(annotationObject["type"].toString() == "offset")
-			{
-				annotation.type = CodeAnnotation::Type::Offset;
-				annotation.offset.offset = annotationObject["offset"].toVariant().toULongLong();
-			}
-			else
-				continue;
-			code.annotations.push_back(annotation);
-		}
-
-		for(QJsonValueRef error : json["errors"].toArray())
-			code.code += "// " + error.toString() + "\n";
-
-		emit finished(code);
-	});
-	task->startTask();
-
+	RAnnotatedCode *code = r2retdec_decompile_annotated_code(Core()->core(), addr);
+	if(code == nullptr){
+		code = r_annotated_code_new(strdup("RetDec Decompiler Error: No function at this offset"));
+	}
+	emit finished(code);
 }

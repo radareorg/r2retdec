@@ -17,6 +17,7 @@
 #include <r_util/r_annotated_code.h>
 
 #include "r2plugin/cmd_exec.h"
+#include "r2plugin/r2retdec.h"
 #include "r2plugin/r2cgen.h"
 #include "r2plugin/r2info.h"
 #include "r2plugin/r2utils.h"
@@ -181,10 +182,12 @@ fs::path getOutDirPath()
  * @brief Main decompilation method. Uses RetDec to decompile input binary.
  *
  * Decompiles binary on input by configuring and calling RetDec decompiler script.
- *
+ * Decompiles the binary given by the offset passed addr.
+ * 
  * @param binInfo Provides informations gathered from r2 console.
+ * @param addr Decompiles the function at this offset.
  */
-RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
+RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 {
 	try {
 		R2CGenerator outgen;
@@ -198,7 +201,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo)
 		binInfo.fetchFunctionsAndGlobals(config);
 		config.generateJsonFile();
 
-		auto fnc = binInfo.fetchCurrentFunction();
+		auto fnc = binInfo.fetchCurrentFunction(addr);
 
 		auto decpath = outDir/"rd_dec.json";
 		auto outpath = outDir/"rd_out.log";
@@ -275,12 +278,23 @@ static void _cmd(RCore &core, const char &input)
 	std::lock_guard<std::mutex> lock (mutex);
 
 	R2InfoProvider binInfo(core);
-	auto code = decompile(binInfo);
+	auto code = decompile(binInfo, core.offset);
 	if (code == nullptr) {
 		return;
 	}
 
 	outputFunction(code);
+}
+
+/**
+ * This function is to get RAnnotatedCode to pass it to Cutter's decompiler widget.
+ */
+RAnnotatedCode* r2retdec_decompile_annotated_code(RCore *core, ut64 addr){
+	static std::mutex mutex;
+	std::lock_guard<std::mutex> lock (mutex);
+
+	R2InfoProvider binInfo(*core);
+	return decompile(binInfo, addr);
 }
 
 /**
