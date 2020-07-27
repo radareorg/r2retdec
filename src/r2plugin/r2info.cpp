@@ -55,7 +55,7 @@ std::string R2InfoProvider::fetchFilePath() const
  *
  * @param addr Analyzes the function at the given address.
  */
-Function R2InfoProvider::fetchCurrentFunction(ut64 addr) const
+Function R2InfoProvider::fetchFunction(ut64 addr) const
 {
 	RAnalFunction *cf = r_anal_get_fcn_in(_r2core.anal, addr, R_ANAL_FCN_TYPE_NULL);
 	if (cf == nullptr) {
@@ -65,6 +65,11 @@ Function R2InfoProvider::fetchCurrentFunction(ut64 addr) const
 	}
 
 	return convertFunctionObject(*cf);
+}
+
+Function R2InfoProvider::fetchSeekedFunction() const
+{
+	return fetchFunction(_r2core.offset);
 }
 
 /**
