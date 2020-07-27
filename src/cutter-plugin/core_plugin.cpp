@@ -5,7 +5,7 @@
  */
 
 #include "cutter-plugin/core_plugin.h"
-#include "r2plugin/r2retdec.h"
+#include "r2plugin/core_plugin.h"
 
 void RetDecPlugin::setupPlugin()
 {
@@ -27,7 +27,11 @@ RetDecPlugin::RetDec::RetDec(QObject *parent)
 
 void RetDecPlugin::RetDec::decompileAt(RVA addr)
 {
-	RAnnotatedCode *code = retdec::r2plugin::decompile(Core()->core(), addr);
+	static std::mutex mutex;
+	std::lock_guard<std::mutex> lock (mutex);
+
+	retdec::r2plugin::R2InfoProvider binInfo(*Core()->core());
+	RAnnotatedCode *code = decompile(binInfo, addr);
 	if (code == nullptr) {
 		code = r_annotated_code_new(strdup("RetDec Decompiler Error: No function at this offset"));
 	}

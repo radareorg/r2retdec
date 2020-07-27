@@ -136,63 +136,6 @@ fs::path getOutDirPath()
 	return tmpDir;
 }
 
-/**
- * @brief Main decompilation method. Uses RetDec to decompile input binary.
- *
- * Decompiles binary on input by configuring and calling RetDec decompiler script.
- * Decompiles the binary given by the offset passed addr.
- *
- * @param binInfo Provides informations gathered from r2 console.
- * @param addr Decompiles the function at this offset.
- */
-RAnnotatedCode* decompileWithScript(
-		const fs::path &rdpath,
-		const R2InfoProvider &binInfo,
-		ut64 addr)
-{
-		R2CGenerator outgen;
-		auto outDir = getOutDirPath();
-		auto config = retdec::config::Config::empty();
-
-		std::string binName = binInfo.fetchFilePath();
-		binInfo.fetchFunctionsAndGlobals(config);
-
-		auto fnc = binInfo.fetchCurrentFunction(addr);
-
-		auto decpath = outDir/"rd_dec.json";
-		auto outpath = outDir/"rd_out.log";
-		auto errpath = outDir/"rd_err.log";
-		auto outconfig = outDir/"rd_config.json";
-
-		config.parameters.setOutputConfigFile(outconfig);
-
-		config.generateJsonFile();
-
-		std::ostringstream decrange;
-		decrange << fnc.getStart() << "-" << fnc.getEnd();
-
-		std::vector<std::string> decparams {
-			ce::sanitizePath(binName),
-			"--cleanup",
-			"--config", ce::sanitizePath(config.generateJsonFile()),
-			"-f", "json-human",
-			//"--select-decode-only",
-			"--select-ranges", decrange.str(),
-			"-o", ce::sanitizePath(decpath.string())
-
-		};
-
-		ce::execute(
-			"",
-			ce::sanitizePath(rdpath.string()),
-			decparams,
-			ce::sanitizePath(outpath.string()),
-			ce::sanitizePath(errpath.string())
-		);
-
-		return outgen.generateOutput(decpath.string());
-}
-
 retdec::config::Config loadDefaultConfig()
 {
 // TODO: First Check Installed Path
@@ -212,14 +155,83 @@ retdec::config::Config loadDefaultConfig()
 	return rdConf;
 }
 
+void initConfigParameters(
+	retdec::config::Config& config,
+	const R2InfoProvider& binInfo,
+	ut64 addr)
+{
+	auto outDir = getOutDirPath();
+	auto fnc = binInfo.fetchFunction(addr);
+
+	auto decpath = outDir/"rd_dec.json";
+	auto outpath = outDir/"rd_out.log";
+	auto errpath = outDir/"rd_err.log";
+	auto outconfig = outDir/"rd_config.json";
+
+	config.parameters.setInputFile(binInfo.fetchFilePath());
+	config.parameters.setOutputFile(decpath.string());
+	config.parameters.setOutputConfigFile(outconfig);
+	config.parameters.setOutputFormat("json-human");
+	config.parameters.selectedRanges.insert(fnc);
+	config.parameters.setIsVerboseOutput(true);
+	config.parameters.setLogFile(outpath.string());
+	config.parameters.setErrFile(errpath.string());
+}
+
+/**
+ * @brief Main decompilation method. Uses RetDec to decompile input binary.
+ *
+ * Decompiles binary on input by configuring and calling RetDec decompiler script.
+ * Decompiles the binary given by the offset passed addr.
+ *
+ * @param binInfo Provides informations gathered from r2 console.
+ * @param addr Decompiles the function at this offset.
+ */
+RAnnotatedCode* decompileWithScript(
+		const fs::path &rdpath,
+		const R2InfoProvider &binInfo,
+		ut64 addr)
+{
+		R2CGenerator outgen;
+		auto config = retdec::config::Config::empty();
+
+		binInfo.fetchFunctionsAndGlobals(config);
+
+		auto fnc = binInfo.fetchFunction(addr);
+
+		initConfigParameters(config, binInfo, addr);
+
+		config.generateJsonFile();
+
+		std::ostringstream decrange;
+		decrange << fnc.getStart() << "-" << fnc.getEnd();
+
+		std::vector<std::string> decparams {
+			ce::sanitizePath(config.parameters.getInputFile()),
+			"--cleanup",
+			"--config", ce::sanitizePath(config.generateJsonFile()),
+			"-f", "json-human",
+			//"--select-decode-only",
+			"--select-ranges", decrange.str(),
+			"-o", ce::sanitizePath(config.parameters.getOutputFile())
+
+		};
+
+		ce::execute(
+			"",
+			ce::sanitizePath(rdpath.string()),
+			decparams,
+			ce::sanitizePath(config.parameters.getLogFile()),
+			ce::sanitizePath(config.parameters.getErrFile())
+		);
+
+		return outgen.generateOutput(config.parameters.getOutputFile());
+}
+
 /**
  * @brief Main decompilation method. Uses RetDec to decompile input binary.
  *
  * Decompiles binary on input by configuring and calling RetDec decompiler executable.
- *
- * TODO:
- *  - merge similiar code from decompileWithScript
- *  - return error messages instead of printing them
  * @param binInfo Provides informations gathered from r2 console.
  */
 RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
@@ -229,27 +241,10 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 			return decompileWithScript(*rdpath, binInfo, addr);
 		}
 
-		auto outDir = getOutDirPath();
 		auto config = loadDefaultConfig();
 
-		std::string binName = binInfo.fetchFilePath();
 		binInfo.fetchFunctionsAndGlobals(config);
-
-		auto fnc = binInfo.fetchCurrentFunction(addr);
-
-		auto decpath = outDir/"rd_dec.json";
-		auto outpath = outDir/"rd_out.log";
-		auto errpath = outDir/"rd_err.log";
-		auto outconfig = outDir/"rd_config.json";
-
-		config.parameters.setInputFile(binName);
-		config.parameters.setOutputFile(decpath.string());
-		config.parameters.setOutputConfigFile(outconfig);
-		config.parameters.setOutputFormat("json-human");
-		config.parameters.selectedRanges.insert(fnc);
-		config.parameters.setIsVerboseOutput(true);
-		config.parameters.setLogFile(outpath.string());
-		config.parameters.setErrFile(errpath.string());
+		initConfigParameters(config, binInfo, addr);
 
 		config.generateJsonFile();
 
@@ -257,12 +252,12 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 			throw DecompilationError(
 				"decompliation ended with error code "
 				+ std::to_string(rc) +
-				"for more details check " + errpath.string()
+				"for more details check " + config.parameters.getErrFile()
 			);
 		}
 
 		R2CGenerator outgen;
-		return outgen.generateOutput(decpath.string());
+		return outgen.generateOutput(config.parameters.getOutputFile());
 	}
 	catch (const std::exception &err) {
 		std::cerr << "retdec-r2plugin: decompilation was not successful: " << err.what() << std::endl;
@@ -272,6 +267,17 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 	}
 
 	return nullptr;
+}
+
+/**
+ * This function is to get RAnnotatedCode to pass it to Cutter's decompiler widget.
+ */
+R_API RAnnotatedCode* decompile(RCore *core, ut64 addr){
+	static std::mutex mutex;
+	std::lock_guard<std::mutex> lock (mutex);
+
+	R2InfoProvider binInfo(*core);
+	return decompile(binInfo, addr);
 }
 
 /**
@@ -325,17 +331,6 @@ static void _cmd(RCore &core, const char &input)
 }
 
 /**
- * This function is to get RAnnotatedCode to pass it to Cutter's decompiler widget.
- */
-RAnnotatedCode* r2retdec_decompile_annotated_code(RCore *core, ut64 addr){
-	static std::mutex mutex;
-	std::lock_guard<std::mutex> lock (mutex);
-
-	R2InfoProvider binInfo(*core);
-	return decompile(binInfo, addr);
-}
-
-/**
  * R2 console registration method. This method is called
  * after each command typed into r2. If the function wants
  * to respond on provided command, provides response and returns true.
@@ -383,4 +378,5 @@ R_API RLibStruct radare_plugin = {
 	/* .free = */ nullptr,
 	/* .pkgname */ "retdec-r2plugin"
 };
+
 #endif
