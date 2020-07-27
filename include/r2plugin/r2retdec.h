@@ -12,6 +12,12 @@
 
 #include "r2plugin/r2info.h"
 
-R_API RAnnotatedCode* decompile(const retdec::r2plugin::R2InfoProvider &binInfo);
+namespace retdec {
+namespace r2plugin {
+
+R_API RAnnotatedCode* decompile(RCore *core, ut64 addr);
+
+}
+}
 
 #endif //R2PLUGIN_R2RETDEC_H
