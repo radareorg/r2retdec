@@ -148,27 +148,123 @@ fs::path getOutDirPath(const fs::path &suffix = "")
 	return tmpDir;
 }
 
+/**
+ * @brief Reads hash from file provided as parameter.
+ */
+std::string loadHashString(const fs::path& cachePath)
+{
+	std::string cacheFileString;
+
+	if (!fs::is_regular_file(cachePath))
+		return "";
+
+	std::ifstream cacheFile(cachePath);
+
+	cacheFile >> cacheFileString;
+
+	cacheFile.close();
+	return cacheFileString;
+}
+
+/**
+ * @brief Constructs hash from RD config.
+ */
+void constructHash(const retdec::config::Config& config, std::ostream& hash)
+{
+	// RetDec automatically sets time and date to the JSON
+	// config. This is not really wanted as each change of time
+	// or date will trigger decompilation. Until RetDec provides
+	// API without this we need to manually set time and date
+	// to constant string.
+	rapidjson::Document d;
+	d.Parse(config.generateJsonString());
+	rapidjson::Value& time = d["time"];
+	rapidjson::Value& date = d["date"];
+
+	time.SetString("removed");
+	date.SetString("removed");
+
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	d.Accept(writer);
+
+	hash << std::hex << std::hash<std::string>{}(buffer.GetString());
+}
+
+fs::path getHashPath(const fs::path& configPath)
+{
+	return fs::path(configPath).replace_filename(".rd_hash");
+}
+
+/**
+ * @brief Checks if cached files are up to date.
+ */
+bool usableCacheExists(const retdec::config::Config& config)
+{
+	fs::path configPath(config.parameters.getOutputConfigFile());
+
+	if (!fs::is_regular_file(configPath))
+		return false;
+
+	std::ostringstream currHash;
+	constructHash(config, currHash);
+
+	std::string savedHash = loadHashString(getHashPath(configPath));
+
+	return currHash.str() == savedHash;
+}
+
+/**
+ * @brief Creates file containng hash constructed from RD config.
+ */
+void createConfigHashFile(const retdec::config::Config& config)
+{
+	fs::path configPath(config.parameters.getOutputConfigFile());
+	fs::path hashPath = getHashPath(configPath);
+	std::ofstream hashFile(hashPath);
+	constructHash(config, hashFile);
+	hashFile.close();
+}
+
+/**
+ * @brief Tries to find and load default RetDec configuration file.
+ *
+ * Default configuration is installed with this plugin on default
+ * location.
+ */
 retdec::config::Config loadDefaultConfig()
 {
-// TODO: First Check Installed Path
-
-// Fallback to default Radare2 Plugin directory
-	auto plugdir = r_str_home (R2_HOME_PLUGINS);
-	auto plugPath = fs::path(plugdir); free(plugdir);
+	// Returns plugin home:
+	// ~/.local/share/radare2/plugins/
+	auto plugdir = r_str_home(R2_HOME_PLUGINS);
+	auto plugPath = fs::path(plugdir);
+	// plugdir is dynamically allocated.
+	free(plugdir);
+	// Default config is always installed with the plugin.
 	auto configPath = plugPath/"decompiler-config.json";
 
-	if (!fs::exists(configPath)) {
+	// Config must be regular file - exception will be thrown otherwise.
+	if (!fs::is_regular_file(configPath)) {
 		throw DecompilationError("unable to locate decompiler configuration");
 	}
 
+	// Loads configuration from file - also contains default config.
 	auto rdConf = retdec::config::Config::fromFile(configPath);
+	// Paths to the signatures, etc.
 	rdConf.parameters.fixRelativePaths(plugPath);
 
 	return rdConf;
 }
 
+/**
+ * @brief Initializes configuration parameters.
+ *
+ * @param parameters Parameters of a RetDec config.
+ * @param binInfo Provides informations gathered from r2 console.
+ * @param addr    Address of current function.
+ */
 void initConfigParameters(
-	retdec::config::Config& config,
+	retdec::config::Parameters& parameters,
 	const R2InfoProvider& binInfo,
 	ut64 addr)
 {
@@ -193,14 +289,14 @@ void initConfigParameters(
 	auto errpath = outDir/"rd_err.log";
 	auto outconfig = outDir/"rd_config.json";
 
-	config.parameters.setInputFile(binInfo.fetchFilePath());
-	config.parameters.setOutputFile(decpath.string());
-	config.parameters.setOutputConfigFile(outconfig);
-	config.parameters.setOutputFormat("json-human");
-	config.parameters.selectedRanges.insert(fnc);
-	config.parameters.setIsVerboseOutput(true);
-	config.parameters.setLogFile(outpath.string());
-	config.parameters.setErrFile(errpath.string());
+	parameters.setInputFile(binInfo.fetchFilePath());
+	parameters.setOutputFile(decpath.string());
+	parameters.setOutputConfigFile(outconfig);
+	parameters.setOutputFormat("json-human");
+	parameters.selectedRanges.insert(fnc);
+	parameters.setIsVerboseOutput(true);
+	parameters.setLogFile(outpath.string());
+	parameters.setErrFile(errpath.string());
 }
 
 /**
@@ -209,8 +305,14 @@ void initConfigParameters(
  * Decompiles binary on input by configuring and calling RetDec decompiler script.
  * Decompiles the binary given by the offset passed addr.
  *
- * @param binInfo Provides informations gathered from r2 console.
- * @param addr Decompiles the function at this offset.
+ * Note:
+ * This function serves as a fallback for testing and not main
+ * feature of this plugin. It is highly possible that this
+ * code will be removed in future.
+ *
+ * @param rdpath  Path to the RetDec decompiler executable.
+ * @param config  Configration filled with data ready for RetDec.
+ * @param fnc     Function that is decompiled.
  */
 RAnnotatedCode* decompileWithScript(
 		const fs::path &rdpath,
@@ -244,75 +346,12 @@ RAnnotatedCode* decompileWithScript(
 	return outgen.generateOutput(config.parameters.getOutputFile());
 }
 
-bool compareCache(const fs::path& cachePath, const std::string& cacheString)
-{
-	std::ifstream cacheFile(cachePath);
-	std::string cacheFileString;
-	cacheFile >> cacheFileString;
-
-	bool result = cacheFileString == cacheString;
-	cacheFile.close();
-	return result;
-}
-
-void createHash(const retdec::config::Config& config, std::ostream& cache)
-{
-	// RetDec automatically sets time and date to the JSON
-	// config. This is not really wanted as each change of time
-	// or date will trigger decompilation. Until RetDec provides
-	// API without this we need to manually set time and date
-	// to constant string.
-	rapidjson::Document d;
-	d.Parse(config.generateJsonString());
-	rapidjson::Value& time = d["time"];
-	rapidjson::Value& date = d["date"];
-
-	time.SetString("removed");
-	date.SetString("removed");
-
-	rapidjson::StringBuffer buffer;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-	d.Accept(writer);
-
-	cache << std::hex << std::hash<std::string>{}(buffer.GetString());
-}
-
-fs::path getCacheFile(const fs::path& configPath)
-{
-	return fs::path(configPath).replace_filename(".rd_cache");
-}
-
-bool usableCacheExists(const retdec::config::Config& config)
-{
-	fs::path configPath(config.parameters.getOutputConfigFile());
-
-	if (!fs::is_regular_file(configPath))
-		return false;
-
-	fs::path hashPath = getCacheFile(configPath);
-	if (!fs::is_regular_file(hashPath))
-		return false;
-
-	std::ostringstream cache;
-	createHash(config, cache);
-
-	return compareCache(hashPath, cache.str());
-}
-
-void createCacheFile(const retdec::config::Config& config)
-{
-	fs::path configPath(config.parameters.getOutputConfigFile());
-	fs::path hashPath = getCacheFile(configPath);
-	std::ofstream hashFile(hashPath);
-	createHash(config, hashFile);
-	hashFile.close();
-}
-
 /**
  * @brief Main decompilation method. Uses RetDec to decompile input binary.
  *
  * Decompiles binary on input by configuring and calling RetDec decompiler executable.
  * @param binInfo Provides informations gathered from r2 console.
+ * @param addr    Address of a function to be decompiled.
  */
 RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 {
@@ -320,7 +359,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 		auto config = loadDefaultConfig();
 
 		binInfo.fetchFunctionsAndGlobals(config);
-		initConfigParameters(config, binInfo, addr);
+		initConfigParameters(config.parameters, binInfo, addr);
 
 		if (usableCacheExists(config)) {
 			R2CGenerator outgen;
@@ -328,7 +367,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 		}
 		else {
 			config.generateJsonFile();
-			createCacheFile(config);
+			createConfigHashFile(config);
 		}
 
 		if (auto rdpath = checkCustomRetDecPath()) {

@@ -1,5 +1,5 @@
 /**
- * @file include/r2plugin/core_plugin.h
+ * @file include/r2plugin/r2retdec.h
  * @brief Main module of the retdec-r2plugin.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
