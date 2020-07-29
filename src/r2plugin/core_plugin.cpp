@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cstring>
 #include <functional>
+#include <fstream>
 #include <iostream>
 #include <iterator>
 #include <mutex>
@@ -174,7 +175,7 @@ void initConfigParameters(
 	// Fetch current function
 	auto fnc = binInfo.fetchFunction(addr);
 
-	// Fetch binary name -> will be used for cacheing
+	// Fetch binary name -> will be used for caching
 	std::string binName = binInfo.fetchFilePath();
 
 	// Create hex from bin name
@@ -213,19 +214,10 @@ void initConfigParameters(
  */
 RAnnotatedCode* decompileWithScript(
 		const fs::path &rdpath,
-		const R2InfoProvider &binInfo,
-		ut64 addr)
+		const retdec::config::Config& config,
+		const retdec::common::Function& fnc)
 {
 	R2CGenerator outgen;
-	auto config = retdec::config::Config::empty();
-
-	binInfo.fetchFunctionsAndGlobals(config);
-
-	auto fnc = binInfo.fetchFunction(addr);
-
-	initConfigParameters(config, binInfo, addr);
-
-	config.generateJsonFile();
 
 	std::ostringstream decrange;
 	decrange << fnc.getStart() << "-" << fnc.getEnd();
@@ -252,6 +244,70 @@ RAnnotatedCode* decompileWithScript(
 	return outgen.generateOutput(config.parameters.getOutputFile());
 }
 
+bool compareCache(const fs::path& cachePath, const std::string& cacheString)
+{
+	std::ifstream cacheFile(cachePath);
+	std::string cacheFileString;
+	cacheFile >> cacheFileString;
+
+	bool result = cacheFileString == cacheString;
+	cacheFile.close();
+	return result;
+}
+
+void createHash(const retdec::config::Config& config, std::ostream& cache)
+{
+	// RetDec automatically sets time and date to the JSON
+	// config. This is not really wanted as each change of time
+	// or date will trigger decompilation. Until RetDec provides
+	// API without this we need to manually set time and date
+	// to constant string.
+	rapidjson::Document d;
+	d.Parse(config.generateJsonString());
+	rapidjson::Value& time = d["time"];
+	rapidjson::Value& date = d["date"];
+
+	time.SetString("removed");
+	date.SetString("removed");
+
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	d.Accept(writer);
+
+	cache << std::hex << std::hash<std::string>{}(buffer.GetString());
+}
+
+fs::path getCacheFile(const fs::path& configPath)
+{
+	return fs::path(configPath).replace_filename(".rd_cache");
+}
+
+bool usableCacheExists(const retdec::config::Config& config)
+{
+	fs::path configPath(config.parameters.getOutputConfigFile());
+
+	if (!fs::is_regular_file(configPath))
+		return false;
+
+	fs::path hashPath = getCacheFile(configPath);
+	if (!fs::is_regular_file(hashPath))
+		return false;
+
+	std::ostringstream cache;
+	createHash(config, cache);
+
+	return compareCache(hashPath, cache.str());
+}
+
+void createCacheFile(const retdec::config::Config& config)
+{
+	fs::path configPath(config.parameters.getOutputConfigFile());
+	fs::path hashPath = getCacheFile(configPath);
+	std::ofstream hashFile(hashPath);
+	createHash(config, hashFile);
+	hashFile.close();
+}
+
 /**
  * @brief Main decompilation method. Uses RetDec to decompile input binary.
  *
@@ -261,16 +317,24 @@ RAnnotatedCode* decompileWithScript(
 RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 {
 	try {
-		if (auto rdpath = checkCustomRetDecPath()) {
-			return decompileWithScript(*rdpath, binInfo, addr);
-		}
-
 		auto config = loadDefaultConfig();
 
 		binInfo.fetchFunctionsAndGlobals(config);
 		initConfigParameters(config, binInfo, addr);
 
-		config.generateJsonFile();
+		if (usableCacheExists(config)) {
+			R2CGenerator outgen;
+			return outgen.generateOutput(config.parameters.getOutputFile());
+		}
+		else {
+			config.generateJsonFile();
+			createCacheFile(config);
+		}
+
+		if (auto rdpath = checkCustomRetDecPath()) {
+			auto fnc = binInfo.fetchFunction(addr);
+			return decompileWithScript(*rdpath, config, fnc);
+		}
 
 		if (auto rc = retdec::decompile(config)) {
 			throw DecompilationError(
