@@ -249,9 +249,9 @@ retdec::config::Config loadDefaultConfig()
 	}
 
 	// Loads configuration from file - also contains default config.
-	auto rdConf = retdec::config::Config::fromFile(configPath);
+	auto rdConf = retdec::config::Config::fromFile(configPath.string());
 	// Paths to the signatures, etc.
-	rdConf.parameters.fixRelativePaths(plugPath);
+	rdConf.parameters.fixRelativePaths(plugPath.string());
 
 	return rdConf;
 }
@@ -291,7 +291,7 @@ void initConfigParameters(
 
 	parameters.setInputFile(binInfo.fetchFilePath());
 	parameters.setOutputFile(decpath.string());
-	parameters.setOutputConfigFile(outconfig);
+	parameters.setOutputConfigFile(outconfig.string());
 	parameters.setOutputFormat("json-human");
 	parameters.selectedRanges.insert(fnc);
 	parameters.setIsVerboseOutput(true);
