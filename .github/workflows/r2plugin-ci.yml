@@ -196,12 +196,16 @@ jobs:
 
             - name: Install Missing Packages on macOS
               if: matrix.os == 'macos-latest'
-              run: brew install pkg-config autoconf automake libtool
+              run: brew install pkg-config autoconf automake libtool openssl
 
               # Qt is needed for the Cutter Plugin
             - name: Install Qt5 on Ubuntu
               if: matrix.os == 'ubuntu-latest'
-              run: sudo apt install qt5-default
+              run: sudo apt install qt5-default openssl
+
+            - name: Install Openssl on Windows
+              if: matrix.os == 'windows-latest'
+              run: choco install openssl
 
             - name: Install Qt5 on macOS
               if: matrix.os == 'macos-latest'
@@ -210,9 +214,11 @@ jobs:
             - name: Build CMake
               if: steps.r2plugin-cache.cache-hit != 'true' && matrix.os != 'windows-latest'
               run: |
-                    # Next line is only for macOS
+                    # Next lines are only for macOS
+                    export PATH="/usr/local/opt/openssl@1.1/bin:${PATH}"
                     export PATH=/usr/local/opt/qt/bin:${PATH}
                     export PATH=${PWD}/../radare2/bin:${PATH}
+                    export OPENSSL_ROOT_DIR="/usr/local/opt/openssl@1.1/"
                     export LD_LIBRARY_PATH=${PWD}/../radare2/lib:${PWD}/../radare2/lib64:${LD_LIBRARY_PATH}
                     export PKG_CONFIG_PATH=${PWD}/../radare2/lib/pkgconfig:${PKG_CONFIG_PATH}
                     cmake ../.. \
@@ -421,8 +427,6 @@ jobs:
                     retdec_build_dir = ${PWD}/build/r2plugin/_deps/retdec-build
                     ; Path to the RetDec's installation directory.
                     retdec_install_dir = ${HOME}/.local
-                    ; Path to the cloned RetDec repository.
-                    retdec_repo_dir = ${PWD}/build/retdec
                     r2plugin_tests_enabled = 1
                     r2plugin_script = ${PWD}/scripts/run-r2-decompilation.py
                     EOF
@@ -440,8 +444,6 @@ jobs:
                     retdec_build_dir = $PWD\build\r2plugin\_deps\retdec-build
                     ; Path to the RetDec's installation directory.
                     retdec_install_dir = $HOME\.local
-                    ; Path to the cloned RetDec repository.
-                    retdec_repo_dir = $PWD\build\retdec
                     r2plugin_tests_enabled = 1
                     r2plugin_script = $PWD\scripts\run-r2-decompilation.py" `
                         > "$($(Get-Location).path)\build\retdec-regression-tests-framework\config_local.ini"
