@@ -353,17 +353,20 @@ RAnnotatedCode* decompileWithScript(
  * @param binInfo Provides informations gathered from r2 console.
  * @param addr    Address of a function to be decompiled.
  */
-RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
+std::pair<RAnnotatedCode*, retdec::config::Config> decompile(const R2InfoProvider &binInfo, ut64 addr, bool useCache = true, bool fetchR2Data = true)
 {
 	try {
 		auto config = loadDefaultConfig();
 
-		binInfo.fetchFunctionsAndGlobals(config);
+		if (fetchR2Data) {
+			binInfo.fetchFunctionsAndGlobals(config);
+		}
+
 		initConfigParameters(config.parameters, binInfo, addr);
 
-		if (usableCacheExists(config)) {
+		if (useCache && usableCacheExists(config)) {
 			R2CGenerator outgen;
-			return outgen.generateOutput(config.parameters.getOutputFile());
+			return {outgen.generateOutput(config.parameters.getOutputFile()), config};
 		}
 		else {
 			config.generateJsonFile();
@@ -372,7 +375,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 
 		if (auto rdpath = checkCustomRetDecPath()) {
 			auto fnc = binInfo.fetchFunction(addr);
-			return decompileWithScript(*rdpath, config, fnc);
+			return {decompileWithScript(*rdpath, config, fnc), config};
 		}
 
 		if (auto rc = retdec::decompile(config)) {
@@ -384,7 +387,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 		}
 
 		R2CGenerator outgen;
-		return outgen.generateOutput(config.parameters.getOutputFile());
+		return {outgen.generateOutput(config.parameters.getOutputFile()), config};
 	}
 	catch (const std::exception &err) {
 		std::cerr << "retdec-r2plugin: decompilation was not successful: " << err.what() << std::endl;
@@ -393,7 +396,7 @@ RAnnotatedCode* decompile(const R2InfoProvider &binInfo, ut64 addr)
 		std::cerr << "retdec-r2plugin: unkown decompilation error" << std::endl;
 	}
 
-	return nullptr;
+	return {nullptr, retdec::config::Config::empty()};
 }
 
 /**
@@ -404,7 +407,8 @@ R_API RAnnotatedCode* decompile(RCore *core, ut64 addr){
 	std::lock_guard<std::mutex> lock (mutex);
 
 	R2InfoProvider binInfo(*core);
-	return decompile(binInfo, addr);
+	auto [code, _] = decompile(binInfo, addr);
+	return code;
 }
 
 /**
@@ -449,8 +453,8 @@ static void _cmd(RCore &core, const char &input)
 	std::lock_guard<std::mutex> lock (mutex);
 
 	R2InfoProvider binInfo(core);
-	auto code = decompile(binInfo, core.offset);
-	if (code == nullptr) {
+	auto [code, config] = decompile(binInfo, core.offset);
+	if (code == nullptr || outputFunction == nullptr) {
 		return;
 	}
 
