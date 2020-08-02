@@ -2,17 +2,17 @@ cmake_minimum_required(VERSION 3.12)
 
 project(retdec-r2plugin C CXX)
 
+# Minimal required version
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Set the default build type to 'Release'
 if(NOT CMAKE_BUILD_TYPE)
 	set(default_build_type "Release")
 	message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
 	set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE STRING "Choose the type of build." FORCE)
 endif()
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # Build parameters.
 if(MSVC) # Windows
@@ -27,19 +27,13 @@ if(MSVC) # Windows
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX")
 elseif(UNIX) # Linux or macOS
 	# Common options.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
-
-	# Ignore the following warnings (they are not fixable).
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-non-virtual-dtor")
-
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
+	# Set C flags
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 else()
 	message(FATAL_ERROR "Unsupported system type: ${CMAKE_SYSTEM_NAME}")
@@ -55,9 +49,7 @@ get_filename_component(RADARE_INSTALL_PATH "${RADARE_INSTALL_PATH}" REALPATH BAS
 set(RADARE2_INSTALL_PLUGDIR "share/radare2/plugins" CACHE PATH "Directory to install radare2 plugin into")
 set(CUTTER_INSTALL_PLUGDIR "share/RadareOrg/Cutter/plugins/native" CACHE PATH "Directory to install Cutter plugin into")
 
-set(CUTTER_SOURCE_DIR CUTTER_SOURCE_DIR-NOTFOUND CACHE STRING "Root directory of Cutter source")
-
-option(BUILD_CUTTER_PLUGIN "Build r2ghidra plugin for Cutter" OFF)
+option(BUILD_CUTTER_PLUGIN "Build r2retdec plugin for Cutter" OFF)
 option(BUILD_BUNDLED_RETDEC "Build retdec with the r2retdec plugin" ON)
 set(RETDEC_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "RetDec installation prefix (if bundled RetDec build is OFF r2plugin will search this directory implicitly in order to find a RetDec installation)")
 
