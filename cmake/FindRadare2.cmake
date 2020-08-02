@@ -19,7 +19,7 @@
 
 if(WIN32)
 	find_path(Radare2_INCLUDE_DIRS
-			NAMES r_core.h r_bin.h r_util.h
+			NAMES r_core.h r_bin.h r_util.h r_userconf.h
 			HINTS
 				"${RADARE_INSTALL_PATH}/include/libr"
 				"$ENV{HOME}/bin/prefix/radare2/include/libr"
@@ -28,12 +28,12 @@ if(WIN32)
 
 	# Support local installation.
 	find_path(Radare2_MAIN_INCLUDE
-			NAMES r_userconf.h
+			NAMES sdb.h
 			HINTS
-				"${RADARE_INSTALL_PATH}/include"
-				"$ENV{HOME}/bin/prefix/radare2/include"
-				/usr/local/include/libr
-				/usr/include/libr)
+				"${RADARE_INSTALL_PATH}/include/libr/sdb"
+				"$ENV{HOME}/bin/prefix/radare2/include/libr/sdb"
+				/usr/local/include/libr/sdb
+				/usr/include/libr/sdb)
 
 	list(APPEND Radare2_INCLUDE_DIRS ${Radare2_MAIN_INCLUDE})
 
