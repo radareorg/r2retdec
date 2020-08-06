@@ -5,6 +5,7 @@ set(SOURCES
 	r2info.cpp
 	r2utils.cpp
 	r2cgen.cpp
+	console/console.cpp
 )
 
 add_library(core_retdec SHARED ${SOURCES})
