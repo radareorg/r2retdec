@@ -6,6 +6,7 @@ set(SOURCES
 	r2utils.cpp
 	r2cgen.cpp
 	console/console.cpp
+	console/data_analysis.cpp
 	console/decompiler.cpp
 	registration.cpp
 )
