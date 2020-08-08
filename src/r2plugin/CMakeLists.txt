@@ -6,6 +6,8 @@ set(SOURCES
 	r2utils.cpp
 	r2cgen.cpp
 	console/console.cpp
+	console/decompiler.cpp
+	registration.cpp
 )
 
 add_library(core_retdec SHARED ${SOURCES})
