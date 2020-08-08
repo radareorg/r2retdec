@@ -32,6 +32,8 @@ config::Config createConfig(const R2InfoProvider& binInfo, const std::string& ca
 
 std::string cacheName(const common::Function& fnc);
 
+fs::path getOutDirPath(const fs::path &suffix = "");
+
 }
 }
 

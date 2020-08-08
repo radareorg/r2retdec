@@ -38,7 +38,7 @@ namespace r2plugin {
  *                            temporary directory DecompilationError is
  *                            thrown.
  */
-fs::path getOutDirPath(const fs::path &suffix = "")
+fs::path getOutDirPath(const fs::path &suffix)
 {
 	std::error_code err;
 

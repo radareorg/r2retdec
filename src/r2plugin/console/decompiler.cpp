@@ -1,7 +1,11 @@
+#include <retdec/utils/io/log.h>
+
 #include "r2plugin/console/decompiler.h"
 #include "r2plugin/console/data_analysis.h"
 
 #define CMD_PREFIX "pdz" /**< Plugin activation command in r2 console.**/
+
+using namespace retdec::utils::io;
 
 namespace retdec {
 namespace r2plugin {
@@ -13,10 +17,11 @@ DecompilerConsole::DecompilerConsole(): Console(
 	"Native RetDec decompiler plugin.",
 	{
 		{"", DecompileCurrent},
-		{"o", DecompileWithOffsetsCurrent},
-		{"j", DecompileJsonCurrent},
+		{"*", DecompileWithOffsetsCurrent},
 		{"a", DecompilerDataAnalysis},
-		{"*", DecompileWithOffsetsCurrent}
+		{"e", ShowUsedEnvironment},
+		{"j", DecompileJsonCurrent},
+		{"o", DecompileWithOffsetsCurrent}
 	})
 {
 }
@@ -45,6 +50,11 @@ const Console::Command DecompilerConsole::DecompilerDataAnalysis = {
 	"Run RetDec analysis.",
 	DataAnalysisConsole::handleCommand,
 	true
+};
+
+const Console::Command DecompilerConsole::ShowUsedEnvironment = {
+	"Show environment variables.",
+	DecompilerConsole::showEnvironment
 };
 
 config::Config DecompilerConsole::createConsoleConfig(const R2InfoProvider& binInfo)
@@ -113,6 +123,23 @@ bool DecompilerConsole::decompileCommentCurrent(const std::string&, const R2Info
 		return false;
 
 	r_core_annotated_code_print_comment_cmds(code);
+	return true;
+}
+
+bool DecompilerConsole::showEnvironment(const std::string&, const R2InfoProvider&)
+{
+	Log::info() << Log::Color::Green << "Environment:" << std::endl;
+
+	std::string padding = "    ";
+
+	std::string outDir;
+	try {
+		outDir = getOutDirPath("").string();
+	} catch(const DecompilationError &e) {
+		outDir = e.what();
+	}
+
+	Log::info() << padding << "DEC_SAVE_DIR = " << outDir << std::endl;
 	return true;
 }
 

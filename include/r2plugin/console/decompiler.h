@@ -19,6 +19,7 @@ public:
 	static const Console::Command DecompileJsonCurrent;
 	static const Console::Command DecompileCommentCurrent;
 	static const Console::Command DecompilerDataAnalysis;
+	static const Console::Command ShowUsedEnvironment;
 
 private:
 	static bool decompileCurrent(const std::string&, const R2InfoProvider& info);
@@ -26,6 +27,7 @@ private:
 	static bool decompileWithOffsetsCurrent(const std::string&, const R2InfoProvider& info);
 	static bool decompileCommentCurrent(const std::string&, const R2InfoProvider& info);
 	static config::Config createConsoleConfig(const R2InfoProvider& binInfo);
+	static bool showEnvironment(const std::string&, const R2InfoProvider&);
 
 private:
 	static DecompilerConsole console;
