@@ -17,7 +17,22 @@ namespace r2plugin {
 
 R_API RAnnotatedCode* decompile(RCore *core, ut64 addr);
 
+std::pair<RAnnotatedCode*, retdec::config::Config> decompile(
+		const R2InfoProvider &binInfo,
+		const common::AddressRange& decompileRange,
+		bool useCache = true,
+		bool fetchR2Data = true);
+
+std::pair<RAnnotatedCode*, retdec::config::Config> decompile(
+		config::Config& config,
+		bool useCache);
+
+config::Config createConfig(const R2InfoProvider& binInfo, const std::string& cacheSuffix = "");
+
+std::string cacheName(const common::Function& fnc);
+
 }
 }
+
 
 #endif //R2PLUGIN_R2RETDEC_H
