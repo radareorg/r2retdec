@@ -4,13 +4,14 @@
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
-#include <iostream>
+#include <retdec/utils/io/log.h>
 #include <r_core.h>
 
 #include "r2plugin/r2info.h"
 #include "r2plugin/console/decompiler.h"
 
 using namespace retdec::r2plugin;
+using namespace retdec::utils::io;
 
 /**
  * R2 console registration method. This method is called
@@ -33,7 +34,7 @@ static int r2retdec_cmd(void *user, const char* input)
 		return DecompilerConsole::handleCommand(std::string(input), binInfo);
 	}
 	catch (const std::exception& e) {
-		std::cerr << "error: " << e.what() << std::endl;
+		Log::error() << Log::Error << e.what() << std::endl;
 		return true;
 	}
 }

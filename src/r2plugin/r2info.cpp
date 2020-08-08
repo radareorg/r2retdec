@@ -4,7 +4,7 @@
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
-#include <iostream>
+#include <retdec/utils/io/log.h>
 
 #include "r2plugin/r2info.h"
 #include "r2plugin/r2utils.h"
@@ -13,6 +13,7 @@ using namespace retdec::common;
 using namespace retdec::config;
 using namespace retdec::r2plugin;
 using fu = retdec::r2plugin::FormatUtils;
+using retdec::utils::io::Log;
 
 /**
  * Translation map between tokens representing calling convention type returned
@@ -66,7 +67,7 @@ void R2InfoProvider::setFunction(const common::Function &fnc) const
 
 	if (!fnc.isDynamicallyLinked() && fnc.getSize().getValue() > 1)
 		if (!r_anal_fcn_add_bb(_r2core.anal, r2fnc, fnc.getStart().getValue(), fnc.getSize().getValue(), UT64_MAX, UT64_MAX, nullptr))
-			std::cerr << "Warning: unable to add basic block of "+fnc.getName() << std::endl;
+			Log::error() << Log::Warning << "unable to add basic block of " << fnc.getName() << std::endl;
 
 	copyFunctionData(fnc, *r2fnc);
 }

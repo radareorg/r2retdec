@@ -2,13 +2,13 @@
 #include <cstring>
 #include <functional>
 #include <fstream>
-#include <iostream>
 #include <iterator>
 #include <mutex>
 
 #include <r_core.h>
 #include <retdec/retdec/retdec.h>
 #include <retdec/utils/binary_path.h>
+#include <retdec/utils/io/log.h>
 #include <retdec/config/config.h>
 #include <retdec/config/parameters.h>
 #include <sstream>
@@ -20,6 +20,7 @@
 #include "r2plugin/r2retdec.h"
 
 using fu = retdec::r2plugin::FormatUtils;
+using namespace retdec::utils::io;
 
 namespace retdec {
 namespace r2plugin {
@@ -48,7 +49,7 @@ fs::path getOutDirPath(const fs::path &suffix)
 		auto outDirPath = fs::path(outDir);
 		if (!is_directory(outDirPath, err)) {
 			throw DecompilationError(
-				"invald $DEC_SAVE_DIR: not a directory: "
+				"invalid $DEC_SAVE_DIR: not a directory: "
 				+outDir
 			);
 		}
@@ -249,7 +250,14 @@ std::pair<RAnnotatedCode*, retdec::config::Config> decompile(
 		}
 
 		// Interface uses non-const config.
+
 		if (auto rc = retdec::decompile(config)) {
+			// Note:
+			//   RetDec sets Loggers in decompile function based on settings in config.
+			//   After this function ends we want to print out on stdout/stderr again.
+			Log::set(Log::Type::Info, Logger::Ptr(new Logger(std::cout)));
+			Log::set(Log::Type::Error, Logger::Ptr(new Logger(std::cerr)));
+
 			throw DecompilationError(
 				"decompilation ended with error code "
 				+ std::to_string(rc) +
@@ -257,14 +265,18 @@ std::pair<RAnnotatedCode*, retdec::config::Config> decompile(
 			);
 		}
 
+		// See note above.
+		Log::set(Log::Type::Info, Logger::Ptr(new Logger(std::cout)));
+		Log::set(Log::Type::Error, Logger::Ptr(new Logger(std::cerr)));
+
 		R2CGenerator outgen;
 		return {outgen.generateOutput(config.parameters.getOutputFile()), config};
 	}
 	catch (const std::exception &err) {
-		std::cerr << "decompilation error: " << err.what() << std::endl;
+		Log::error() << "decompilation error: " << err.what() << std::endl;
 	}
 	catch (...) {
-		std::cerr << "an unknown decompilation error occurred" << std::endl;
+		Log::error() << "an unknown decompilation error occurred" << std::endl;
 	}
 
 	return {nullptr, retdec::config::Config::empty()};
