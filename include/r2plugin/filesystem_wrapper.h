@@ -1,5 +1,5 @@
 /**
- * @file src/r2plugin/filesystem_wrapper.h
+ * @file include/r2plugin/filesystem_wrapper.h
  * @brief Wrapper for conditional include of C++17 filesystem feature.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */

@@ -19,8 +19,6 @@
 
 #include "r2plugin/r2retdec.h"
 
-#include "filesystem_wrapper.h"
-
 using fu = retdec::r2plugin::FormatUtils;
 
 namespace retdec {

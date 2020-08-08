@@ -11,6 +11,7 @@
 #include <r_core.h>
 
 #include "r2plugin/r2info.h"
+#include "filesystem_wrapper.h"
 
 namespace retdec {
 namespace r2plugin {
