@@ -13,7 +13,6 @@
 #include <retdec/config/parameters.h>
 #include <sstream>
 
-#include "r2plugin/cmd_exec.h"
 #include "r2plugin/r2retdec.h"
 #include "r2plugin/r2cgen.h"
 #include "r2plugin/r2utils.h"
@@ -22,7 +21,6 @@
 
 #include "filesystem_wrapper.h"
 
-using ce = retdec::r2plugin::CmdExec;
 using fu = retdec::r2plugin::FormatUtils;
 
 namespace retdec {

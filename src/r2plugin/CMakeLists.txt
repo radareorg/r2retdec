@@ -1,7 +1,6 @@
 # RetDec r2plugin sources.
 set(SOURCES
 	r2retdec.cpp
-	cmd_exec.cpp
 	r2info.cpp
 	r2utils.cpp
 	r2cgen.cpp
