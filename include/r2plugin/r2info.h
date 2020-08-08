@@ -19,6 +19,8 @@
 namespace retdec {
 namespace r2plugin {
 
+using R2Address = ut64;
+
 /**
  * R2InfoProvider implements wrapper around R2 API functions.
  */
@@ -29,6 +31,11 @@ public:
 public:
 	std::string fetchFilePath() const;
 
+	void setFunction(const common::Function &fnc) const;
+	void copyFunctionData(const common::Function &fnc, RAnalFunction& r2fnc) const;
+
+	void setFunctions(const config::Config &rdconfig) const;
+
 	common::Function fetchFunction(ut64 addr) const;	
 	common::Function fetchSeekedFunction() const;	
 
@@ -38,6 +45,8 @@ public:
 	void fetchFunctionCallingconvention(common::Function &function, RAnalFunction &r2fnc) const;
 	void fetchFunctionReturnType(common::Function &function, RAnalFunction &r2fnc) const;
 	size_t fetchWordSize() const;
+	R2Address seekedAddress() const;
+	const RCore& core() const;
 
 protected:
 	void fetchGlobals(config::Config &rdconfig) const;

@@ -4,6 +4,8 @@
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
+#include <iostream>
+
 #include "r2plugin/r2info.h"
 #include "r2plugin/r2utils.h"
 
@@ -48,6 +50,78 @@ R2InfoProvider::R2InfoProvider(RCore &core):
 std::string R2InfoProvider::fetchFilePath() const
 {
 	return _r2core.file->binb.bin->file;
+}
+
+void R2InfoProvider::setFunction(const common::Function &fnc) const
+{
+	auto r2fnc = r_anal_get_function_at(_r2core.anal, fnc.getStart().getValue());
+	if (r2fnc == nullptr) {
+		r2fnc = r_anal_create_function(_r2core.anal, fnc.getName().c_str(),
+				fnc.getStart().getValue(), R_ANAL_FCN_TYPE_FCN, nullptr);
+		if (r2fnc == nullptr) {
+			throw DecompilationError("Unable to create function on address "
+					+ std::to_string(fnc.getStart().getValue()));
+		}
+	}
+
+	if (!fnc.isDynamicallyLinked() && fnc.getSize().getValue() > 1)
+		if (!r_anal_fcn_add_bb(_r2core.anal, r2fnc, fnc.getStart().getValue(), fnc.getSize().getValue(), UT64_MAX, UT64_MAX, nullptr))
+			std::cerr << "Warning: unable to add basic block of "+fnc.getName() << std::endl;
+
+	copyFunctionData(fnc, *r2fnc);
+}
+
+std::string sanitize(const std::string& a)
+{
+	std::ostringstream ok;
+	for (auto& c: a)
+		if (c != '$' && c != '@')
+			ok << c;
+
+	return ok.str();
+}
+
+void R2InfoProvider::copyFunctionData(const common::Function &fnc, RAnalFunction &r2fnc) const
+{
+	if (r_anal_function_rename(&r2fnc, fnc.getName().c_str()) == false) {
+		std::ostringstream err;
+		err << "unable to set rename function at offset "
+			<< std::hex << fnc.getStart() << ": new name \"" << fnc.getName();
+		throw DecompilationError(err.str());
+	}
+
+	// TODO:
+	//   - Provide "hack":
+	//     Get/Create declaration string. When such string is available provide "sanitization".
+	//     Sanitization will check for symbols that r2 cannot parse and replace them with
+	//     more appropriate symbols.
+	if (false && !fnc.getDeclarationString().empty()) {
+		r_anal_str_to_fcn(_r2core.anal, &r2fnc, (fnc.getDeclarationString()+";").c_str());
+	}
+	else {
+		std::ostringstream data;
+		data << fu::convertLlvmTypeToC(fnc.returnType.getLlvmIr()) << " "
+			<< fnc.getName() << "(";
+
+		if (!fnc.parameters.empty()) {
+			data << fu::convertLlvmTypeToC(fnc.parameters.front().type.getLlvmIr());
+			data << " " << fnc.parameters.front().getName();
+		}
+		for (auto& a: fnc.parameters) {
+			data << ", " << fu::convertLlvmTypeToC(a.type.getLlvmIr())
+				<< " " << a.getName();
+		}
+		data << ");";
+		r_anal_str_to_fcn(_r2core.anal, &r2fnc, sanitize(data.str()).c_str());
+	}
+
+}
+
+void R2InfoProvider::setFunctions(const config::Config& config) const
+{
+	for (auto& fnc: config.functions) {
+		setFunction(fnc);
+	}
 }
 
 /**
@@ -328,4 +402,14 @@ void R2InfoProvider::fetchFunctionReturnType(Function &function, RAnalFunction &
 size_t R2InfoProvider::fetchWordSize() const
 {
 	return r_config_get_i(_r2core.config, "asm.bits");
+}
+
+ut64 R2InfoProvider::seekedAddress() const
+{
+	return _r2core.offset;
+}
+
+const RCore& R2InfoProvider::core() const
+{
+	return _r2core;
 }
