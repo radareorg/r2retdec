@@ -22,6 +22,7 @@ private:
 
 public:
 	static const std::string convertTypeToLlvm(const std::string &ctype);
+	static const std::string convertLlvmTypeToC(const std::string &ctype);
 
 	static const std::string joinTokens(
 			const std::vector<std::string> &tokens,

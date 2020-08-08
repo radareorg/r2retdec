@@ -34,9 +34,9 @@ const std::map<const std::string, const std::string> FormatUtils::_primitives {
 	{"int", "i32"},
 	{"long", "i64"},
 	{"size_t", "i64"},
-	{"gid_t", "i32"},
-	{"uid_t", "i32"},
-	{"pid_t", "i32"},
+	//{"gid_t", "i32"},
+	//{"uid_t", "i32"},
+	//{"pid_t", "i32"},
 
 	{"int8_t", "i8"},
 	{"int16_t", "i16"},
@@ -117,6 +117,20 @@ std::string FormatUtils::stripName(const std::string &name)
 	}
 
 	return newName;
+}
+
+const std::string FormatUtils::convertLlvmTypeToC(const std::string& llvmType)
+{
+	auto search = [llvmType](const std::pair<std::string, std::string>& v) {
+		auto [_, l] = v;
+		return l == llvmType;
+	};
+
+	auto it = std::find_if(_primitives.begin(), _primitives.end(), search);
+	if (it == _primitives.end())
+		return "void*";
+
+	return it->first;
 }
 
 /**
