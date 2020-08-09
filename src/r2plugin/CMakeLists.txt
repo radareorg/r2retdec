@@ -73,10 +73,4 @@ set_target_properties(core_retdec PROPERTIES
 	PREFIX ""
 )
 
-target_compile_definitions(core_retdec
-	PRIVATE
-	"-DRETDEC_INSTALL_PREFIX=\"${RETDEC_INSTALL_PREFIX}\""
-	"-DPLUGIN_INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\""
-)
-
 install(TARGETS core_retdec DESTINATION "${RADARE2_INSTALL_PLUGDIR}")

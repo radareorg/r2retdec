@@ -2,12 +2,6 @@ cmake_minimum_required(VERSION 3.8)
 
 include(FetchContent)
 
-if (RETDEC_INSTALL_PREFIX)
-	set(RETDEC_INSTALL_DIR "${RETDEC_INSTALL_PREFIX}")
-else ()
-	set(RETDEC_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/retdec-install")
-endif ()
-
 FetchContent_Declare(retdec
 	GIT_REPOSITORY https://github.com/avast/retdec
 	GIT_TAG 127dbe2b97c0e618b75c618e82cdf6127e0ebdab

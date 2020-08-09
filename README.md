@@ -80,8 +80,7 @@ You have to pass the following parameters to `cmake`:
 * `-DCMAKE_INSTALL_PREFIX=<path>` to set the installation path to `<path>`. It is important to set the `<path>` to a location where Radare2 can load plugins from (for example `~/.local`).
 
 You can pass the following additional parameters to `cmake`:
-* `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. The build of the bundled RetDec is by default turned on. RetDec will be installed to `CMAKE_INSTALL_PREFIX`.
-* `-DRETDEC_INSTALL_PREFIX=<path>` specify path to be searched when RetDec is not found at `CMAKE_INSTALL_PREFIX`.
+* `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. The build of the bundled RetDec is by default turned on. RetDec will be installed to `CMAKE_INSTALL_PREFIX`. When turned OFF system is searched for RetDec installation.
 * `-DR2PLUGIN_DOC=OFF` optional parameter to build Doxygen documentation.
 * `-DBUILD_CUTTER_PLUGIN=OFF` setting to ON will build the Cutter plugin. Cutter must be built with support for plugin loading, see [Cutter documentation](https://cutter.re/docs/plugins.html).
 
