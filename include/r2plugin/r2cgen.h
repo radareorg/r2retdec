@@ -11,6 +11,7 @@
 #include <optional>
 #include <rapidjson/document.h>
 
+#include <retdec/common/address.h>
 #include <r_util/r_annotated_code.h>
 
 namespace retdec {
@@ -22,6 +23,21 @@ public:
 
 protected:
 	RAnnotatedCode* provideAnnotations(const rapidjson::Document &root) const;
+	void annotate(
+		RAnnotatedCode* code,
+		const common::Address& binAdress,
+		const common::AddressRange& inCode) const;
+
+	void annotate(
+		RAnnotatedCode* code,
+		const RSyntaxHighlightType& high,
+		const common::AddressRange& inCode) const;
+
+	std::optional<RCodeAnnotation> specialAnnotation(
+		const std::string& kind,
+		const std::string& val,
+		const std::optional<common::Address>& address) const;
+
 	std::optional<RSyntaxHighlightType> highlightTypeForToken(const std::string &token) const;
 
 private:
