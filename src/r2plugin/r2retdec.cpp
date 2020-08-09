@@ -273,9 +273,13 @@ std::pair<RAnnotatedCode*, retdec::config::Config> decompile(
 		return {outgen.generateOutput(config.parameters.getOutputFile()), config};
 	}
 	catch (const std::exception &err) {
+		Log::set(Log::Type::Info, Logger::Ptr(new Logger(std::cout)));
+		Log::set(Log::Type::Error, Logger::Ptr(new Logger(std::cerr)));
 		Log::error() << "decompilation error: " << err.what() << std::endl;
 	}
 	catch (...) {
+		Log::set(Log::Type::Info, Logger::Ptr(new Logger(std::cout)));
+		Log::set(Log::Type::Error, Logger::Ptr(new Logger(std::cerr)));
 		Log::error() << "an unknown decompilation error occurred" << std::endl;
 	}
 
