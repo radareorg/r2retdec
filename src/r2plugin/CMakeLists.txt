@@ -1,3 +1,8 @@
+if (NOT BUILD_BUNDLED_RETDEC)
+	set(RETDEC_VERSION 4.0)
+	find_package(retdec ${RETDEC_VERSION} REQUIRED COMPONENTS retdec config)
+endif()
+
 # RetDec r2plugin sources.
 set(SOURCES
 	r2retdec.cpp
