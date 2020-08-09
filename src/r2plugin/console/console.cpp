@@ -1,3 +1,9 @@
+/**
+ * @file src/r2plugin/console/console.cpp
+ * @brief R2 console interface.
+ * @copyright (c) 2020 Avast Software, licensed under the MIT license.
+ */
+
 #include <iostream>
 #include <regex>
 

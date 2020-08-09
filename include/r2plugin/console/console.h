@@ -1,3 +1,9 @@
+/**
+ * @file include/r2plugin/console/console.h
+ * @brief R2 include interface.
+ * @copyright (c) 2020 Avast Software, licensed under the MIT license.
+ */
+
 #pragma once
 
 #include <map>

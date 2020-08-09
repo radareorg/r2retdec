@@ -1,3 +1,9 @@
+/**
+ * @file include/r2plugin/console/decompiler.h
+ * @brief implementation of decompiler console (pdz_).
+ * @copyright (c) 2020 avast software, licensed under the mit license.
+ */
+
 #pragma once
 
 #include "r2plugin/console/console.h"

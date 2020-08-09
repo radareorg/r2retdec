@@ -1,3 +1,9 @@
+/**
+ * @file src/r2plugin/console/data_analysis.cpp
+ * @brief Implementation of data analysis console (pdza_).
+ * @copyright (c) 2020 Avast Software, licensed under the MIT license.
+ */
+
 #include <iostream>
 #include <regex>
 

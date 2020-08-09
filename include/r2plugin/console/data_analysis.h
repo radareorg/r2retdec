@@ -1,3 +1,9 @@
+/**
+ * @file include/r2plugin/console/data_analysis.h
+ * @brief implementation of data analysis console (pdza_).
+ * @copyright (c) 2020 avast software, licensed under the mit license.
+ */
+
 #pragma once
 
 #include "r2plugin/console/console.h"
