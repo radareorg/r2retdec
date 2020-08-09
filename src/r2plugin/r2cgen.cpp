@@ -22,7 +22,7 @@ std::map<const std::string, RSyntaxHighlightType> R2CGenerator::_hig2token = {
 	// {"punc", ... }
 	// {"op", ... }
 	{"i_var", R_SYNTAX_HIGHLIGHT_TYPE_GLOBAL_VARIABLE},
-	// {"i_var", R_SYNTAX_HIGHLIGHT_TYPE_LOCAL_VARIABLE},
+	{"i_lvar", R_SYNTAX_HIGHLIGHT_TYPE_LOCAL_VARIABLE},
 	// {"i_mem", R_SYNTAX_HIGHLIGHT_TYPE_DATATYPE},
 	{"i_lab", R_SYNTAX_HIGHLIGHT_TYPE_KEYWORD},
 	{"i_fnc", R_SYNTAX_HIGHLIGHT_TYPE_FUNCTION_NAME},
@@ -66,7 +66,7 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const rapidjson::Document &root
 	}
 
 	std::ostringstream planecode;
-	std::optional<unsigned long> lastAddr;
+	std::optional<common::Address> lastAddr;
 
 	if (!root["tokens"].IsArray()) {
 		throw DecompilationError("malformed JSON");
@@ -89,27 +89,29 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const rapidjson::Document &root
 			continue;
 		}
 		else if (token.HasMember("val") && token.HasMember("kind")) {
+			// Beginning position in the code.
 			unsigned long bpos = planecode.tellp();
 			planecode << token["val"].GetString();
+			// Ending position in the code
 			unsigned long epos = planecode.tellp();
 
-			if (lastAddr.has_value()) {
-				RCodeAnnotation annotation = {};
-				annotation.type = R_CODE_ANNOTATION_TYPE_OFFSET;
-				annotation.offset.offset = lastAddr.value();
-				annotation.start = bpos;
-				annotation.end = epos;
-				r_annotated_code_add_annotation(code, &annotation);
-			}
+			if (lastAddr.has_value())
+				annotate(code, lastAddr.value(), {bpos, epos});
 
-			auto higlight = highlightTypeForToken(token["kind"].GetString());
-			if (higlight.has_value()) {
-				RCodeAnnotation annotation = {};
-				annotation.type = R_CODE_ANNOTATION_TYPE_SYNTAX_HIGHLIGHT;
-				annotation.syntax_highlight.type = higlight.value();
-				annotation.start = bpos;
-				annotation.end = epos;
-				r_annotated_code_add_annotation(code, &annotation);
+			auto highlight = highlightTypeForToken(token["kind"].GetString());
+			if (highlight.has_value())
+				annotate(code, highlight.value(), {bpos, epos});
+
+			auto special = specialAnnotation(
+				token["kind"].GetString(),
+				token["val"].GetString(),
+				lastAddr);
+
+			if (special.has_value()) {
+				auto specialAnnotation = special.value();
+				specialAnnotation.start = bpos;
+				specialAnnotation.end = epos;
+				r_annotated_code_add_annotation(code, &specialAnnotation);
 			}
 		}
 		else {
@@ -127,6 +129,91 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const rapidjson::Document &root
 	code->code[str.length()] = '\0';
 
 	return code;
+}
+
+/**
+ * Generates annotation of the address.
+ */
+void R2CGenerator::annotate(
+	RAnnotatedCode* code,
+	const common::Address& binAdress,
+	const common::AddressRange& inCode) const
+{
+	RCodeAnnotation annotation = {};
+	annotation.type = R_CODE_ANNOTATION_TYPE_OFFSET;
+	annotation.offset.offset = binAdress.getValue();
+	annotation.start = inCode.getStart().getValue();
+	annotation.end = inCode.getEnd().getValue();
+	r_annotated_code_add_annotation(code, &annotation);
+}
+
+/**
+ * Generates syntax highlight annotation.
+ */
+void R2CGenerator::annotate(
+	RAnnotatedCode* code,
+	const RSyntaxHighlightType& highlight,
+	const common::AddressRange& inCode) const
+{
+	RCodeAnnotation annotation = {};
+	annotation.type = R_CODE_ANNOTATION_TYPE_SYNTAX_HIGHLIGHT;
+	annotation.syntax_highlight.type = highlight;
+	annotation.start = inCode.getStart().getValue();
+	annotation.end = inCode.getEnd().getValue();
+	r_annotated_code_add_annotation(code, &annotation);
+}
+
+/**
+ * Possibly creates special annotation based on kind, value and address.
+ */
+std::optional<RCodeAnnotation> R2CGenerator::specialAnnotation(
+		const std::string& kind,
+		const std::string& val,
+		const std::optional<common::Address>& address) const
+{
+	auto hl = highlightTypeForToken(kind);
+	if (!hl.has_value())
+		return {};
+
+	auto offset = [kind](const std::optional<common::Address>& a) -> common::Address {
+		if (!a.has_value())
+			throw DecompilationError("expected offset for "+kind);
+
+		return a->getValue();
+	};
+
+	RCodeAnnotation an;
+
+	switch (hl.value()) {
+	case R_SYNTAX_HIGHLIGHT_TYPE_FUNCTION_NAME:
+		an.type = R_CODE_ANNOTATION_TYPE_FUNCTION_NAME;
+		an.reference.name = strdup(val.c_str());
+		an.reference.offset = offset(address);
+		return an;
+
+	case R_SYNTAX_HIGHLIGHT_TYPE_GLOBAL_VARIABLE:
+		an.type = R_CODE_ANNOTATION_TYPE_GLOBAL_VARIABLE;
+		an.reference.offset = offset(address);
+		return an;
+
+	case R_SYNTAX_HIGHLIGHT_TYPE_CONSTANT_VARIABLE:
+		an.type = R_CODE_ANNOTATION_TYPE_CONSTANT_VARIABLE;
+		an.reference.offset = offset(address);
+		return an;
+
+	case R_SYNTAX_HIGHLIGHT_TYPE_LOCAL_VARIABLE:
+		an.type = R_CODE_ANNOTATION_TYPE_LOCAL_VARIABLE;
+		an.variable.name = strdup(val.c_str());
+		return an;
+
+	case R_SYNTAX_HIGHLIGHT_TYPE_FUNCTION_PARAMETER:
+		an.type = R_CODE_ANNOTATION_TYPE_FUNCTION_PARAMETER;
+		an.variable.name = strdup(val.c_str());
+		return an;
+
+	default:
+		return {};
+	}
 }
 
 /**
