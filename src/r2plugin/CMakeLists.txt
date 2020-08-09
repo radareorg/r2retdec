@@ -76,4 +76,3 @@ target_compile_definitions(core_retdec
 )
 
 install(TARGETS core_retdec DESTINATION "${RADARE2_INSTALL_PLUGDIR}")
-install(FILES decompiler-config.json DESTINATION "${RADARE2_INSTALL_PLUGDIR}")
