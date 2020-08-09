@@ -16,11 +16,6 @@ FetchContent_Declare(retdec
 FetchContent_GetProperties(retdec)
 if(NOT retdec_POPULATED)
 	FetchContent_Populate(retdec)
-	if (${BUILD_BUNDLED_RETDEC})
-		option(RETDEC_ENABLE_CONFIG "" OFF)
-	else()
-		option(RETDEC_ENABLE_CONFIG "" ON)
-	endif()
 
 	add_subdirectory(
 		${retdec_SOURCE_DIR}
