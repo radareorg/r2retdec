@@ -16,7 +16,7 @@ protected:
 
 public:
 	/// Calls handle method of singleton.
-	static bool handleCommand(const std::string& commad, const R2InfoProvider& info);
+	static bool handleCommand(const std::string& commad, const R2Database& info);
 
 	/// Representation of pdza command.
 	static Console::Command AnalyzeRange;
@@ -26,10 +26,10 @@ public:
 
 private:
 	/// Implementation of pdza command.
-	static bool analyzeRange(const std::string&, const R2InfoProvider& info);
+	static bool analyzeRange(const std::string&, const R2Database& info);
 
 	/// Implementation of pdzaa command.
-	static bool analyzeWholeBinary(const std::string&, const R2InfoProvider& info);
+	static bool analyzeWholeBinary(const std::string&, const R2Database& info);
 
 private:
 	/// Helper method. Parses arguments of pdza commnad.

@@ -10,7 +10,7 @@
 #include <r_util/r_annotated_code.h>
 #include <r_core.h>
 
-#include "r2plugin/r2info.h"
+#include "r2plugin/r2data.h"
 #include "filesystem_wrapper.h"
 
 namespace retdec {
@@ -19,7 +19,7 @@ namespace r2plugin {
 R_API RAnnotatedCode* decompile(RCore *core, ut64 addr);
 
 std::pair<RAnnotatedCode*, retdec::config::Config> decompile(
-		const R2InfoProvider &binInfo,
+		const R2Database &binInfo,
 		const common::AddressRange& decompileRange,
 		bool useCache = true,
 		bool fetchR2Data = true);
@@ -28,7 +28,7 @@ std::pair<RAnnotatedCode*, retdec::config::Config> decompile(
 		config::Config& config,
 		bool useCache);
 
-config::Config createConfig(const R2InfoProvider& binInfo, const std::string& cacheSuffix = "");
+config::Config createConfig(const R2Database& binInfo, const std::string& cacheSuffix = "");
 
 std::string cacheName(const common::Function& fnc);
 

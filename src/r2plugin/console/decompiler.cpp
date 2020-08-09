@@ -57,7 +57,7 @@ const Console::Command DecompilerConsole::ShowUsedEnvironment = {
 	DecompilerConsole::showEnvironment
 };
 
-config::Config DecompilerConsole::createConsoleConfig(const R2InfoProvider& binInfo)
+config::Config DecompilerConsole::createConsoleConfig(const R2Database& binInfo)
 {
 	auto fnc = binInfo.fetchSeekedFunction();
 	auto config = createConfig(binInfo, cacheName(fnc));
@@ -69,12 +69,12 @@ config::Config DecompilerConsole::createConsoleConfig(const R2InfoProvider& binI
 	return config;
 }
 
-bool DecompilerConsole::handleCommand(const std::string& command, const R2InfoProvider& info)
+bool DecompilerConsole::handleCommand(const std::string& command, const R2Database& info)
 {
 	return DecompilerConsole::console.handle(command, info);
 }
 
-bool DecompilerConsole::decompileCurrent(const std::string&, const R2InfoProvider& binInfo)
+bool DecompilerConsole::decompileCurrent(const std::string&, const R2Database& binInfo)
 {
 	auto config = createConsoleConfig(binInfo);
 
@@ -86,7 +86,7 @@ bool DecompilerConsole::decompileCurrent(const std::string&, const R2InfoProvide
 	return true;
 }
 
-bool DecompilerConsole::decompileWithOffsetsCurrent(const std::string&, const R2InfoProvider& binInfo)
+bool DecompilerConsole::decompileWithOffsetsCurrent(const std::string&, const R2Database& binInfo)
 {
 	auto config = createConsoleConfig(binInfo);
 
@@ -102,7 +102,7 @@ bool DecompilerConsole::decompileWithOffsetsCurrent(const std::string&, const R2
 }
 
 
-bool DecompilerConsole::decompileJsonCurrent(const std::string&, const R2InfoProvider& binInfo)
+bool DecompilerConsole::decompileJsonCurrent(const std::string&, const R2Database& binInfo)
 {
 	auto config = createConsoleConfig(binInfo);
 
@@ -114,7 +114,7 @@ bool DecompilerConsole::decompileJsonCurrent(const std::string&, const R2InfoPro
 	return true;
 }
 
-bool DecompilerConsole::decompileCommentCurrent(const std::string&, const R2InfoProvider& binInfo)
+bool DecompilerConsole::decompileCommentCurrent(const std::string&, const R2Database& binInfo)
 {
 	auto config = createConsoleConfig(binInfo);
 
@@ -126,7 +126,7 @@ bool DecompilerConsole::decompileCommentCurrent(const std::string&, const R2Info
 	return true;
 }
 
-bool DecompilerConsole::showEnvironment(const std::string&, const R2InfoProvider&)
+bool DecompilerConsole::showEnvironment(const std::string&, const R2Database&)
 {
 	Log::info() << Log::Color::Green << "Environment:" << std::endl;
 

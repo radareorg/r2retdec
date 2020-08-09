@@ -204,7 +204,7 @@ std::string cacheName(const common::Function& fnc)
 	return fnc.getName()+"@"+hexAddr.str();
 }
 
-config::Config createConfig(const R2InfoProvider& binInfo, const std::string& cacheSuffix)
+config::Config createConfig(const R2Database& binInfo, const std::string& cacheSuffix)
 {
 	auto config = loadDefaultConfig();
 
@@ -289,7 +289,7 @@ R_API RAnnotatedCode* decompile(RCore *core, ut64 addr){
 	static std::mutex mutex;
 	std::lock_guard<std::mutex> lock (mutex);
 
-	R2InfoProvider binInfo(*core);
+	R2Database binInfo(*core);
 
 	auto fnc = binInfo.fetchFunction(addr);
 	auto config = createConfig(binInfo, cacheName(fnc));

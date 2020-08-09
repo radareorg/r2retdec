@@ -3,7 +3,7 @@
 #include <map>
 #include <tuple>
 
-#include "r2plugin/r2info.h"
+#include "r2plugin/r2data.h"
 
 namespace retdec {
 namespace r2plugin {
@@ -19,7 +19,7 @@ namespace r2plugin {
 class Console {
 public:
 	/// Callback funuction that can be registered to handle command.
-	typedef bool (*Callback)(const std::string&, const R2InfoProvider&);
+	typedef bool (*Callback)(const std::string&, const R2Database&);
 
 	/// Command is represented as suffix and callback for that suffix.
 	struct Command {
@@ -35,7 +35,7 @@ protected:
 	Console(const std::string& base, const std::string& about, const std::vector<NamedCommand>&);
 
 public:
-	bool handle(const std::string& commad, const R2InfoProvider& info);
+	bool handle(const std::string& commad, const R2Database& info);
 	bool printHelp(const RCore& core) const;
 
 private:

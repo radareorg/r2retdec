@@ -7,7 +7,7 @@
 #include <retdec/utils/io/log.h>
 #include <r_core.h>
 
-#include "r2plugin/r2info.h"
+#include "r2plugin/r2data.h"
 #include "r2plugin/console/decompiler.h"
 
 using namespace retdec::r2plugin;
@@ -27,7 +27,7 @@ static int r2retdec_cmd(void *user, const char* input)
 {
 	static std::mutex mutex;
 	RCore& core = *(RCore*)user;
-	R2InfoProvider binInfo(core);
+	R2Database binInfo(core);
 
 	try {
 		std::lock_guard<std::mutex> lock (mutex);

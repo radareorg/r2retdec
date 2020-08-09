@@ -16,7 +16,7 @@ protected:
 
 public:
 	/// Calls handle method of the DecompilerConsole singleton.
-	static bool handleCommand(const std::string& commad, const R2InfoProvider& info);
+	static bool handleCommand(const std::string& commad, const R2Database& info);
 
 public:
 	/// Representation of pdz command.
@@ -39,21 +39,21 @@ public:
 
 private:
 	/// Implementation of pdz command.
-	static bool decompileCurrent(const std::string&, const R2InfoProvider& info);
+	static bool decompileCurrent(const std::string&, const R2Database& info);
 
 	/// Implementation of pdzj command.
-	static bool decompileJsonCurrent(const std::string&, const R2InfoProvider& info);
+	static bool decompileJsonCurrent(const std::string&, const R2Database& info);
 
 	/// Implementation of pdzo command.
-	static bool decompileWithOffsetsCurrent(const std::string&, const R2InfoProvider& info);
+	static bool decompileWithOffsetsCurrent(const std::string&, const R2Database& info);
 
 	/// Implementation of pdz* command.
-	static bool decompileCommentCurrent(const std::string&, const R2InfoProvider& info);
+	static bool decompileCommentCurrent(const std::string&, const R2Database& info);
 
 	/// Implementation of pdze command.
-	static bool showEnvironment(const std::string&, const R2InfoProvider&);
+	static bool showEnvironment(const std::string&, const R2Database&);
 
-	static config::Config createConsoleConfig(const R2InfoProvider& binInfo);
+	static config::Config createConsoleConfig(const R2Database& binInfo);
 
 private:
 	/// Singleton.

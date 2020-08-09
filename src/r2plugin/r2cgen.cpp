@@ -7,7 +7,7 @@
 #include <fstream>
 #include <optional>
 
-#include "r2plugin/r2info.h"
+#include "r2plugin/r2data.h"
 #include "r2plugin/r2cgen.h"
 
 using namespace retdec::r2plugin;

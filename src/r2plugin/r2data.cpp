@@ -1,12 +1,12 @@
 /**
- * @file src/r2plugin/r2info.cpp
+ * @file src/r2plugin/r2data.cpp
  * @brief Information gathering from R2 and user.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
 #include <retdec/utils/io/log.h>
 
-#include "r2plugin/r2info.h"
+#include "r2plugin/r2data.h"
 #include "r2plugin/r2utils.h"
 
 using namespace retdec::common;
@@ -19,7 +19,7 @@ using retdec::utils::io::Log;
  * Translation map between tokens representing calling convention type returned
  * by Radare2 and CallingConventionID that is recognized by RetDec.
  */
-std::map<const std::string, const CallingConventionID> R2InfoProvider::_r2rdcc = {
+std::map<const std::string, const CallingConventionID> R2Database::_r2rdcc = {
 	{"arm32", CallingConventionID::CC_ARM},
 	{"arm64", CallingConventionID::CC_ARM64},
 
@@ -40,7 +40,7 @@ std::map<const std::string, const CallingConventionID> R2InfoProvider::_r2rdcc =
 	{"watcom", CallingConventionID::CC_WATCOM}
 };
 
-R2InfoProvider::R2InfoProvider(RCore &core):
+R2Database::R2Database(RCore &core):
 	_r2core(core)
 {
 }
@@ -48,12 +48,12 @@ R2InfoProvider::R2InfoProvider(RCore &core):
 /**
  * @brief Fetches path of the binary file from Radare2.
  */
-std::string R2InfoProvider::fetchFilePath() const
+std::string R2Database::fetchFilePath() const
 {
 	return _r2core.file->binb.bin->file;
 }
 
-void R2InfoProvider::setFunction(const common::Function &fnc) const
+void R2Database::setFunction(const common::Function &fnc) const
 {
 	auto r2fnc = r_anal_get_function_at(_r2core.anal, fnc.getStart().getValue());
 	if (r2fnc == nullptr) {
@@ -82,7 +82,7 @@ std::string sanitize(const std::string& a)
 	return ok.str();
 }
 
-void R2InfoProvider::copyFunctionData(const common::Function &fnc, RAnalFunction &r2fnc) const
+void R2Database::copyFunctionData(const common::Function &fnc, RAnalFunction &r2fnc) const
 {
 	if (r_anal_function_rename(&r2fnc, fnc.getName().c_str()) == false) {
 		std::ostringstream err;
@@ -118,7 +118,7 @@ void R2InfoProvider::copyFunctionData(const common::Function &fnc, RAnalFunction
 
 }
 
-void R2InfoProvider::setFunctions(const config::Config& config) const
+void R2Database::setFunctions(const config::Config& config) const
 {
 	for (auto& fnc: config.functions) {
 		setFunction(fnc);
@@ -130,7 +130,7 @@ void R2InfoProvider::setFunctions(const config::Config& config) const
  *
  * @param addr Analyzes the function at the given address.
  */
-Function R2InfoProvider::fetchFunction(ut64 addr) const
+Function R2Database::fetchFunction(ut64 addr) const
 {
 	RAnalFunction *cf = r_anal_get_fcn_in(_r2core.anal, addr, R_ANAL_FCN_TYPE_NULL);
 	if (cf == nullptr) {
@@ -142,7 +142,7 @@ Function R2InfoProvider::fetchFunction(ut64 addr) const
 	return convertFunctionObject(*cf);
 }
 
-Function R2InfoProvider::fetchSeekedFunction() const
+Function R2Database::fetchSeekedFunction() const
 {
 	return fetchFunction(_r2core.offset);
 }
@@ -150,7 +150,7 @@ Function R2InfoProvider::fetchSeekedFunction() const
 /**
  * @brief Fetches functions and global variables from Radare2.
  */
-void R2InfoProvider::fetchFunctionsAndGlobals(Config &rconfig) const
+void R2Database::fetchFunctionsAndGlobals(Config &rconfig) const
 {
 	auto list = r_anal_get_fcns(_r2core.anal);
 	if (list != nullptr) {
@@ -172,7 +172,7 @@ void R2InfoProvider::fetchFunctionsAndGlobals(Config &rconfig) const
  *
  * This method is intended only for internal usage. That is
  * why this method is private. To obtain functions and global
- * variables the R2InfoProvider::fetchFunctionsAndGlobals
+ * variables the R2Database::fetchFunctionsAndGlobals
  * method is available.
  *
  * Reason for this is that currently the global variables are
@@ -187,7 +187,7 @@ void R2InfoProvider::fetchFunctionsAndGlobals(Config &rconfig) const
  * This is another reason why this method is private and interface
  * to fetch globals is integrated with interface to fetch functions.
  */
-void R2InfoProvider::fetchGlobals(Config &config) const
+void R2Database::fetchGlobals(Config &config) const
 {
 	RBinObject *obj = r_bin_cur_object(_r2core.bin);
 	if (obj == nullptr || obj->symbols == nullptr)
@@ -262,7 +262,7 @@ void R2InfoProvider::fetchGlobals(Config &config) const
  * Converts function object from its representation in Radare2 into
  * represnetation that is used in RetDec.
  */
-Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
+Function R2Database::convertFunctionObject(RAnalFunction &r2fnc) const
 {
 	auto start = r_anal_function_min_addr(&r2fnc);
 	auto end = r_anal_function_max_addr(&r2fnc);
@@ -291,7 +291,7 @@ Function R2InfoProvider::convertFunctionObject(RAnalFunction &r2fnc) const
  * This is not, however, projected into function's calling convention and the args are needed to
  * be fetched with stack variables of the funciton.
  */
-void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunction &r2fnc) const
+void R2Database::fetchFunctionLocalsAndArgs(Function &function, RAnalFunction &r2fnc) const
 {
 	ObjectSetContainer locals;
 	ObjectSequentialContainer r2args, r2userArgs;
@@ -345,7 +345,7 @@ void R2InfoProvider::fetchFunctionLocalsAndArgs(Function &function, RAnalFunctio
 /**
  * @brief Fetches function arguments defined by user.
  */
-void R2InfoProvider::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFunction &r2fnc) const
+void R2Database::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFunction &r2fnc) const
 {
 	RAnalFuncArg *arg;
 
@@ -370,7 +370,7 @@ void R2InfoProvider::fetchExtraArgsData(ObjectSequentialContainer &args, RAnalFu
 /**
  * @brief Fetches the calling convention of the input function from Radare2.
  */
-void R2InfoProvider::fetchFunctionCallingconvention(Function &function, RAnalFunction &r2fnc) const
+void R2Database::fetchFunctionCallingconvention(Function &function, RAnalFunction &r2fnc) const
 {
 	if (r2fnc.cc != nullptr) {
 		if (_r2rdcc.count(r2fnc.cc)) {
@@ -385,7 +385,7 @@ void R2InfoProvider::fetchFunctionCallingconvention(Function &function, RAnalFun
 /**
  * @brief Fetches the return type of the input function from Radare2.
  */
-void R2InfoProvider::fetchFunctionReturnType(Function &function, RAnalFunction &r2fnc) const
+void R2Database::fetchFunctionReturnType(Function &function, RAnalFunction &r2fnc) const
 {
 	function.returnType = Type("void");
 	char* key = resolve_fcn_name(_r2core.anal, r2fnc.name);
@@ -400,17 +400,17 @@ void R2InfoProvider::fetchFunctionReturnType(Function &function, RAnalFunction &
 /**
  * @brief Fetch word size of the input file architecture.
  */
-size_t R2InfoProvider::fetchWordSize() const
+size_t R2Database::fetchWordSize() const
 {
 	return r_config_get_i(_r2core.config, "asm.bits");
 }
 
-ut64 R2InfoProvider::seekedAddress() const
+ut64 R2Database::seekedAddress() const
 {
 	return _r2core.offset;
 }
 
-const RCore& R2InfoProvider::core() const
+const RCore& R2Database::core() const
 {
 	return _r2core;
 }

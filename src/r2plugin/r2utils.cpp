@@ -8,7 +8,7 @@
 #include <regex>
 #include <sstream>
 
-#include "r2plugin/r2info.h"
+#include "r2plugin/r2data.h"
 #include "r2plugin/r2utils.h"
 
 using namespace retdec::r2plugin;

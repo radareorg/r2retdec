@@ -16,7 +16,7 @@ Console::Console(
 {
 }
 
-bool Console::handle(const std::string& cmd, const R2InfoProvider& info)
+bool Console::handle(const std::string& cmd, const R2Database& info)
 {
 	if (cmd.compare(0, _base.length(), _base, 0, _base.length()) != 0)
 		return false;

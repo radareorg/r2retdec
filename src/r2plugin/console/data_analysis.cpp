@@ -32,7 +32,7 @@ DataAnalysisConsole::DataAnalysisConsole(): Console(
 {
 }
 
-bool DataAnalysisConsole::handleCommand(const std::string& command, const R2InfoProvider& info)
+bool DataAnalysisConsole::handleCommand(const std::string& command, const R2Database& info)
 {
 	return DataAnalysisConsole::console.handle(command, info);
 }
@@ -68,7 +68,7 @@ common::AddressRange defaultAnalysisRange(const common::Address& start)
 /**
  * Runs decompilation on range of currently seeked function. Optional argument is 
  */
-bool DataAnalysisConsole::analyzeRange(const std::string& command, const R2InfoProvider& binInfo)
+bool DataAnalysisConsole::analyzeRange(const std::string& command, const R2Database& binInfo)
 {
 	std::string cache = "";
 
@@ -112,7 +112,7 @@ bool DataAnalysisConsole::analyzeRange(const std::string& command, const R2InfoP
 	return true;
 }
 
-bool DataAnalysisConsole::analyzeWholeBinary(const std::string&, const R2InfoProvider& binInfo)
+bool DataAnalysisConsole::analyzeWholeBinary(const std::string&, const R2Database& binInfo)
 {
 	auto config = createConfig(binInfo, "whole");
 

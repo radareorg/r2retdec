@@ -1,5 +1,5 @@
 /**
- * @file include/r2plugin/r2info.h
+ * @file include/r2plugin/r2data.h
  * @brief Information gathering from R2 and user.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
@@ -22,11 +22,11 @@ namespace r2plugin {
 using R2Address = ut64;
 
 /**
- * R2InfoProvider implements wrapper around R2 API functions.
+ * R2Database implements wrapper around R2 API functions.
  */
-class R2InfoProvider {
+class R2Database {
 public:
-	R2InfoProvider(RCore &core);
+	R2Database(RCore &core);
 
 public:
 	std::string fetchFilePath() const;
