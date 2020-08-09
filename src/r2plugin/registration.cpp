@@ -4,6 +4,8 @@
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
+#include <mutex>
+
 #include <retdec/utils/io/log.h>
 #include <r_core.h>
 
