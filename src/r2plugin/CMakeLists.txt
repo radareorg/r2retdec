@@ -15,7 +15,6 @@ add_library(core_retdec SHARED ${SOURCES})
 target_link_libraries(core_retdec
 	retdec::retdec
 	retdec::config
-	rapidjson
 	Radare2::libr
 )
 
