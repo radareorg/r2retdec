@@ -179,8 +179,6 @@ retdec::config::Config loadDefaultConfig()
 	// ~/.local/share/radare2/plugins/
 	auto plugdir = r_str_home(R2_HOME_PLUGINS);
 	auto plugPath = fs::path(plugdir);
-	// plugdir is dynamically allocated.
-	free(plugdir);
 	// Default config is always installed with the plugin.
 	auto configPath = plugPath/"decompiler-config.json";
 
