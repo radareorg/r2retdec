@@ -47,7 +47,7 @@ common::AddressRange DataAnalysisConsole::parseRange(const std::string& range)
 {
 	std::smatch match;
 	std::regex rangeRegex("(0x)?([0-9a-fA-F][0-9a-fA-F]*)(?:-|  *)(0x)?([0-9a-fA-F][0-9a-fA-F]*)");
-	
+
 	if (!std::regex_match(range, match, rangeRegex))
 		throw DecompilationError("Invalid range: "+range);
 
@@ -72,7 +72,7 @@ common::AddressRange defaultAnalysisRange(const common::Address& start)
 }
 
 /**
- * Runs decompilation on range of currently seeked function. Optional argument is 
+ * Runs decompilation on range of currently seeked function. Optional argument is
  */
 bool DataAnalysisConsole::analyzeRange(const std::string& command, const R2Database& binInfo)
 {

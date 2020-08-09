@@ -36,7 +36,7 @@ public:
 
 	/// Representation of pdz* command.
 	static const Console::Command DecompileCommentCurrent;
-	
+
 	/// Representation of pdza command.
 	static const Console::Command DecompilerDataAnalysis;
 
