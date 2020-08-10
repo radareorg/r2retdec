@@ -76,7 +76,7 @@ std::string sanitize(const std::string& a)
 {
 	std::ostringstream ok;
 	for (auto& c: a)
-		if (c != '$' && c != '@')
+		if (c != '$' && c != '@' && c != '.')
 			ok << c;
 
 	return ok.str();
