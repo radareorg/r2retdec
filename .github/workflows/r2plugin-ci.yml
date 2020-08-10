@@ -349,10 +349,18 @@ jobs:
               run: make -j$(nproc) install
               working-directory: build/r2plugin
 
+            - name: Install Missing Packages on macOS
+              if: matrix.os == 'macos-latest'
+              run: brew install pkg-config autoconf automake libtool openssl
+
             - name: Install Cached RetDec R2Plugin on macOS
               if: matrix.os == 'macos-latest'
               run: make -j $(sysctl -n hw.ncpu) install
               working-directory: build/r2plugin
+
+            - name: Install Openssl on Windows
+              if: matrix.os == 'windows-latest'
+              run: choco install openssl
 
             - name: Install Cached RetDec R2Plugin on Windows
               if: matrix.os == 'windows-latest'
