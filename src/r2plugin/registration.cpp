@@ -45,7 +45,7 @@ static int r2retdec_cmd(void *user, const char* input)
 RCorePlugin r_core_plugin_retdec = {
 	/* .name = */ "r2retdec",
 	/* .desc = */ "RetDec integration",
-	/* .license = */ "GPL3",
+	/* .license = */ "MIT",
 	/* .author = */ "Avast",
 	/* .version = */ "0.1.2",
 	/* .call = */ r2retdec_cmd,
