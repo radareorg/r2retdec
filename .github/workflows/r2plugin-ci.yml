@@ -180,7 +180,7 @@ jobs:
               id: r2plugin-cache
               uses: actions/cache@v1
               env:
-                  cache-name: r2plugin-cache
+                  cache-name: r2plugin-cache-invalidate
               with:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
@@ -301,7 +301,7 @@ jobs:
               id: r2plugin-cache
               uses: actions/cache@v1
               env:
-                  cache-name: r2plugin-cache
+                  cache-name: r2plugin-cache-invalidate
               with:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
