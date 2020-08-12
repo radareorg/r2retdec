@@ -230,13 +230,23 @@ jobs:
                         -DCMAKE_LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/
               working-directory: build/r2plugin
 
+            - name: Install Qt
+              uses: jurplel/install-qt-action@v2
+              if: matrix.os == 'windows-latest'
+              with:
+                  version: '5.12.9'
+                  target: 'desktop'
+                  arch: 'win64_msvc2017_64'
+                  dir: '${{ github.workspace }}/qt/'
+                  cached: 'false'
+
             - name: Build CMake on Windows
               if: steps.r2plugin-cache.cache-hit != 'true' && matrix.os == 'windows-latest'
               run: |
                     cmake ..\.. `
                         -DCMAKE_INSTALL_PREFIX="$HOME/.local" `
                         -DBUILD_BUNDLED_RETDEC=ON `
-                        -DBUILD_CUTTER_PLUGIN=OFF `
+                        -DBUILD_CUTTER_PLUGIN=ON `
                         -DCMAKE_BUILD_TYPE=release `
                         -DRETDEC_INSTALL_PREFIX=install `
                         -DRADARE_INSTALL_PATH="..\radare2"
@@ -361,6 +371,16 @@ jobs:
             - name: Install Openssl on Windows
               if: matrix.os == 'windows-latest'
               run: choco install openssl
+
+            - name: Install Qt
+              uses: jurplel/install-qt-action@v2
+              if: matrix.os == 'windows-latest'
+              with:
+                  version: '5.12.9'
+                  target: 'desktop'
+                  arch: 'win64_msvc2017_64'
+                  dir: '${{ github.workspace }}/qt/'
+                  cached: 'false'
 
             - name: Install Cached RetDec R2Plugin on Windows
               if: matrix.os == 'windows-latest'
