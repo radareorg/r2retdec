@@ -168,7 +168,7 @@ jobs:
             # Let other builds finish.
             fail-fast: false
 
-        needs: [prepare-radare2]
+        needs: [prepare-radare2, prepare-retdec-framework]
 
         steps:
             - uses: actions/checkout@v2
@@ -180,7 +180,7 @@ jobs:
               id: r2plugin-cache
               uses: actions/cache@v1
               env:
-                  cache-name: r2plugin-cache-invalidate
+                  cache-name: r2plugin-cache-v2
               with:
                   path: build/r2plugin
                   key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
@@ -230,6 +230,13 @@ jobs:
                         -DCMAKE_LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/
               working-directory: build/r2plugin
 
+            - name: Cache Qt
+              id: cache-qt
+              uses: actions/cache@v1
+              with:
+                  path: '${{ github.workspace }}/qt/'
+                  key: ${{ runner.os }}-QtCache
+
             - name: Install Qt
               uses: jurplel/install-qt-action@v2
               if: matrix.os == 'windows-latest'
@@ -238,7 +245,7 @@ jobs:
                   target: 'desktop'
                   arch: 'win64_msvc2017_64'
                   dir: '${{ github.workspace }}/qt/'
-                  cached: 'false'
+                  cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
             - name: Build CMake on Windows
               if: steps.r2plugin-cache.cache-hit != 'true' && matrix.os == 'windows-latest'
@@ -266,45 +273,6 @@ jobs:
               if: matrix.os == 'windows-latest'
               run: cmake --build . --config Release --target install -- -m
               working-directory: build/r2plugin
-
-    ## Run tests on RetDec R2plugin
-    ## After this step artifacts are published.
-    run-tests:
-        runs-on: ${{ matrix.os }}
-
-        strategy:
-            matrix:
-                os: [ubuntu-latest, macos-latest, windows-latest]
-                type: [Release, Debug]
-
-            # Let other builds finish.
-            fail-fast: false
-
-        needs: [prepare-radare2, prepare-retdec-framework, build-r2plugin]
-
-        steps:
-            - uses: actions/checkout@v2
-
-            - name: Create Build Directory
-              run: mkdir -p build
-
-            - name: Extract Radare2 Cache
-              id: radare2-cache
-              uses: actions/cache@v1
-              env:
-                  cache-name: radare2-chb
-              with:
-                  path: build/radare2
-                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/radare2.version') }}
-
-            - name: Extract R2Plugin Cache
-              id: r2plugin-cache
-              uses: actions/cache@v1
-              env:
-                  cache-name: r2plugin-cache-invalidate
-              with:
-                  path: build/r2plugin
-                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
 
             - name: Prepare Ubuntu
               if: matrix.os == 'ubuntu-latest'
@@ -344,48 +312,6 @@ jobs:
                     cd clang
                     7z x ..\llvm.exe
               working-directory: build
-
-              # Qt is needed for the Cutter Plugin
-            - name: Install Qt5 on Ubuntu
-              if: matrix.os == 'ubuntu-latest'
-              run: sudo apt install qt5-default
-
-            - name: Install Qt5 on macOS
-              if: matrix.os == 'macos-latest'
-              run: brew install qt5
-
-            - name: Install Cached RetDec R2Plugin on Ubuntu
-              if: matrix.os == 'ubuntu-latest'
-              run: make -j$(nproc) install
-              working-directory: build/r2plugin
-
-            - name: Install Missing Packages on macOS
-              if: matrix.os == 'macos-latest'
-              run: brew install pkg-config autoconf automake libtool openssl
-
-            - name: Install Cached RetDec R2Plugin on macOS
-              if: matrix.os == 'macos-latest'
-              run: make -j $(sysctl -n hw.ncpu) install
-              working-directory: build/r2plugin
-
-            - name: Install Openssl on Windows
-              if: matrix.os == 'windows-latest'
-              run: choco install openssl
-
-            - name: Install Qt
-              uses: jurplel/install-qt-action@v2
-              if: matrix.os == 'windows-latest'
-              with:
-                  version: '5.12.9'
-                  target: 'desktop'
-                  arch: 'win64_msvc2017_64'
-                  dir: '${{ github.workspace }}/qt/'
-                  cached: 'false'
-
-            - name: Install Cached RetDec R2Plugin on Windows
-              if: matrix.os == 'windows-latest'
-              run: cmake --build . --config Release --target install -- -m
-              working-directory: build/r2plugin
 
             - name: Verify Installation of R2plugin
               if: matrix.os != 'windows-latest'
