@@ -4,7 +4,7 @@ include(FetchContent)
 
 FetchContent_Declare(retdec
 	GIT_REPOSITORY https://github.com/avast/retdec
-	GIT_TAG 127dbe2b97c0e618b75c618e82cdf6127e0ebdab
+	GIT_TAG 73184b0c17b8790ab691217d2ab4cb6d569495fb
 )
 
 FetchContent_GetProperties(retdec)
