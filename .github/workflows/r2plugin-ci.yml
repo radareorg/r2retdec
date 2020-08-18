@@ -367,10 +367,8 @@ jobs:
                     clang_dir = ${PWD}/build/clang
                     ; Path to the cloned repository containing regression tests.
                     tests_root_dir = ${PWD}/build/retdec-regression-tests
-                    ; Path to the RetDec's build directory.
-                    retdec_build_dir = ${PWD}/build/r2plugin/_deps/retdec-build
                     ; Path to the RetDec's installation directory.
-                    retdec_install_dir = ${HOME}/.local
+                    retdec_install_dir = ${PWD}/build/r2plugin/retdec-install
                     r2plugin_tests_enabled = 1
                     r2plugin_script = ${PWD}/scripts/run-r2-decompilation.py
                     EOF
@@ -384,10 +382,8 @@ jobs:
                     clang_dir = $PWD\build\clang
                     ; Path to the cloned repository containing regression tests.
                     tests_root_dir = $PWD\build\retdec-regression-tests
-                    ; Path to the RetDec's build directory.
-                    retdec_build_dir = $PWD\build\r2plugin\_deps\retdec-build
                     ; Path to the RetDec's installation directory.
-                    retdec_install_dir = $HOME\.local
+                    retdec_install_dir = $PWD\build\r2plugin\retdec-install
                     r2plugin_tests_enabled = 1
                     r2plugin_script = $PWD\scripts\run-r2-decompilation.py" `
                         > "$($(Get-Location).path)\build\retdec-regression-tests-framework\config_local.ini"
