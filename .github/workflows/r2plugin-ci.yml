@@ -217,6 +217,7 @@ jobs:
                         -DBUILD_BUNDLED_RETDEC=ON \
                         -DBUILD_CUTTER_PLUGIN=ON \
                         -DCMAKE_BUILD_TYPE=${{ matrix.type }} \
+                        -DRETDEC_INSTALL_PREFIX=retdec-install \
                         -DCMAKE_LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/
               working-directory: build/r2plugin
 
@@ -245,6 +246,7 @@ jobs:
                         -DBUILD_BUNDLED_RETDEC=ON `
                         -DBUILD_CUTTER_PLUGIN=ON `
                         -DCMAKE_BUILD_TYPE=release `
+                        -DRETDEC_INSTALL_PREFIX=retdec-install `
                         -DRADARE_INSTALL_PATH="..\radare2"
               working-directory: build/r2plugin
 
@@ -323,7 +325,6 @@ jobs:
               if: matrix.type == 'Release'
               run: |
                     mkdir -p build/r2plugin/install
-                    cp -r ~/.local/bin build/r2plugin/install/
                     cp -r ~/.local/share build/r2plugin/install/
                     cp LICENSE* build/r2plugin/install/
                     cp CHANGELOG.md build/r2plugin/install/
