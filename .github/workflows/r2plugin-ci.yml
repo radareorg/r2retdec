@@ -176,15 +176,6 @@ jobs:
             - name: Create Build Directory
               run: mkdir -p build/r2plugin
 
-            - name: Create/Check Cache of RetDec R2plugin
-              id: r2plugin-cache
-              uses: actions/cache@v1
-              env:
-                  cache-name: r2plugin-cache-v2
-              with:
-                  path: build/r2plugin
-                  key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.type }}-${{ hashFiles('**/retdec/CMakeLists.txt') }}
-
             - name: Extract Radare2 Installation
               id: radare2-cache
               uses: actions/cache@v1
@@ -212,7 +203,7 @@ jobs:
               run: brew install qt5
 
             - name: Build CMake
-              if: steps.r2plugin-cache.cache-hit != 'true' && matrix.os != 'windows-latest'
+              if: matrix.os != 'windows-latest'
               run: |
                     # Next lines are only for macOS
                     export PATH="/usr/local/opt/openssl@1.1/bin:${PATH}"
@@ -248,7 +239,7 @@ jobs:
                   cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
             - name: Build CMake on Windows
-              if: steps.r2plugin-cache.cache-hit != 'true' && matrix.os == 'windows-latest'
+              if: matrix.os == 'windows-latest'
               run: |
                     cmake ..\.. `
                         -DCMAKE_INSTALL_PREFIX="$HOME/.local" `
