@@ -30,19 +30,17 @@ In r2 console you can type `pdz?` to print help:
 
 ```bash
 Usage: pdz   # Native RetDec decompiler plugin.
-| pdz            # Decompile current function with the RetDec decompiler.
-| pdzj           # Dump the current decompiled function as JSON.
-| pdzo           # Decompile current function side by side with offsets.
-| pdz*           # Decompiled code is returned to r2 as a comment.
-Environment:
-| %RETDEC_PATH   # Path to the RetDec decompiler executable.
-| %DEC_SAVE_DIR  # Directory to save decompilation into.
+| pdz      # Show decompilation result of current function.
+| pdz*     # Show current decompiled function side by side with offsets.
+| pdza[?]  # Run RetDec analysis.
+| pdze     # Show environment variables.
+| pdzj     # Dump current decompiled function as JSON.
+| pdzo     # Show current decompiled function side by side with offsets.
 ```
 
 The following environment variables may be used to dynamically customize the plugin's behavior:
 
 ```bash
-$ export RETDEC_PATH=<path> # path to the `retdec-decompiler.py` executable to be used for decompilation.
 $ export DEC_SAVE_DIR=<path> # custom path for output of decompilation to be saved to.
 ```
 
