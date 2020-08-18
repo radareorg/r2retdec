@@ -2,6 +2,8 @@
 
 ## dev
 
+## v0.2 (2020-08-18)
+
 * Enhancement: The plugin can use system RetDec if build option specified ([#19](https://github.com/avast/retdec-r2plugin/issues/19)).
 * Enhancement: Provided output caching ([#13](https://github.com/avast/retdec-r2plugin/issues/13))
 * Enhancement: New command `pdza` to import data from RetDec ([#10](https://github.com/avast/retdec-r2plugin/issues/10)).
