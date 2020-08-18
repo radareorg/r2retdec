@@ -67,6 +67,12 @@ get_filename_component(RADARE_INSTALL_PATH "${RADARE_INSTALL_PATH}" REALPATH BAS
 set(RADARE2_INSTALL_PLUGDIR "share/radare2/plugins" CACHE PATH "Directory to install radare2 plugin into")
 set(CUTTER_INSTALL_PLUGDIR "share/RadareOrg/Cutter/plugins/native" CACHE PATH "Directory to install Cutter plugin into")
 
+if (RETDEC_INSTALL_PREFIX)
+	set(RADARE2_INSTALL_PLUGDIR "${CMAKE_INSTALL_PREFIX}/${RADARE2_INSTALL_PLUGDIR}")
+	set(CUTTER_INSTALL_PLUGDIR "${CMAKE_INSTALL_PREFIX}/${CUTTER_INSTALL_PLUGDIR}")
+	set(CMAKE_INSTALL_PREFIX "${RETDEC_INSTALL_PREFIX}")
+endif()
+
 option(BUILD_CUTTER_PLUGIN "Build r2retdec plugin for Cutter" OFF)
 option(BUILD_BUNDLED_RETDEC "Build retdec with the r2retdec plugin" ON)
 
