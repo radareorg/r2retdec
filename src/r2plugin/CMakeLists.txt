@@ -17,14 +17,14 @@ set(SOURCES
 
 add_library(core_retdec SHARED ${SOURCES})
 
-target_link_libraries(core_retdec
+set(CORE_LIBS
 	retdec::retdec
 	retdec::config
 	Radare2::libr
 )
 
 if (MSVC)
-	target_link_libraries(core_retdec
+	list(APPEND CORE_LIBS
 		retdec::bin2llvmir -WHOLEARCHIVE:$<TARGET_FILE_NAME:retdec::bin2llvmir>
 		retdec::llvmir2hll -WHOLEARCHIVE:$<TARGET_FILE_NAME:retdec::llvmir2hll>
 	)
@@ -40,17 +40,17 @@ if (MSVC)
 	# Allow the 32b version of bin2llvmir on Windows handle addresses larger
 	# than 2 GB (up to 4 GB).
 	if(CMAKE_SIZEOF_VOID_P MATCHES "4")
-		set_property(TARGET retdec
+		set_property(TARGET core_retdec
 			APPEND_STRING PROPERTY LINK_FLAGS " /LARGEADDRESSAWARE"
 		)
 	endif()
 elseif (APPLE)
-	target_link_libraries(core_retdec
+	list(APPEND CORE_LIBS
 		-Wl,-force_load retdec::bin2llvmir
 		-Wl,-force_load retdec::llvmir2hll
 	)
 else ()
-	target_link_libraries(core_retdec
+	list(APPEND CORE_LIBS
 		-Wl,--whole-archive retdec::bin2llvmir -Wl,--no-whole-archive
 		-Wl,--whole-archive retdec::llvmir2hll -Wl,--no-whole-archive
 	)
@@ -59,12 +59,14 @@ endif()
 find_library(STD_CPP_FS stdc++fs)
 if (STD_CPP_FS)
 	message("-- Linking with ${STD_CPP_FS} library")
-	target_link_libraries(core_retdec
+	list(APPEND CORE_LIBS
 		stdc++fs
 	)
 else()
 	message("-- Library stdc++fs NOT FOUND -> linking core_retdec without stdc++fs library")
 endif()
+
+target_link_libraries(core_retdec ${CORE_LIBS})
 
 target_include_directories(core_retdec PUBLIC ${PROJECT_SOURCE_DIR}/include/)
 
@@ -72,5 +74,7 @@ set_target_properties(core_retdec PROPERTIES
 	OUTPUT_NAME core_retdec
 	PREFIX ""
 )
+
+set_property(GLOBAL PROPERTY R2RETDEC_CORE_LIBS ${CORE_LIBS})
 
 install(TARGETS core_retdec DESTINATION "${RADARE2_INSTALL_PLUGDIR}")

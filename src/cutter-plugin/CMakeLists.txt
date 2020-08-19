@@ -1,3 +1,7 @@
+if (NOT BUILD_BUNDLED_RETDEC)
+	set(RETDEC_VERSION 4.0)
+	find_package(retdec ${RETDEC_VERSION} REQUIRED COMPONENTS retdec config)
+endif()
 
 set(CUTTER_PLUGIN_INCLUDE ${PROJECT_SOURCE_DIR}/include/cutter-plugin)
 
@@ -15,11 +19,13 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets)
 
 add_library(r2retdec_cutter SHARED ${SOURCE})
 
+get_property(CORE_LIBS GLOBAL PROPERTY R2RETDEC_CORE_LIBS)
+
 target_link_libraries(r2retdec_cutter
+	${CORE_LIBS}
 	Qt5::Widgets
 	Radare2::libr
 	Cutter::Cutter
-	core_retdec
 )
 
 target_include_directories(r2retdec_cutter PUBLIC ${PROJECT_SOURCE_DIR}/include/)
