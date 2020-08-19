@@ -1,3 +1,17 @@
+/**
+ * @file src/r2plugin/decompiler-config.h
+ * @brief Provides default decompiler configuration.
+ * @copyright (c) 2020 Avast Software, licensed under the MIT license.
+ */
+
+#pragma once
+
+#include <string>
+
+namespace retdec {
+namespace r2plugin {
+
+const std::string DefaultConfigJSON = R"(
 {
     "decompParams": {
         "verboseOut": false,
@@ -180,4 +194,8 @@
             "retdec-llvmir2hll"
         ]
     }
+}
+)";
+
+}
 }

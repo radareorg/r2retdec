@@ -92,4 +92,3 @@ find_package(Radare2 REQUIRED)
 
 add_subdirectory(deps)
 add_subdirectory(src)
-add_subdirectory(support)

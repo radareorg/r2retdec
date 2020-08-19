@@ -17,6 +17,8 @@
 #include "r2plugin/r2cgen.h"
 #include "r2plugin/r2utils.h"
 
+#include "decompiler-config.h"
+
 #include "r2plugin/r2retdec.h"
 
 using fu = retdec::r2plugin::FormatUtils;
@@ -175,22 +177,13 @@ void createConfigHashFile(const retdec::config::Config& config)
  */
 retdec::config::Config loadDefaultConfig()
 {
-	// Returns plugin home:
-	// ~/.local/share/radare2/plugins/
+	// Perhaps support signatures are installed in R2_HOME_PLUGDIR?
 	auto plugdir = r_str_home(R2_HOME_PLUGINS);
-	auto plugPath = fs::path(plugdir);
-	// Default config is always installed with the plugin.
-	auto configPath = plugPath/"decompiler-config.json";
-
-	// Config must be regular file - exception will be thrown otherwise.
-	if (!fs::is_regular_file(configPath)) {
-		throw DecompilationError("unable to locate decompiler configuration");
-	}
 
 	// Loads configuration from file - also contains default config.
-	auto rdConf = retdec::config::Config::fromFile(configPath.string());
+	auto rdConf = retdec::config::Config::fromJsonString(DefaultConfigJSON);
 	// Paths to the signatures, etc.
-	rdConf.parameters.fixRelativePaths(plugPath.string());
+	rdConf.parameters.fixRelativePaths(plugdir);
 
 	return rdConf;
 }
