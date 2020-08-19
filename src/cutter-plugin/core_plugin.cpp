@@ -4,6 +4,8 @@
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
+#include <exception>
+
 #include "cutter-plugin/core_plugin.h"
 #include "r2plugin/r2retdec.h"
 
@@ -27,10 +29,21 @@ RetDecPlugin::RetDec::RetDec(QObject *parent)
 
 void RetDecPlugin::RetDec::decompileAt(RVA addr)
 {
-	RAnnotatedCode *code = retdec::r2plugin::decompile(Core()->core(), addr);
-	if (code == nullptr) {
-		code = r_annotated_code_new(strdup("RetDec Decompiler Error: No function at this offset"));
+	RAnnotatedCode* code = nullptr;
+
+	try {
+		code = retdec::r2plugin::decompile(Core()->core(), addr);
 	}
+	catch (const std::exception& e) {
+		code = r_annotated_code_new(strdup((
+				std::string("decompilation error: ")+e.what()).c_str()));
+	}
+	catch (...) {
+		code = nullptr;
+	}
+
+	if (code == nullptr)
+		code = r_annotated_code_new(strdup("decompilation error: unable to decompile function at this offset"));
 
 	emit finished(code);
 }
