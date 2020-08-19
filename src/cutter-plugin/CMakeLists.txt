@@ -1,7 +1,12 @@
+
+set(CUTTER_PLUGIN_INCLUDE ${PROJECT_SOURCE_DIR}/include/cutter-plugin)
+
 set(SOURCE
+	${CUTTER_PLUGIN_INCLUDE}/core_plugin.h
 	core_plugin.cpp
 )
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
