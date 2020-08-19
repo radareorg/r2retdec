@@ -23,7 +23,7 @@ DecompilerConsole::DecompilerConsole(): Console(
 	"Native RetDec decompiler plugin.",
 	{
 		{"", DecompileCurrent},
-		{"*", DecompileWithOffsetsCurrent},
+		{"*", DecompileCommentCurrent},
 		{"a", DecompilerDataAnalysis},
 		{"e", ShowUsedEnvironment},
 		{"j", DecompileJsonCurrent},
