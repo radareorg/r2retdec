@@ -225,17 +225,17 @@ jobs:
               id: cache-qt
               uses: actions/cache@v1
               with:
-                  path: '${{ github.workspace }}/qt/'
-                  key: ${{ runner.os }}-QtCache
+                  path: '${{ github.workspace }}/qt5/'
+                  key: ${{ runner.os }}-qt-cache
 
             - name: Install Qt
               uses: jurplel/install-qt-action@v2
               if: matrix.os == 'windows-latest'
               with:
-                  version: '5.12.9'
+                  version: '5.14.2'
                   target: 'desktop'
                   arch: 'win64_msvc2017_64'
-                  dir: '${{ github.workspace }}/qt/'
+                  dir: '${{ github.workspace }}/qt5/'
                   cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
             - name: Build CMake on Windows
