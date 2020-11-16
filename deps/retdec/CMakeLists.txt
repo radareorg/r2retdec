@@ -4,7 +4,9 @@ include(FetchContent)
 
 FetchContent_Declare(retdec
 	GIT_REPOSITORY https://github.com/avast/retdec
-	GIT_TAG 73184b0c17b8790ab691217d2ab4cb6d569495fb
+	GIT_TAG 73184b0c17b8790ab691217d2ab4cb6d569495fb # TODO use branch_name or tag_name
+	GIT_PROGRESS TRUE
+	#GIT_SHALLOW TRUE # requires GIT_TAG to be branch_name or tag_name
 )
 
 FetchContent_GetProperties(retdec)
