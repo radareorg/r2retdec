@@ -5,6 +5,8 @@ include(FetchContent)
 FetchContent_Declare(cutter
 	GIT_REPOSITORY https://github.com/radareorg/cutter
 	GIT_TAG master
+	GIT_PROGRESS TRUE
+	GIT_SHALLOW TRUE
 )
 
 FetchContent_GetProperties(cutter)
