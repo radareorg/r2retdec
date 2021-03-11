@@ -50,7 +50,7 @@ R2Database::R2Database(RCore &core):
  */
 std::string R2Database::fetchFilePath() const
 {
-	return _r2core.file->binb.bin->file;
+	return _r2core.io->desc->name;
 }
 
 void R2Database::setFunction(const common::Function &fnc) const
