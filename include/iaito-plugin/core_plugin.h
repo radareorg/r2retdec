@@ -1,6 +1,6 @@
 /**
- * @file include/cutter-plugin/core_plugin.h
- * @brief Main module of the retdec-cutter-plugin.
+ * @file include/iaito-plugin/core_plugin.h
+ * @brief Main module of the retdec-iaito-plugin.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
@@ -9,14 +9,14 @@
 
 #include <QObject>
 #include <QtPlugin>
-#include <plugins/CutterPlugin.h>
+#include <plugins/IaitoPlugin.h>
 
 #include "Decompiler.h"
 
-class RetDecPlugin : public QObject, CutterPlugin {
+class RetDecPlugin : public QObject, IaitoPlugin {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.radare.cutter.plugins.r2retdec")
-    Q_INTERFACES(CutterPlugin)
+    Q_PLUGIN_METADATA(IID "org.radare.iaito.plugins.r2retdec")
+    Q_INTERFACES(IaitoPlugin)
 
     class RetDec: public Decompiler {
     public:
@@ -38,11 +38,11 @@ public:
     }
 
     QString getDescription() const override {
-	    return "RetDec plugin for Cutter";
+	    return "RetDec plugin for Iaito";
     }
 
     QString getVersion() const override {
-	    return "0.2";
+	    return "0.3";
     }
 };
 

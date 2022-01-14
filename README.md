@@ -22,7 +22,7 @@ The r2pm package is available for Radare2 version 4.5.0 and newer. To install th
 $ r2pm -i retdec-r2plugin
 ```
 
-This will, however, install only the plugin for r2 console. To use the Cutter plugin you must build this plugin manually. See the [Build and Installation](https://github.com/avast/retdec-r2plugin#build-and-installation) section.
+This will, however, install only the plugin for r2 console. To use the Iaito plugin you must build this plugin manually. See the [Build and Installation](https://github.com/avast/retdec-r2plugin#build-and-installation) section.
 
 ### Use in Radare2 Console
 
@@ -80,7 +80,7 @@ You have to pass the following parameters to `cmake`:
 You can pass the following additional parameters to `cmake`:
 * `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. The build of the bundled RetDec is by default turned on. RetDec will be installed to `CMAKE_INSTALL_PREFIX`. When turned OFF system is searched for RetDec installation.
 * `-DR2PLUGIN_DOC=OFF` optional parameter to build Doxygen documentation.
-* `-DBUILD_CUTTER_PLUGIN=OFF` setting to ON will build the Cutter plugin. Cutter must be built with support for plugin loading, see [Cutter documentation](https://cutter.re/docs/plugins.html).
+* `-DBUILD_IAITO_PLUGIN=OFF` setting to ON will build the Iaito plugin.
 
 *Note*: retdec-r2plugin requires [filesystem](https://en.cppreference.com/w/cpp/filesystem) library to be linked with the plugin. CMake will try to find the library in the system but on GCC 7 it might not be able to do so automatically. In that case you must specify a path where this library is located in the system to the cmake by adding:
 * `-DCMAKE_LIBRARY_PATH=${PATH_TO_FILESTSTEM_DIR}`

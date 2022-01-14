@@ -1,12 +1,12 @@
 /**
- * @file src/cutter-plugin/core_plugin.cpp
- * @brief Main module of the retdec-cutter-plugin.
+ * @file src/iaito-plugin/core_plugin.cpp
+ * @brief Main module of the retdec-iaito-plugin.
  * @copyright (c) 2020 Avast Software, licensed under the MIT license.
  */
 
 #include <exception>
 
-#include "cutter-plugin/core_plugin.h"
+#include "iaito-plugin/core_plugin.h"
 #include "r2plugin/r2retdec.h"
 
 void RetDecPlugin::setupPlugin()

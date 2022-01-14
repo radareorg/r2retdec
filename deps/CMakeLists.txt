@@ -2,6 +2,6 @@ if (BUILD_BUNDLED_RETDEC)
 	add_subdirectory(retdec)
 endif()
 
-if (BUILD_CUTTER_PLUGIN)
-	add_subdirectory(cutter)
+if (BUILD_IAITO_PLUGIN)
+	add_subdirectory(iaito)
 endif()

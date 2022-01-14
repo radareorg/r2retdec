@@ -278,7 +278,7 @@ std::pair<RAnnotatedCode*, retdec::config::Config> decompile(
 }
 
 /**
- * This function is to get RAnnotatedCode to pass it to Cutter's decompiler widget.
+ * This function is to get RAnnotatedCode to pass it to Iaito's decompiler widget.
  */
 R_API RAnnotatedCode* decompile(RCore *core, ut64 addr){
 	static std::mutex mutex;
