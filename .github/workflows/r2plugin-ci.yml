@@ -207,7 +207,7 @@ jobs:
               run: |
                     # Next lines are only for macOS
                     export PATH="/usr/local/opt/openssl@1.1/bin:${PATH}"
-                    export PATH=/usr/local/opt/qt/bin:${PATH}
+                    export PATH="/usr/local/opt/qt@5/bin:$PATH"
                     export PATH=${PWD}/../radare2/bin:${PATH}
                     export OPENSSL_ROOT_DIR="/usr/local/opt/openssl@1.1/"
                     export LD_LIBRARY_PATH=${PWD}/../radare2/lib:${PWD}/../radare2/lib64:${LD_LIBRARY_PATH}
