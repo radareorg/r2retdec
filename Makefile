@@ -11,9 +11,10 @@ all: p
 asan:
 	rm -rf p
 	mkdir -p p
-	export CFLAGS=-fsanitize=address ; \
-	export CXXFLAGS=-fsanitize=address ; \
-	cd p && cmake .. -DCMAKE_INSTALL_PREFIX=$(PREFIX) --config Debug
+	export CFLAGS="-g -fsanitize=address -O1" ; \
+	export CXXFLAGS="-g -fsanitize=address -O1" ; \
+	cd p && cmake .. -DCMAKE_INSTALL_PREFIX=$(PREFIX)
+	cd p && make -j8
 
 p:
 	mkdir -p p && cd p && cmake .. -DCMAKE_INSTALL_PREFIX=$(PREFIX)
