@@ -19,7 +19,7 @@ The plugin was tested and should work on following operating systems: Linux, mac
 The r2pm package is available for Radare2 version 4.5.0 and newer. To install the plugin using r2pm use:
 
 ```bash
-$ r2pm -i retdec-r2plugin
+$ r2pm -i r2retdec
 ```
 
 This will, however, install only the plugin for r2 console. To use the Iaito plugin you must build this plugin manually. See the [Build and Installation](https://github.com/avast/retdec-r2plugin#build-and-installation) section.
