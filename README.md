@@ -22,12 +22,6 @@ radare2 comes with its own package manager named 'r2pm', you can install the plu
 $ r2pm -i r2retdec
 ```
 
-This will, however, install only the plugin for r2 console. To use the Iaito plugin you must build this plugin manually. See the [Build and Installation](https://github.com/avast/retdec-r2plugin#build-and-installation) section.
-
-```sh
-$ r2pm -i r2retdec-iaito
-```
-
 ### Dependencies
 
 To compile retdec you need a relatively powerful machine with 2GB free disk and the following software installed:
@@ -37,8 +31,6 @@ On Ubuntu:
 ```sh
 apt install autoconf libtool automake build-essential make git g++
 ```
-
-For building the iaito plugin you need `qt5-default`.
 
 ### Troubleshooting
 
@@ -70,7 +62,13 @@ $ export DEC_SAVE_DIR=<path> # custom path for output of decompilation to be sav
 
 ## Build and Installation
 
-This section describes a local build and installation of RetDec Radare2 plugin.
+This section describes a local build and installation of RetDec Radare2 plugin, you will need 26GB of ram and 1.5GB of disk to compile it.
+
+```bash
+$ mkdir b && cd b
+$ cmake -DCMAKE_INSTALL_PREFIX=~/.local ..
+$ make && make install
+```
 
 ### Requirements
 
@@ -104,7 +102,6 @@ You have to pass the following parameters to `cmake`:
 You can pass the following additional parameters to `cmake`:
 * `-DBUILD_BUNDLED_RETDEC=ON` to build bundled RetDec version with the plugin. The build of the bundled RetDec is by default turned on. RetDec will be installed to `CMAKE_INSTALL_PREFIX`. When turned OFF system is searched for RetDec installation.
 * `-DR2PLUGIN_DOC=OFF` optional parameter to build Doxygen documentation.
-* `-DBUILD_IAITO_PLUGIN=OFF` setting to ON will build the Iaito plugin.
 
 *Note*: retdec-r2plugin requires [filesystem](https://en.cppreference.com/w/cpp/filesystem) library to be linked with the plugin. CMake will try to find the library in the system but on GCC 7 it might not be able to do so automatically. In that case you must specify a path where this library is located in the system to the cmake by adding:
 * `-DCMAKE_LIBRARY_PATH=${PATH_TO_FILESTSTEM_DIR}`
