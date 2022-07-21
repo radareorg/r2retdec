@@ -50,7 +50,7 @@ R2Database::R2Database(RCore &core):
  */
 std::string R2Database::fetchFilePath() const
 {
-	return _r2core.file->binb.bin->file;
+	return _r2core.bin->file;
 }
 
 void R2Database::setFunction(const common::Function &fnc) const
@@ -66,7 +66,7 @@ void R2Database::setFunction(const common::Function &fnc) const
 	}
 
 	if (!fnc.isDynamicallyLinked() && fnc.getSize().getValue() > 1)
-		if (!r_anal_fcn_add_bb(_r2core.anal, r2fnc, fnc.getStart().getValue(), fnc.getSize().getValue(), UT64_MAX, UT64_MAX, nullptr))
+		if (!r_anal_function_add_bb(_r2core.anal, r2fnc, fnc.getStart().getValue(), fnc.getSize().getValue(), UT64_MAX, UT64_MAX, nullptr))
 			Log::error() << Log::Warning << "unable to add basic block of " << fnc.getName() << std::endl;
 
 	copyFunctionData(fnc, *r2fnc);

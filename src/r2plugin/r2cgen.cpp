@@ -58,9 +58,9 @@ std::optional<RSyntaxHighlightType> R2CGenerator::highlightTypeForToken(const st
  *
  * @param root The root of JSON decompilation output.
  */
-RAnnotatedCode* R2CGenerator::provideAnnotations(const rapidjson::Document &root) const
+RCodeMeta* R2CGenerator::provideAnnotations(const rapidjson::Document &root) const
 {
-	RAnnotatedCode *code = r_annotated_code_new(nullptr);
+	RCodeMeta *code = r_codemeta_new(nullptr);
 	if (code == nullptr) {
 		throw DecompilationError("unable to allocate memory");
 	}
@@ -94,22 +94,22 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const rapidjson::Document &root
 			unsigned long epos = planecode.tellp();
 
 			if (lastAddr.has_value()) {
-				RCodeAnnotation annotation = {};
-				annotation.type = R_CODE_ANNOTATION_TYPE_OFFSET;
-				annotation.offset.offset = lastAddr.value();
-				annotation.start = bpos;
-				annotation.end = epos;
-				r_annotated_code_add_annotation(code, &annotation);
+				RCodeMetaItem *mi = r_codemeta_item_new ();
+				mi->type = R_CODEMETA_TYPE_OFFSET;
+				mi->offset.offset = lastAddr.value();
+				mi->start = bpos;
+				mi->end = epos;
+				r_codemeta_add_item(code, mi);
 			}
 
 			auto higlight = highlightTypeForToken(token["kind"].GetString());
 			if (higlight.has_value()) {
-				RCodeAnnotation annotation = {};
-				annotation.type = R_CODE_ANNOTATION_TYPE_SYNTAX_HIGHLIGHT;
-				annotation.syntax_highlight.type = higlight.value();
-				annotation.start = bpos;
-				annotation.end = epos;
-				r_annotated_code_add_annotation(code, &annotation);
+				RCodeMetaItem *mi = r_codemeta_item_new ();
+				mi->type = R_CODEMETA_TYPE_SYNTAX_HIGHLIGHT;
+				mi->syntax_highlight.type = higlight.value();
+				mi->start = bpos;
+				mi->end = epos;
+				r_codemeta_add_item(code, mi);
 			}
 		}
 		else {
@@ -120,7 +120,7 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const rapidjson::Document &root
 	std::string str = planecode.str();
 	code->code = reinterpret_cast<char *>(r_malloc(str.length() + 1));
 	if(!code->code) {
-		r_annotated_code_free(code);
+		r_codemeta_free(code);
 		throw DecompilationError("unable to allocate memory");
 	}
 	memcpy(code->code, str.c_str(), str.length());
@@ -132,7 +132,7 @@ RAnnotatedCode* R2CGenerator::provideAnnotations(const rapidjson::Document &root
 /**
  * Generates output by parsing RetDec's JSON output and calling R2CGenerator::provideAnnotations.
  */
-RAnnotatedCode* R2CGenerator::generateOutput(const std::string &rdoutJson) const
+RCodeMeta* R2CGenerator::generateOutput(const std::string &rdoutJson) const
 {
 	std::ifstream jsonFile(rdoutJson, std::ios::in | std::ios::binary);
 	if (!jsonFile) {

@@ -16,13 +16,37 @@ The plugin was tested and should work on following operating systems: Linux, mac
 
 ### R2PM Installation
 
-The r2pm package is available for Radare2 version 4.5.0 and newer. To install the plugin using r2pm use:
+radare2 comes with its own package manager named 'r2pm', you can install the plugin with the following line:
 
-```bash
-$ r2pm -i retdec-r2plugin
+```sh
+$ r2pm -i r2retdec
 ```
 
 This will, however, install only the plugin for r2 console. To use the Iaito plugin you must build this plugin manually. See the [Build and Installation](https://github.com/avast/retdec-r2plugin#build-and-installation) section.
+
+```sh
+$ r2pm -i r2retdec-iaito
+```
+
+### Dependencies
+
+To compile retdec you need a relatively powerful machine with 2GB free disk and the following software installed:
+
+On Ubuntu:
+
+```sh
+apt install autoconf libtool automake build-essential make git g++
+```
+
+For building the iaito plugin you need `qt5-default`.
+
+### Troubleshooting
+
+If you are not able to compile the plugin please fill an issue in github after carefully
+reading the error messages in the console.
+
+If the plugin is compiled and installed, but `pdz` doesn't show up, set the `R2_DEBUG=1`
+env var to debug the plugin loading process in `radare2`.
 
 ### Use in Radare2 Console
 

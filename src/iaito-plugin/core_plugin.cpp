@@ -29,21 +29,20 @@ RetDecPlugin::RetDec::RetDec(QObject *parent)
 
 void RetDecPlugin::RetDec::decompileAt(RVA addr)
 {
-	RAnnotatedCode* code = nullptr;
+	RCodeMeta * code = nullptr;
 
 	try {
 		code = retdec::r2plugin::decompile(Core()->core(), addr);
 	}
 	catch (const std::exception& e) {
-		code = r_annotated_code_new(strdup((
-				std::string("decompilation error: ")+e.what()).c_str()));
+		code = r_codemeta_new((std::string("decompilation error: ")+e.what()).c_str());
 	}
 	catch (...) {
 		code = nullptr;
 	}
 
 	if (code == nullptr)
-		code = r_annotated_code_new(strdup("decompilation error: unable to decompile function at this offset"));
+		code = r_codemeta_new("decompilation error: unable to decompile function at this offset");
 
 	emit finished(code);
 }

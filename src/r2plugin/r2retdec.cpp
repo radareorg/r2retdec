@@ -227,7 +227,7 @@ config::Config createConfig(const R2Database& binInfo, const std::string& cacheS
 	return config;
 }
 
-std::pair<RAnnotatedCode*, retdec::config::Config> decompile(
+std::pair<RCodeMeta*, retdec::config::Config> decompile(
 		config::Config& config,
 		bool useCache)
 {
@@ -278,9 +278,9 @@ std::pair<RAnnotatedCode*, retdec::config::Config> decompile(
 }
 
 /**
- * This function is to get RAnnotatedCode to pass it to Iaito's decompiler widget.
+ * This function is to get RCodeMeta to pass it to Iaito's decompiler widget.
  */
-R_API RAnnotatedCode* decompile(RCore *core, ut64 addr){
+R_API RCodeMeta* decompile(RCore *core, ut64 addr){
 	static std::mutex mutex;
 	std::lock_guard<std::mutex> lock (mutex);
 
