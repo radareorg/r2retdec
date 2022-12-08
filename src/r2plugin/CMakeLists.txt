@@ -56,15 +56,15 @@ else ()
 	)
 endif()
 
-find_library(STD_CPP_FS stdc++fs)
-if (STD_CPP_FS)
-	message("-- Linking with ${STD_CPP_FS} library")
-	list(APPEND CORE_LIBS
-		stdc++fs
-	)
-else()
-	message("-- Library stdc++fs NOT FOUND -> linking core_retdec without stdc++fs library")
-endif()
+# find_library(STD_CPP_FS stdc++fs)
+# if (STD_CPP_FS)
+# 	message("-- Linking with ${STD_CPP_FS} library")
+# 	list(APPEND CORE_LIBS
+# 		stdc++fs
+# 	)
+# else()
+# 	message("-- Library stdc++fs NOT FOUND -> linking core_retdec without stdc++fs library")
+# endif()
 
 target_link_libraries(core_retdec ${CORE_LIBS})
 

@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.13)
 
-project(retdec-r2plugin C CXX)
+project(retdec-r2plugin
+	LANGUAGES C CXX
+	VERSION 5.7.9
+)
 
 # Minimal required version
 set(CMAKE_CXX_STANDARD 17)

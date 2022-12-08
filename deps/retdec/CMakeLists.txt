@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.13)
 
 include(FetchContent)
 
 FetchContent_Declare(retdec
 	GIT_REPOSITORY https://github.com/avast/retdec
-	GIT_TAG 73184b0c17b8790ab691217d2ab4cb6d569495fb
+	GIT_TAG 53e55b4b26e9b843787f0e06d867441e32b1604e
 )
 
 FetchContent_GetProperties(retdec)
