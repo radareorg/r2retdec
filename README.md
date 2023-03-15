@@ -9,6 +9,7 @@ The plugin integrates RetDec decompiler into Radare2 console. RetDec Radare2 plu
 With the bundled version of RetDec you can decompile the following architectures:
 * 32-bit: Intel x86, ARM, MIPS, PIC32, and PowerPC.
 * 64-bit: x86-64, ARM64 (AArch64).
+* Experimental: 6502, 8051, AVR, Dalvik, m68k, SuperH, Sparc, v850, Wasm, RISC-V
 
 ## Installation and Use
 
