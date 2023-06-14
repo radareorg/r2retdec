@@ -178,7 +178,11 @@ void createConfigHashFile(const retdec::config::Config& config)
 retdec::config::Config loadDefaultConfig()
 {
 	// Perhaps support signatures are installed in R2_HOME_PLUGDIR?
+#if R2_VERSION_NUMBER >= 50709
+	auto plugdir = r_xdg_datadir ("plugins");
+#else
 	auto plugdir = r_str_home(R2_HOME_PLUGINS);
+#endif
 
 	// Loads configuration from file - also contains default config.
 	auto rdConf = retdec::config::Config::fromJsonString(DefaultConfigJSON);
